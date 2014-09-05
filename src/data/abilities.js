@@ -2,8 +2,8 @@ var logger = require("../js/log.js");
 
 
 module.exports = {
-    "firearmor": {
-        "onTurnBegin": function(){
+    firearmor: {
+        onTurnBegin: function(){
             //console.log("firearmor on turn begin called!", this);
             var length = this.yourSide.length(true);
 
