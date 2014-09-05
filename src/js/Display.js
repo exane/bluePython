@@ -38,6 +38,10 @@ var Display = (function(){
     r.start = function(){
         var self = this;
         var coords = this.getSpriteCenter();
+        var randomX, randomY;
+
+        randomX = (Math.random() * 30 | 0) - 15;
+        randomY = (Math.random() * 30 | 0) - 15;
 
 
         //this.uiNumber = "<div data-id='" + this.id + "' class='display display-dmg'>150</div>";
@@ -53,16 +57,50 @@ var Display = (function(){
         this.uiData.addClass(this.getStyleClass(this.amount));
         this.uiData.text(this.getAmount());
 
+
+
         $(this.uiData).css({
-            "top": (coords.y - self.uiData.height()/2 )+ "px",
-            "left": coords.x - self.uiData.width()/2 + "px"
+            "top": coords.y + self.uiData.height() /*/ 2*/  + randomY + "px",
+            "left": coords.x - self.uiData.width() / 2 + randomX + "px"
         });
+
+
+        this.popOut(this.flyAbove);
+        this.flyAbove();
+
 
 
         setTimeout(function(){
             $(self.uiData).remove();
-        }, 1000);
+        }, 3000);
     }
+
+    r.popOut = function(next){
+        var randomFactor = (Math.random()*3 | 0) - 6;
+        var size = 15 + randomFactor;
+        var correction = size/2;
+
+        $(this.uiData).animate({
+            "font-size": "+=" + size,
+            "top": "-="+correction,
+            "left": "-="+correction
+        }, {
+            duration: 60,
+            easing: "linear",
+            complete: next
+        });
+    }
+
+    r.flyAbove = function(){
+        $(this.uiData).animate({
+            "top": "-=150",
+            "opacity": "0.75"
+        }, {
+            duration: 3500,
+            easing: "easeOutCirc"
+        })
+    }
+
 
 
     return Display;

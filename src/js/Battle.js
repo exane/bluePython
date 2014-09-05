@@ -54,7 +54,11 @@ var Battle = (function(){
         this.listTargets();
         this.listSkills();
 
-        this.battleStart();
+        var self = this;
+        setTimeout(function(){
+            self.battleStart();
+        }, 100);
+        //this.battleStart();
     }
 
     r.battleStart = function(){
