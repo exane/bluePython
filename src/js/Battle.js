@@ -16,8 +16,8 @@ var logger = require("./log.js");
 
 var Battle = (function(){
     var Battle = function(){
-        this.allies = new BattleSide($(".side-ally"), "s1", "Team Yolo");
-        this.enemies = new BattleSide($(".side-enemy"), "s2", "Team Swag");
+        this.side1 = new BattleSide($(".side-ally"), "s1", "Team Yolo");
+        this.side2 = new BattleSide($(".side-enemy"), "s2", "Team Swag");
 
         this.uiMenu = $(".controller");
     }
@@ -36,15 +36,15 @@ var Battle = (function(){
 
     r.init = function(){
 
-        this.addNewNpc(data.gnomemage, this.allies, this.enemies);
-        this.addNewPlayer(data.exane, this.allies, this.enemies);
-        this.addNewNpc(data.gnomemage, this.allies, this.enemies);
-        this.addNewNpc(data.chernabog, this.allies, this.enemies);
+        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        this.addNewPlayer(data.exane, this.side1, this.side2);
+        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        this.addNewNpc(data.chernabog, this.side1, this.side2);
 
-        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
-        this.addNewNpc(data.chernabog, this.enemies, this.allies);
-        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
-        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
+        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        this.addNewNpc(data.chernabog, this.side2, this.side1);
+        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
         this.listTargets();
@@ -77,33 +77,33 @@ var Battle = (function(){
     }
 
     r.decrementDurationTimer = function(){
-        var n = this.allies.length();
-        var m = this.enemies.length();
+        var n = this.side1.length();
+        var m = this.side2.length();
 
         for(var i = 0; i < n; i++) {
-            var member = this.allies.member[i];
+            var member = this.side1.member[i];
             member.decreaseDurationTime();
         }
         for(var i = 0; i < m; i++) {
-            var member = this.enemies.member[i];
+            var member = this.side2.member[i];
             member.decreaseDurationTime();
         }
     }
 
     r.startAi = function(){
-        var n = this.enemies.length();
-        var m = this.allies.length();
+        var n = this.side2.length();
+        var m = this.side1.length();
         var npc;
 
 
         for(var i = 0; i < n; i++) {
-            npc = this.enemies.getMemberByIndex(i);
+            npc = this.side2.getMemberByIndex(i);
             if (npc.ai){
                 npc.startAi();
             }
         }
         for(var j = 0; j < m; j++) {
-            npc = this.allies.getMemberByIndex(j);
+            npc = this.side1.getMemberByIndex(j);
             if (npc.ai){
                 npc.startAi();
             }
@@ -167,17 +167,17 @@ var Battle = (function(){
 
     r.listTargets = function(){
         var ul = this.uiMenu.children(".menu-target").find("ul");
-        var n = this.enemies.length();
+        var n = this.side2.length();
 
         ul.text("");
 
         for(var i = 0; i < n; i++) {
-            var npc = this.enemies.getMemberByIndex(i);
+            var npc = this.side2.getMemberByIndex(i);
             var pointer = $("<li>" + npc.name + "</li>");
 
             //console.log("npc", npc);
 
-            this.enemies.addDomPointerReferenceTo(npc.id, pointer);
+            this.side2.addDomPointerReferenceTo(npc.id, pointer);
 
             $(pointer).appendTo(ul);
 
@@ -202,8 +202,8 @@ var Battle = (function(){
     }
 
     r.observe = function(){
-        var n = this.allies.length(true);
-        var m = this.enemies.length(true);
+        var n = this.side1.length(true);
+        var m = this.side2.length(true);
         var k = 0;
         var sum = n + m;
         var self = this;
@@ -244,8 +244,8 @@ var Battle = (function(){
         var res = [];
         var a, b;
 
-        a = this.allies.getAllAliveMembers();
-        b = this.enemies.getAllAliveMembers();
+        a = this.side1.getAllAliveMembers();
+        b = this.side2.getAllAliveMembers();
 
         list = a.concat(b);
 
@@ -422,11 +422,11 @@ var Battle = (function(){
     }
 
     r.nextTurn = function(){
-        if(!this.allies.hasMemberAlive()){
+        if(!this.side1.hasMemberAlive()){
             this.showGameOver("Loss!")
             return 1;
         }
-        if(!this.enemies.hasMemberAlive()){
+        if(!this.side2.hasMemberAlive()){
             this.showGameOver("Won!")
             return -1;
         }
