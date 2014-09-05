@@ -29,6 +29,10 @@ var Entity = (function(){
 
         this.buffs = [];
 
+        this.turnAction = {};
+
+
+
 
         this.nextTurnListener();
     }
@@ -52,6 +56,8 @@ var Entity = (function(){
 
     r.yourSide = null;
     r.otherSide = null;
+
+    r.turnAction = null;
 
 
     //r.events = null;
@@ -147,11 +153,6 @@ var Entity = (function(){
             this.uiSprite.addClass("fainted");
         }
 
-        //console.log(this.uiInfo);
-        //console.log(this.uiHp, this.uiHp.text, this.currHp, this.maxHp);
-        if(this.id === "gnomemage"){
-            console.log(this, this.getVit());
-        }
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
     }
 
@@ -215,6 +216,7 @@ var Entity = (function(){
 
     r.revive = function(hp){
         this.fainted = false;
+        this.uiSprite.removeClass("fainted");
         this.changeHpBy(hp);
     }
 

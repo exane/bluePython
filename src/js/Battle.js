@@ -16,8 +16,8 @@ var logger = require("./log.js");
 
 var Battle = (function(){
     var Battle = function(){
-        this.allies = new BattleSide($(".side-ally"));
-        this.enemies = new BattleSide($(".side-enemy"));
+        this.allies = new BattleSide($(".side-ally"), "s1");
+        this.enemies = new BattleSide($(".side-enemy"), "s2");
 
         this.uiMenu = $(".controller");
     }
@@ -36,11 +36,14 @@ var Battle = (function(){
 
     r.init = function(){
 
-        this.addNewAlly(data.exane);
-        this.addNewNpc(data.gnomemage);
-        this.addNewNpc(data.chernabog);
-        this.addNewNpc(data.gnomemage);
-        this.addNewNpc(data.gnomemage);
+        this.addNewNpc(data.gnomemage, this.allies, this.enemies);
+        this.addNewPlayer(data.exane, this.allies, this.enemies);
+        this.addNewNpc(data.gnomemage, this.allies, this.enemies);
+
+        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
+        this.addNewNpc(data.chernabog, this.enemies, this.allies);
+        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
+        this.addNewNpc(data.gnomemage, this.enemies, this.allies);
 
 
         this.listTargets();
@@ -87,32 +90,47 @@ var Battle = (function(){
     }
 
     r.startAi = function(){
-        var n = this.enemies.length()
+        var n = this.enemies.length();
+        var m = this.allies.length();
+        var npc;
+
+
         for(var i = 0; i < n; i++) {
-            var npc = this.enemies.getMemberByIndex(i);
-            npc.startAi();
+            npc = this.enemies.getMemberByIndex(i);
+            if (npc.ai){
+                npc.startAi();
+            }
+        }
+        for(var j = 0; j < m; j++) {
+            npc = this.allies.getMemberByIndex(j);
+            if (npc.ai){
+                npc.startAi();
+            }
         }
     }
 
-    r.addNewAlly = function(options){
-        var ally = this.player = new Player(options, this.allies, this.enemies, this.uiMenu, this.events);
-        this.allies.add(ally);
+    r.addNewPlayer = function(options, yourSide, otherSide){
+        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.events);
+        yourSide.add(ally);
     }
 
-    r.addNewNpc = function(options){
-        var npc = new Npc(options, this.events, this.enemies, this.allies);
-        this.checkIfEntityAlreadyExists(npc, this.enemies);
+    r.addNewNpc = function(options, yourSide, otherSide){
+        var npc = new Npc(options, this.events, yourSide, otherSide);
+        this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
-        this.enemies.add(npc);
+        yourSide.add(npc);
     }
 
-    r.checkIfEntityAlreadyExists = function(entity, side){
+    r.checkIfEntityAlreadyExists = function(entity, yourSide){
         var k = 1;
         var originalName = entity.name;
         var originalId = entity.id;
+        var member;
 
-        for(var i = 0; i < side.length(); i++) {
-            var member = side.getMemberByIndex(i);
+
+
+        for(var i = 0; i < yourSide.length(); i++) {
+            member = yourSide.getMemberByIndex(i);
 
             if(entity.name === member.name){
                 k++;
@@ -120,6 +138,7 @@ var Battle = (function(){
                 entity.id = originalId + k;
             }
         }
+
     }
 
     r.createTurnorder = function(data){
@@ -129,6 +148,8 @@ var Battle = (function(){
         data.sort(function(a, b){
             return b.from.getAgi() - a.from.getAgi();
         });
+
+        console.log(data);
 
         //priority check
         //console.log(data);
@@ -180,38 +201,71 @@ var Battle = (function(){
     }
 
     r.observe = function(){
-        var n = this.allies.length();
-        var m = this.enemies.length();
+        var n = this.allies.length(true);
+        var m = this.enemies.length(true);
         var k = 0;
         var sum = n + m;
         var self = this;
 
         var collectData = [];
+        var observeList = this.getObserveList();
 
 
         $(document).on("bp-battle-chosen", function(e, data){
             k++;
-            //console.log(k, "customEvent");
+
+            self.removeFromObserveList(observeList, data.data.from.id);
+            console.log(observeList, data.data);
+
+
             collectData.push(data.data);
 
-            //console.log(data.data);
-            if(k === sum){
+
+            //if(k === sum){
+            if(!observeList.length){
                 $(document).unbind("bp-battle-chosen");
                 self.runEvent(collectData);
             }
         })
     }
 
+    r.removeFromObserveList = function(list, id){
+        for(var i=0; i< list.length; i++){
+            if(list[i] === id){
+                list.splice(i, 1);
+                return 0;
+            }
+        }
+    }
+
+    r.getObserveList = function(){
+        var list = [];
+        var res = [];
+        var a, b;
+
+        a = this.allies.getAllAliveMembers();
+        b = this.enemies.getAllAliveMembers();
+
+        list = a.concat(b);
+
+        for(var i=0; i<list.length; i++){
+            res.push(list[i].id);
+        }
+
+        return res;
+    }
+
     r.runEvent = function(data){
         //calculate stuff and simulate game, then starts next turn
 
         var n = data.length;
-        this.createTurnorder(data);
-        //console.log("runevent...", data);
-        //console.log("sorted", data);
         logger.message("Turn: " + this.turn);
 
+
         this.checkEventOnTurnBegin(data);
+        this.createTurnorder(data);
+
+
 
         if(this.debug){
 
@@ -242,7 +296,7 @@ var Battle = (function(){
     }
 
     r.runEventSlow = function(i, n, data){
-        if(i >= n) {
+        if(i >= n){
             this.checkEventOnTurnEnd(data);
             this.nextTurn();
             return 0;
@@ -321,36 +375,6 @@ var Battle = (function(){
         }
     }
 
-    /*
-     r.checkEventOnBattleBegin = function(data){
-     var n = data.length;
-
-
-     for(var i = 0; i < n; i++) {
-     var move = moveData[data[i].do];
-     var self = data[i].from;
-
-     //skills
-     if(move.onTurnBegin){
-     move.onTurnBegin.call(self);
-     }
-     //console.log("yoyo",data[i].from.abilities.length);
-
-     //abilities
-     for(var k = 0; k < data[i].from.abilities.length; k++) {
-     var ability = abilityData[data[i].from.abilities[k]];
-     //var self = data[i].from;
-
-     if(ability.onTurnBegin){
-     ability.onTurnBegin.call(self);
-     }
-     }
-
-
-     }
-     }
-     */
-
     r.calculateTurnOf = function(user, target, move){
         var dmg = 0;
 
@@ -421,7 +445,6 @@ var Battle = (function(){
 
 
     return Battle;
-})
-    ();
+})();
 
 module.exports = Battle;

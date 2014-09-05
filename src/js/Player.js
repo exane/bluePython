@@ -12,6 +12,8 @@ var Player = (function(){
         this.uiMenuSkill = $("#menu-skill");
         this.uiMenu  = uiMenu;
 
+        this.fainted = false;
+
         //this.events = events;
 
 
@@ -54,8 +56,10 @@ var Player = (function(){
     r.clickDefense = function(){
         this.turnAction.do = "default_defense";
         this.turnAction.from = this;
-        this.hasChosen = true;
+        //this.hasChosen = true;
+        this.setChosen(true);
         this.ready(this.turnAction);
+        console.log(this);
     }
 
     r.clickAttack = function(){
@@ -70,6 +74,7 @@ var Player = (function(){
 
 
     r.resetMenu = function(){
+        if(this.fainted) return 0;
         this.uiMenu.children(".menu-main").show();
         this.uiMenu.children(".menu-target").hide();
         this.uiMenu.children(".menu-skills").hide();
@@ -85,6 +90,13 @@ var Player = (function(){
         this.uiMenu.children(".menu-target").show();
     }
 
+    r.setChosen = function(value){
+        if(value){
+            $(".controller").hide();
+        }
+        this.hasChosen = value;
+    }
+
     r.onTargetClick = function(target){
         if(this.hasChosen) return 0;
 
@@ -92,7 +104,8 @@ var Player = (function(){
         this.turnAction.from = this;
 
         //console.log("yolo", this, target);
-        this.hasChosen = true;
+        //this.hasChosen = true;
+        this.setChosen(true);
         this.ready(this.turnAction);
     }
 

@@ -53,8 +53,9 @@ module.exports = {
         name: "Revive",
         id: "revive",
         "onCast": function(target){
+            logger.message(this.name + " revives " + target.name + "!");
             if(!target.fainted) {
-                return logger.message("Can't use revive on this target! Target is alive.")
+                return logger.message(this.name + "'s revive failed! Target is alive.");
             }
             target.revive(1);
         }

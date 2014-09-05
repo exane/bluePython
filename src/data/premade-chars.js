@@ -1,68 +1,88 @@
+var logger = require("../js/log.js");
+
+
 var data = {
     exane: {
         name: "Exane",
         id: "exane",
         stats: {
-            "atk": 50,
-            "def": 30,
-            "agi": 40,
-            "tec": 20,
-            "vit": 80
+            atk: 50,
+            def: 30,
+            agi: 40,
+            tec: 20,
+            vit: 80
         },
-        "img": "assets/gajeel_150.jpg",
-        "skills": ["quick_attack", "assassination"]
+        img: "assets/gajeel_150.jpg",
+        skills: ["quick_attack", "assassination"]
     },
     boss: {
         name: "Boss",
         id: "boss",
         stats: {
-            "atk": 100,
-            "def": 0,
-            "agi": 100,
-            "tec": 10,
-            "vit": 150
+            atk: 100,
+            def: 0,
+            agi: 100,
+            tec: 10,
+            vit: 150
         },
-        "img": "assets/Serpant.png"
+        img: "assets/Serpant.png"
     },
     boss2: {
         name: "Big Boss",
         id: "boss2",
         stats: {
-            "atk": 100,
-            "def": 50,
-            "agi": 100,
-            "tec": 10,
-            "vit": 500
+            atk: 100,
+            def: 50,
+            agi: 100,
+            tec: 10,
+            vit: 500
         },
-        "img": "assets/Serpant.png",
-        "skills": ["sacrifice"]
+        img: "assets/Serpant.png",
+        skills: ["sacrifice"]
     },
     gnomemage: {
         name: "Gnome Mage",
         id: "gnomemage",
         stats: {
-            "atk": 10,
-            "def": 10,
-            "agi": 10,
-            "tec": 50,
-            "vit": 30
+            atk: 10,
+            def: 10,
+            agi: 10,
+            tec: 50,
+            vit: 30
         },
-        "img": "assets/GnomeMage.png",
-        "skills": ["revive"]
+        img: "assets/GnomeMage.png",
+        ai: function(){
+
+            if(this.yourSide.hasDeadMember()){
+                var member = this.yourSide.getRandomMember(false);
+                this.turnAction.do = "revive";
+                this.turnAction.target = member;
+
+            }
+
+            else {
+                //this.doAttack();
+                this.turnAction.do = "default_attack";
+            }
+
+
+
+        },
+        skills: ["revive"]
 
     },
     chernabog: {
         name: "Chernabog",
         id: "chernabog",
         stats: {
-            "atk": 25,
-            "def": 15,
-            "agi": 25,
-            "tec": 25,
-            "vit": 25
+            atk: 100,
+            def: 15,
+            agi: 25,
+            tec: 25,
+            vit: 25
         },
-        "img": "assets/Chernabog.png",
-        "abilities": ["firearmor"]
+        img: "assets/Chernabog.png",
+        abilities: ["firearmor"]
 
     }
 }

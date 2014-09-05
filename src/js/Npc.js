@@ -6,23 +6,45 @@ var Npc = (function(){
     var Npc = function(options, events, yourSide, otherSide){
         Entity.call(this, options, events, yourSide, otherSide);
 
+        this.fainted = false;
+
+        this.ai = options.ai || this.ai;
+
     }
     __extends(Npc, Entity);
     var r = Npc.prototype;
+    r.ai = true;
 
     r.startAi = function(){
+        this.turnAction.from = this;
+        this.turnAction.target = this.otherSide.member[0];
 
-        this.doAttack();
+
+        if(typeof this.ai == "function"){
+            this.ai.call(this);
+
+            this.ready(this.turnAction);
+        }
+
+        else {
+            this.doAttack();
+        }
+
     }
 
     r.doAttack = function(){
-        var target = this.otherSide.member[0];
+        var target = this.chooseTarget();
 
         this.ready({
             "do": "default_attack",
             "target": target,
             "from": this
         })
+    }
+
+    r.chooseTarget = function(){
+        var target = this.otherSide.getRandomMember(true);
+        return target;
     }
 
     return Npc;

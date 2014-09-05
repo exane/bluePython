@@ -1,10 +1,12 @@
 "use strict";
 
 var BattleSide = (function(){
-    var BattleSide = function(side){
+    var BattleSide = function(side, id){
         this.member = [];
         this.uiMember = [];
         this.uiSide = side;
+
+        this.sideId = id || null;
 
         //console.log(side);
     }
@@ -17,7 +19,10 @@ var BattleSide = (function(){
     r.uiInfo = null;
     r.uiSprite = null;
 
+    r.sideId = null;
+
     r.add = function(entity){
+        entity.id = this.sideId+ "_" + entity.id;
         this.member.push(entity);
         this.uiMember.push(null);
         this.createInfoUi(entity);
@@ -27,14 +32,14 @@ var BattleSide = (function(){
         var uiInfo = $(this.uiSide).find(".battle-info");
         var uiSprite = $(this.uiSide).find(".sprite");
 
-        var uiName = "<div id='battle-name-" + entity.id + "' class='battle-name'>" + entity.name + "</div>";
+        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.id + "' class='battle-name'>" + entity.name + "</div>";
 
-        var uiHp = "<div id='battle-hp-" + entity.id + "' class='bar bar-hp'>" +
+        var uiHp = "<div id='" + this.sideId + "-battle-hp-" + entity.id + "' class='bar bar-hp'>" +
             entity.currHp + " / " + entity.maxHp +
             "</div>";
 
 
-        var sprite = "<img id='battle-sprite-" + entity.id + "' src='" + entity.img + "'>";
+        var sprite = "<img id='" + this.sideId + "-battle-sprite-" + entity.id + "' src='" + entity.img + "'>";
 
 
         $(uiName).appendTo(uiInfo);
@@ -42,9 +47,11 @@ var BattleSide = (function(){
 
         $(sprite).appendTo(uiSprite);
 
-        entity.uiSprite = $("#battle-sprite-" + entity.id);
-        entity.uiName = $("#battle-name-" + entity.id);
-        entity.uiHp = $("#battle-hp-" + entity.id);
+        //debugger;
+
+        entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.id);
+        entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.id);
+        entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.id);
 
     }
 
@@ -68,14 +75,14 @@ var BattleSide = (function(){
 
     r.length = function(onlyAlive){
         onlyAlive = onlyAlive || false;
-        var k=0;
+        var k = 0;
 
         if(!onlyAlive){
             return this.member.length;
         }
 
-        for(var i=0; i<this.member.length; i++){
-            if(!this.member[i].fainted) {
+        for(var i = 0; i < this.member.length; i++) {
+            if(!this.member[i].fainted){
                 k++;
             }
         }
@@ -117,7 +124,37 @@ var BattleSide = (function(){
         return false;
     }
 
+    r.getRandomMember = function(alive){
+        var n = 0;
+        var index = 0;
+        n = this.member.length;
+        index = Math.random() * n | 0;
 
+        if(typeof alive == "undefined"){
+            // doesnt matter whether alive or dead
+            return this.member[index];
+        }
+
+        if(!this.member[index].fainted === alive){
+            return this.member[index];
+        }
+
+        return this.getRandomMember(alive);
+
+    }
+
+    r.getAllAliveMembers = function(){
+        var n = this.member.length;
+        var tmp = [];
+
+        for(var i = 0; i < n; i++) {
+            if(!this.member[i].fainted){
+                tmp.push(this.member[i]);
+            }
+        }
+
+        return tmp;
+    }
 
 
     return BattleSide;
