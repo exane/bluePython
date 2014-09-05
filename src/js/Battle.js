@@ -1,5 +1,5 @@
 var Player = require("./Player.js");
-var Enemy = require("./Enemy.js");
+var Npc = require("./Npc.js");
 var BattleSide = require("./BattleSide.js");
 var data = require("../data/premade-chars.js");
 var moveData = require("../data/moves.js");
@@ -37,10 +37,10 @@ var Battle = (function(){
     r.init = function(){
 
         this.addNewAlly(data.exane);
-        this.addNewEnemy(data.gnomemage);
-        this.addNewEnemy(data.chernabog);
-        this.addNewEnemy(data.gnomemage);
-        this.addNewEnemy(data.gnomemage);
+        this.addNewNpc(data.gnomemage);
+        this.addNewNpc(data.chernabog);
+        this.addNewNpc(data.gnomemage);
+        this.addNewNpc(data.gnomemage);
 
 
         this.listTargets();
@@ -89,8 +89,8 @@ var Battle = (function(){
     r.startAi = function(){
         var n = this.enemies.length()
         for(var i = 0; i < n; i++) {
-            var enemy = this.enemies.getMemberByIndex(i);
-            enemy.startAi();
+            var npc = this.enemies.getMemberByIndex(i);
+            npc.startAi();
         }
     }
 
@@ -99,11 +99,11 @@ var Battle = (function(){
         this.allies.add(ally);
     }
 
-    r.addNewEnemy = function(options){
-        var enemy = new Enemy(options, this.events, this.enemies, this.allies);
-        this.checkIfEntityAlreadyExists(enemy, this.enemies);
+    r.addNewNpc = function(options){
+        var npc = new Npc(options, this.events, this.enemies, this.allies);
+        this.checkIfEntityAlreadyExists(npc, this.enemies);
 
-        this.enemies.add(enemy);
+        this.enemies.add(npc);
     }
 
     r.checkIfEntityAlreadyExists = function(entity, side){
@@ -150,23 +150,21 @@ var Battle = (function(){
         ul.text("");
 
         for(var i = 0; i < n; i++) {
-            var enemy = this.enemies.getMemberByIndex(i);
-            var pointer = $("<li>" + enemy.name + "</li>");
-            var self = this;
+            var npc = this.enemies.getMemberByIndex(i);
+            var pointer = $("<li>" + npc.name + "</li>");
 
-            //console.log("enemy", enemy);
+            //console.log("npc", npc);
 
-            this.enemies.addDomPointerReferenceTo(enemy.id, pointer);
+            this.enemies.addDomPointerReferenceTo(npc.id, pointer);
 
             $(pointer).appendTo(ul);
 
-            $(pointer).on("click", this.player.onTargetClick.bind(this.player, enemy));
+            $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
         }
     }
 
     r.listSkills = function(){
         var ul = $(".menu-skills ul");
-        var moves = [];
         var n = this.player.skillList.length;
 
         for(var i = 0; i < n; i++) {
@@ -208,7 +206,6 @@ var Battle = (function(){
         //calculate stuff and simulate game, then starts next turn
 
         var n = data.length;
-        var self = this;
         this.createTurnorder(data);
         //console.log("runevent...", data);
         //console.log("sorted", data);
