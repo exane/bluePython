@@ -76,6 +76,10 @@ var Entity = (function(){
     r.abilities = [];
     r.buffs = [];
 
+    r.getFullName = function(){
+        return this.yourSide.sideName + " " + this.name;
+    }
+
 
     r.boost = function(stats){
         //this.boosts[attr] += val;

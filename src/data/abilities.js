@@ -18,7 +18,7 @@ module.exports = {
                 "duration": 1
             })
 
-            logger.message(this.name + " ignites his armor!");
+            logger.message(this.getFullName() + " ignites his armor!");
 
         }
     }

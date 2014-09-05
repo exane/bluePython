@@ -1,12 +1,13 @@
 "use strict";
 
 var BattleSide = (function(){
-    var BattleSide = function(side, id){
+    var BattleSide = function(side, id, name){
         this.member = [];
         this.uiMember = [];
         this.uiSide = side;
 
         this.sideId = id || null;
+        this.sideName = name || "unnamed";
 
         //console.log(side);
     }
@@ -20,9 +21,11 @@ var BattleSide = (function(){
     r.uiSprite = null;
 
     r.sideId = null;
+    r.sideName = null;
 
     r.add = function(entity){
         entity.id = this.sideId+ "_" + entity.id;
+        //entity.name = this.sideName + " " + entity.name;
         this.member.push(entity);
         this.uiMember.push(null);
         this.createInfoUi(entity);
@@ -32,7 +35,7 @@ var BattleSide = (function(){
         var uiInfo = $(this.uiSide).find(".battle-info");
         var uiSprite = $(this.uiSide).find(".sprite");
 
-        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.id + "' class='battle-name'>" + entity.name + "</div>";
+        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.id + "' class='battle-name'>" + entity.getFullName() + "</div>";
 
         var uiHp = "<div id='" + this.sideId + "-battle-hp-" + entity.id + "' class='bar bar-hp'>" +
             entity.currHp + " / " + entity.maxHp +

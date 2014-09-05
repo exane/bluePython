@@ -39,7 +39,7 @@ module.exports = {
         "priority": 1,
         "onAttack": function(enemy){
             enemy.changeHpBy(-enemy.maxHp);
-            logger.message(this.name + " cut " + enemy.name + "'s throat!")
+            logger.message(this.getFullName() + " cut " + enemy.getFullName() + "'s throat!")
         }
     },
     "quick_attack": {
@@ -53,9 +53,9 @@ module.exports = {
         name: "Revive",
         id: "revive",
         "onCast": function(target){
-            logger.message(this.name + " revives " + target.name + "!");
+            logger.message(this.getFullName() + " revives " + target.getFullName() + "!");
             if(!target.fainted) {
-                return logger.message(this.name + "'s revive failed! Target is alive.");
+                return logger.message(this.getFullName() + "'s revive failed! Target is alive.");
             }
             target.revive(1);
         }
@@ -69,7 +69,7 @@ module.exports = {
         priority: -1,
         id: "sacrifice",
         onBeforeAttack: function(){
-            logger.message(this.name + " sacrifices himself and causes an explosion!");
+            logger.message(this.getFullName() + " sacrifices himself and causes an explosion!");
         },
         onAfterAttack: function(){
             this.changeHpBy(-this.maxHp);

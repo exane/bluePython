@@ -16,6 +16,8 @@ var Npc = (function(){
     r.ai = true;
 
     r.startAi = function(){
+        if(this.fainted) return 0;
+
         this.turnAction.from = this;
         this.turnAction.target = this.otherSide.member[0];
 

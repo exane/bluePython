@@ -16,8 +16,8 @@ var logger = require("./log.js");
 
 var Battle = (function(){
     var Battle = function(){
-        this.allies = new BattleSide($(".side-ally"), "s1");
-        this.enemies = new BattleSide($(".side-enemy"), "s2");
+        this.allies = new BattleSide($(".side-ally"), "s1", "Team Yolo");
+        this.enemies = new BattleSide($(".side-enemy"), "s2", "Team Swag");
 
         this.uiMenu = $(".controller");
     }
@@ -39,6 +39,7 @@ var Battle = (function(){
         this.addNewNpc(data.gnomemage, this.allies, this.enemies);
         this.addNewPlayer(data.exane, this.allies, this.enemies);
         this.addNewNpc(data.gnomemage, this.allies, this.enemies);
+        this.addNewNpc(data.chernabog, this.allies, this.enemies);
 
         this.addNewNpc(data.gnomemage, this.enemies, this.allies);
         this.addNewNpc(data.chernabog, this.enemies, this.allies);
@@ -215,7 +216,7 @@ var Battle = (function(){
             k++;
 
             self.removeFromObserveList(observeList, data.data.from.id);
-            console.log(observeList, data.data);
+            //console.log(observeList, data.data);
 
 
             collectData.push(data.data);
@@ -389,7 +390,7 @@ var Battle = (function(){
         if(move.basePower){
             if(target.fainted){
 
-                logger.message(user.name + " uses " + move.name + " to attack " + target.name);
+                logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
                 logger.message("but there is no target alive...");
                 return 0;
             }
@@ -400,10 +401,10 @@ var Battle = (function(){
 
 
             dmg = user.calculateDmgTo(move, target);
-            logger.message(user.name + " uses " + move.name + " to attack " + target.name);
+            logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
 
             target.changeHpBy(-dmg);
-            logger.message(target.name + " takes " + dmg + " damage");
+            logger.message(target.getFullName() + " takes " + dmg + " damage");
         }
 
         if(move.boost){
@@ -416,7 +417,7 @@ var Battle = (function(){
 
         //console.log(target);
         if(target && target.fainted){
-            logger.message(target.name + " fainted...");
+            logger.message(target.getFullName() + " fainted...");
         }
     }
 
