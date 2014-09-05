@@ -4,8 +4,8 @@ var logger = require("./log.js");
 "use strict";
 var Player = (function(){
 
-    var Player = function(options, yourSide, otherSide, uiMenu, events){
-        Entity.call(this, options, events, yourSide, otherSide);
+    var Player = function(options, yourSide, otherSide, uiMenu){
+        Entity.call(this, options, yourSide, otherSide);
 
         this.uiMenuAttack = $("#menu-attack");
         this.uiMenuDefense = $("#menu-defense");

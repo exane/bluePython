@@ -111,12 +111,12 @@ var Battle = (function(){
     }
 
     r.addNewPlayer = function(options, yourSide, otherSide){
-        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.events);
+        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu);
         yourSide.add(ally);
     }
 
     r.addNewNpc = function(options, yourSide, otherSide){
-        var npc = new Npc(options, this.events, yourSide, otherSide);
+        var npc = new Npc(options, yourSide, otherSide);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
         yourSide.add(npc);

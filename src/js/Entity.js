@@ -3,7 +3,7 @@
 var logger = require("./log.js");
 
 var Entity = (function(){
-    var Entity = function(options, events, yourSide, otherSide){
+    var Entity = function(options, yourSide, otherSide){
         this.name = (options && options.name) || "unnamed";
         this.id = (options && options.id) || null;
         this.img = (options && options.img) || null;

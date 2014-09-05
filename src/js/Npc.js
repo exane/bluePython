@@ -3,8 +3,8 @@ var Entity = require("./Entity.js");
 
 
 var Npc = (function(){
-    var Npc = function(options, events, yourSide, otherSide){
-        Entity.call(this, options, events, yourSide, otherSide);
+    var Npc = function(options, yourSide, otherSide){
+        Entity.call(this, options, yourSide, otherSide);
 
         this.fainted = false;
 
