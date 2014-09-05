@@ -5,6 +5,7 @@ var data = require("../data/premade-chars.js");
 var moveData = require("../data/moves.js");
 var abilityData = require("../data/abilities.js");
 var logger = require("./log.js");
+var Display = require("./Display.js");
 
 "use strict";
 
@@ -31,6 +32,8 @@ var Battle = (function(){
     r.player = null;
     //r.events = {};
 
+    r.speed = 1000;
+
     r.debug = false;
 
 
@@ -38,6 +41,7 @@ var Battle = (function(){
 
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewPlayer(data.exane, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewNpc(data.chernabog, this.side1, this.side2);
 
@@ -98,13 +102,13 @@ var Battle = (function(){
 
         for(var i = 0; i < n; i++) {
             npc = this.side2.getMemberByIndex(i);
-            if (npc.ai){
+            if(npc.ai){
                 npc.startAi();
             }
         }
         for(var j = 0; j < m; j++) {
             npc = this.side1.getMemberByIndex(j);
-            if (npc.ai){
+            if(npc.ai){
                 npc.startAi();
             }
         }
@@ -129,7 +133,6 @@ var Battle = (function(){
         var member;
 
 
-
         for(var i = 0; i < yourSide.length(); i++) {
             member = yourSide.getMemberByIndex(i);
 
@@ -150,7 +153,7 @@ var Battle = (function(){
             return b.from.getAgi() - a.from.getAgi();
         });
 
-        console.log(data);
+        //console.log(data);
 
         //priority check
         //console.log(data);
@@ -166,6 +169,7 @@ var Battle = (function(){
     }
 
     r.listTargets = function(){
+        if(!this.player) return 0;
         var ul = this.uiMenu.children(".menu-target").find("ul");
         var n = this.side2.length();
 
@@ -186,6 +190,7 @@ var Battle = (function(){
     }
 
     r.listSkills = function(){
+        if(!this.player) return 0;
         var ul = $(".menu-skills ul");
         var n = this.player.skillList.length;
 
@@ -231,7 +236,7 @@ var Battle = (function(){
     }
 
     r.removeFromObserveList = function(list, id){
-        for(var i=0; i< list.length; i++){
+        for(var i = 0; i < list.length; i++) {
             if(list[i] === id){
                 list.splice(i, 1);
                 return 0;
@@ -249,7 +254,7 @@ var Battle = (function(){
 
         list = a.concat(b);
 
-        for(var i=0; i<list.length; i++){
+        for(var i = 0; i < list.length; i++) {
             res.push(list[i].id);
         }
 
@@ -265,7 +270,6 @@ var Battle = (function(){
 
         this.checkEventOnTurnBegin(data);
         this.createTurnorder(data);
-
 
 
         if(this.debug){
@@ -312,12 +316,22 @@ var Battle = (function(){
             self.runEventSlow(++i, n, data);
             return 0;
         }
-        this.calculateTurnOf(user, target, move);
+
+        if(move.isAoe){
+            //debugger;
+            var t = user.otherSide.length();
+            for(var k = 0; k < t; k++) {
+                this.calculateTurnOf(user, user.otherSide.member[k], move);
+            }
+        }
+        else {
+            this.calculateTurnOf(user, target, move);
+        }
 
 
         setTimeout(function(){
             self.runEventSlow(++i, n, data);
-        }, 1000);
+        }, this.speed);
 
 
     }
@@ -378,33 +392,23 @@ var Battle = (function(){
 
     r.calculateTurnOf = function(user, target, move){
         var dmg = 0;
+        var wasFainted = target ? target.fainted : false; //target.fainted || null;
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user);
         }
 
         if(move.onCast){
-            move.onCast.call(user, target);
+            move.onCast.call(user, {
+                target: target,
+                yourSide: user.yourSide,
+                otherSide: user.otherSide
+            });
         }
 
         if(move.basePower){
-            if(target.fainted){
+            this.calculateDmg(user, target, move)
 
-                logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
-                logger.message("but there is no target alive...");
-                return 0;
-            }
-
-            if(move.onAttack){
-                move.onAttack.call(user, target);
-            }
-
-
-            dmg = user.calculateDmgTo(move, target);
-            logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
-
-            target.changeHpBy(-dmg);
-            logger.message(target.getFullName() + " takes " + dmg + " damage");
         }
 
         if(move.boost){
@@ -416,24 +420,52 @@ var Battle = (function(){
         }
 
         //console.log(target);
-        if(target && target.fainted){
+        if(target && target.fainted && !wasFainted){
             logger.message(target.getFullName() + " fainted...");
         }
     }
 
+    r.calculateDmg = function(user, target, move){
+        var dmg = 0;
+        if(target.fainted){
+
+            logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
+            logger.message("but there is no target alive...");
+            return 0;
+        }
+
+        if(move.onAttack){
+            move.onAttack.call(user, {
+                target: target,
+                yourSide: user.yourSide,
+                otherSide: user.otherSide
+            });
+        }
+
+        dmg = user.calculateDmgTo(move, target);
+        logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
+
+        target.changeHpBy(-dmg);
+        logger.message(target.getFullName() + " takes " + dmg + " damage");
+
+    }
+
     r.nextTurn = function(){
         if(!this.side1.hasMemberAlive()){
-            this.showGameOver("Loss!")
+            this.showGameOver(this.side2.sideName + " won!");
             return 1;
         }
         if(!this.side2.hasMemberAlive()){
-            this.showGameOver("Won!")
+            //this.showGameOver("Won!")
+            this.showGameOver(this.side1.sideName + " won!");
             return -1;
         }
 
         this.turn++;
         $.event.trigger("bp-battle-nextTurn");
-        this.player.resetMenu();
+        if(this.player){
+            this.player.resetMenu();
+        }
         this.startNewTurn();
 
     }

@@ -3,6 +3,8 @@
 var logger = require("./log.js");
 
 var Entity = (function(){
+    var Display = require("./Display.js");
+
     var Entity = function(options, yourSide, otherSide){
         this.name = (options && options.name) || "unnamed";
         this.id = (options && options.id) || null;
@@ -144,6 +146,9 @@ var Entity = (function(){
 
     r.changeHpBy = function(value){
         if(this.fainted) return 0;
+
+        //console.log("entity", this);
+        var d = new Display(this, value);
 
         this.currHp = this.getHp() + value;
         if(this.currHp > this.getMaxHp()){

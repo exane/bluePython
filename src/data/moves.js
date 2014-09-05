@@ -20,24 +20,30 @@ module.exports = {
         name: "Default Defense",
         priority: 1,
         boost: function(){
-            this.boosts.def += 1;
+            this.boosts.def += 2;
             logger.message(this.name + " defends himself!");
         },
         onTurnEnd: function(){
-            this.boosts.def -= 1;
+            this.boosts.def -= 2;
         },
         id: "default_defense"
     },
     heal: {
         name: "Heal",
-        id: "heal"
+        id: "heal",
+        onCast: function(opt){
+            opt.target.changeHpBy(200);
+            logger.message(this.getFullName() + " heals " + opt.target.getFullName()
+            + " by 200 hp!");
+        }
     },
     assassination: {
         id: "assassination",
         name: "Assassination (instant kill)",
         basePower: 100,
         priority: 1,
-        onAttack: function(enemy){
+        onAttack: function(opt){
+            var enemy = opt.target;
             enemy.changeHpBy(-enemy.maxHp);
             logger.message(this.getFullName() + " cut " + enemy.getFullName() + "'s throat!")
         }
@@ -52,7 +58,8 @@ module.exports = {
     revive: {
         name: "Revive",
         id: "revive",
-        onCast: function(target){
+        onCast: function(opt){
+            var target = opt.target;
             logger.message(this.getFullName() + " revives " + target.getFullName() + "!");
             if(!target.fainted){
                 return logger.message(this.getFullName() + "'s revive failed! Target is alive.");
@@ -74,5 +81,14 @@ module.exports = {
         onAfterAttack: function(){
             this.changeHpBy(-this.maxHp);
         }
+    },
+
+    burnslash: {
+        basePower: 20,
+        name: "Burnslash (Aoe)",
+        accuracy: 100,
+        id: "burnslash",
+        isAoe: true,
+        priority: 0
     }
 }

@@ -1,5 +1,6 @@
 
 var logging = {};
+var debug = false;
 
 var l = $(".log-console");
 
@@ -13,6 +14,9 @@ logging.public = function(data){
 
 logging.message = function(text){
     l.append("<p>" + text + "</p>");
+    if(debug){
+        console.log(text);
+    }
     scrollDown();
 }
 

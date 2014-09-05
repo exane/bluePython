@@ -86,7 +86,15 @@ var Player = (function(){
         if(this.hasChosen) return 0;
 
         this.turnAction.do = skill.id;
+        this.turnAction.from = this;
         this.uiMenu.children(".menu-skills").hide();
+        if(skill.isAoe){
+            //this.onTargetClick(this.otherSide.member);
+            if(this.hasChosen) return 0;
+            this.setChosen(true);
+            this.ready(this.turnAction);
+            return 0;
+        }
         this.uiMenu.children(".menu-target").show();
     }
 

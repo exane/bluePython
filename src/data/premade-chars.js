@@ -6,14 +6,14 @@ var data = {
         name: "Exane",
         id: "exane",
         stats: {
-            atk: 50,
-            def: 30,
-            agi: 40,
-            tec: 20,
-            vit: 80
+            atk: 100,
+            def: 80,
+            agi: 100,
+            tec: 100,
+            vit: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["quick_attack", "assassination"]
+        skills: ["quick_attack", "assassination", "burnslash"]
     },
     boss: {
         name: "Boss",
@@ -44,11 +44,11 @@ var data = {
         name: "Gnome Mage",
         id: "gnomemage",
         stats: {
-            atk: 10,
-            def: 10,
-            agi: 10,
-            tec: 50,
-            vit: 30
+            atk: 40,
+            def: 60,
+            agi: 80,
+            tec: 100,
+            vit: 80
         },
         img: "assets/GnomeMage.png",
         ai: function(){
@@ -57,18 +57,27 @@ var data = {
                 var member = this.yourSide.getRandomMember(false);
                 this.turnAction.do = "revive";
                 this.turnAction.target = member;
-
+                return 0;
             }
-
-            else {
                 //this.doAttack();
-                this.turnAction.do = "default_attack";
+                //this.turnAction.do = "default_defense";
+
+
+            var m = this.yourSide.getRandomMember(true);
+            if(m.getHp() < m.getMaxHp()){
+                this.turnAction.do = "heal";
+                this.turnAction.target = m;
+                return 0;
             }
+
+
+            this.turnAction.do = "default_attack";
+
 
 
 
         },
-        skills: ["revive"]
+        skills: ["revive", "heal"]
 
     },
     chernabog: {
@@ -76,13 +85,17 @@ var data = {
         id: "chernabog",
         stats: {
             atk: 100,
-            def: 15,
-            agi: 25,
-            tec: 25,
-            vit: 25
+            def: 70,
+            agi: 50,
+            tec: 100,
+            vit: 120
         },
         img: "assets/Chernabog.png",
-        abilities: ["firearmor"]
+        abilities: ["firearmor"],
+        skills: ["burnslash"],
+        ai: function(){
+            this.turnAction.do = "burnslash";
+        }
 
     }
 }

@@ -5,4 +5,4 @@ var Battle = require("./Battle.js");
 var battle = new Battle();
 
 battle.init();
-console.log(battle);
+//console.log(battle);

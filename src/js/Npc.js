@@ -19,7 +19,7 @@ var Npc = (function(){
         if(this.fainted) return 0;
 
         this.turnAction.from = this;
-        this.turnAction.target = this.otherSide.member[0];
+        this.turnAction.target = this.chooseTarget();
 
 
         if(typeof this.ai == "function"){

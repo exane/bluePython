@@ -189,3 +189,41 @@ $height: 600px;
 .fainted {
   opacity: 0.1;
 }
+
+.display-floating-dmg {
+  //border: 1px solid red;
+  height: $height;
+  width: $width;
+  position: absolute;
+  top: 0;
+  font-size: 40px;
+
+  .display {
+    //font-style: italic;
+    //border: 1px solid black;
+    height: auto;
+    width: auto;
+    display: inline-block;
+    text-align: center;
+    line-height: auto;
+    padding: 1px 10px 3px 10px;
+    border-radius: 7px;
+    text-shadow: 0px 0px 5px #000000;
+    position: absolute;
+
+
+
+  }
+  .display-dmg {
+    color: #ff9a34;
+    //color: #ffffff;
+    //left: 450px+ 412px/2;
+    //top: 0px + 300/2;
+  }
+  .display-heal {
+    color: #3dff3f;
+  }
+}
+
+
+
