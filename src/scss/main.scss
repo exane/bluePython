@@ -211,6 +211,7 @@ $height: 600px;
     text-shadow: 1px 1px 2px #000000;
     position: absolute;
     font-weight: bold;
+    font-size: 1px;
     //font-style: italic;
 
 
@@ -224,6 +225,11 @@ $height: 600px;
   }
   .display-heal {
     color: #3dff3f;
+  }
+  .display-crit {
+    font-style: italic;
+    color: #ff5f42;
+
   }
 }
 

@@ -53,6 +53,7 @@ module.exports = {
         name: "Quick Attack",
         accuracy: 90,
         priority: 2,
+        isCrit: true,
         id: "quick_attack"
     },
     revive: {

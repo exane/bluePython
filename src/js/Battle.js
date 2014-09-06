@@ -396,7 +396,14 @@ var Battle = (function(){
 
     r.calculateTurnOf = function(user, target, move){
         var dmg = 0;
+        var critChance = this.calculateCritChance(user, target, move);
         var wasFainted = target ? target.fainted : false; //target.fainted || null;
+
+        move.isCrit = move.isCrit || this.calculateCrit(critChance);
+
+        //if(isCrit){
+        //    move.isCrit = true;
+        //}
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user);
@@ -429,6 +436,25 @@ var Battle = (function(){
         }
     }
 
+    r.calculateCritChance = function(user, target, move){
+        var baseCrit = 500;
+
+        baseCrit += user.getLck();
+
+        //console.log(user.getLck());
+
+        return baseCrit / 100;
+    }
+
+    r.calculateCrit = function(chance){
+        var crit = Math.random()*100;
+
+        //console.log(crit <= chance, crit, chance);
+
+        return crit <= chance;
+
+    }
+
     r.calculateDmg = function(user, target, move){
         var dmg = 0;
         if(target.fainted){
@@ -449,8 +475,8 @@ var Battle = (function(){
         dmg = user.calculateDmgTo(move, target);
         logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
 
-        target.changeHpBy(-dmg);
-        logger.message(target.getFullName() + " takes " + dmg + " damage");
+        target.changeHpBy(-dmg, move.isCrit);
+        logger.message(target.getFullName() + " takes " + dmg + " damage!" + (move.isCrit?" (crit)":""));
 
     }
 

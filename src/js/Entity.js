@@ -12,11 +12,12 @@ var Entity = (function(){
         this.stats = options.stats || this.stats;
 
         this.boosts = { //percent
-            "atk": 1,
-            "def": 1,
-            "agi": 1,
-            "tec": 1,
-            "vit": 1
+            atk: 1,
+            def: 1,
+            agi: 1,
+            tec: 1,
+            vit: 1,
+            lck: 1
         }
 
         this.skillList = options.skills || [];
@@ -65,11 +66,13 @@ var Entity = (function(){
     //r.events = null;
 
     r.stats = {
-        "atk": 50,
-        "def": 50,
-        "agi": 50,
-        "tec": 50,
-        "vit": 50
+        atk: 50,
+        def: 50,
+        agi: 50,
+        tec: 50,
+        vit: 50,
+        lck: 50
+
     };
 
     r.boosts = null;
@@ -144,11 +147,12 @@ var Entity = (function(){
         return this.stats;
     }
 
-    r.changeHpBy = function(value){
+    r.changeHpBy = function(value, crit){
         if(this.fainted) return 0;
+        crit = crit || false;
 
         //console.log("entity", this);
-        var d = new Display(this, value);
+        var d = new Display(this, value, crit);
 
         this.currHp = this.getHp() + value;
         if(this.currHp > this.getMaxHp()){
@@ -201,8 +205,17 @@ var Entity = (function(){
     r.getTec = function(){
         return this.stats.tec * this.boosts.tec;
     }
+    r.getLck = function(){
+        return this.stats.lck * this.boosts.lck;
+    }
     r.calculatePower = function(move){
-        return (move.basePower + this.getAtk());
+        var dmg = (move.basePower + this.getAtk());
+
+        if(move.isCrit){
+            dmg *= 2;
+        }
+
+        return dmg;
     }
 
     r.calculateDef = function(){

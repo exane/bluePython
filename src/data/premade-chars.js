@@ -10,7 +10,8 @@ var data = {
             def: 80,
             agi: 100,
             tec: 100,
-            vit: 100
+            vit: 100,
+            lck: 100
         },
         img: "assets/gajeel_150.jpg",
         skills: ["quick_attack", "assassination", "burnslash"]
@@ -23,7 +24,8 @@ var data = {
             def: 0,
             agi: 100,
             tec: 10,
-            vit: 150
+            vit: 150,
+            lck: 100
         },
         img: "assets/Serpant.png"
     },
@@ -35,7 +37,8 @@ var data = {
             def: 50,
             agi: 100,
             tec: 10,
-            vit: 500
+            vit: 500,
+            lck: 100
         },
         img: "assets/Serpant.png",
         skills: ["sacrifice"]
@@ -48,7 +51,8 @@ var data = {
             def: 60,
             agi: 80,
             tec: 100,
-            vit: 80
+            vit: 80,
+            lck: 100
         },
         img: "assets/GnomeMage.png",
         ai: function(){
@@ -88,7 +92,8 @@ var data = {
             def: 70,
             agi: 50,
             tec: 100,
-            vit: 120
+            vit: 120,
+            lck: 100
         },
         img: "assets/Chernabog.png",
         abilities: ["firearmor"],
