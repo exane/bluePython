@@ -59,7 +59,7 @@ var Player = (function(){
         //this.hasChosen = true;
         this.setChosen(true);
         this.ready(this.turnAction);
-        console.log(this);
+        //console.log(this);
     }
 
     r.clickAttack = function(){
@@ -68,7 +68,7 @@ var Player = (function(){
 
         //logger.message("-> Choose a target to attack");
         this.uiMenu.children(".menu-main").hide();
-        this.uiMenu.children(".menu-target").show();
+        this.uiMenu.children(".menu-target-enemy").show();
 
     }
 
@@ -76,7 +76,8 @@ var Player = (function(){
     r.resetMenu = function(){
         if(this.fainted) return 0;
         this.uiMenu.children(".menu-main").show();
-        this.uiMenu.children(".menu-target").hide();
+        this.uiMenu.children(".menu-target-enemy").hide();
+        this.uiMenu.children(".menu-target-ally").hide();
         this.uiMenu.children(".menu-skills").hide();
 
     }
@@ -85,17 +86,29 @@ var Player = (function(){
         //console.log(skill);
         if(this.hasChosen) return 0;
 
+
+
+        //this.listTargets();
+
         this.turnAction.do = skill.id;
         this.turnAction.from = this;
         this.uiMenu.children(".menu-skills").hide();
-        if(skill.isAoe){
+
+        if(skill.isAoe || skill.noTarget){
             //this.onTargetClick(this.otherSide.member);
             if(this.hasChosen) return 0;
             this.setChosen(true);
             this.ready(this.turnAction);
             return 0;
         }
-        this.uiMenu.children(".menu-target").show();
+
+        if(skill.target && skill.target === "friendly"){
+            this.uiMenu.children(".menu-target-ally").show();
+            return 0;
+        }
+
+
+        this.uiMenu.children(".menu-target-enemy").show();
     }
 
     r.setChosen = function(value){

@@ -1,0 +1,6 @@
+buffs überarbeiten
+passive abilities einbauen
+tooltips
+buffs anzeigen
+hp-balken anders anordnen (über den entities?)
+zurück button für skill/target auswahl

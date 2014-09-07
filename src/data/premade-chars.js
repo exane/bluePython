@@ -14,7 +14,7 @@ var data = {
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["quick_attack", "assassination", "burnslash"]
+        skills: ["heal", "ultrabuffDEBUG", "quick_attack", "assassination", "burnslash"]
     },
     boss: {
         name: "Boss",
@@ -63,8 +63,7 @@ var data = {
                 this.turnAction.target = member;
                 return 0;
             }
-                //this.doAttack();
-                //this.turnAction.do = "default_defense";
+
 
 
             var m = this.yourSide.getRandomMember(true);
@@ -77,11 +76,8 @@ var data = {
 
             this.turnAction.do = "default_attack";
 
-
-
-
         },
-        skills: ["revive", "heal"]
+        skills: ["quick_attack","revive", "heal"]
 
     },
     chernabog: {

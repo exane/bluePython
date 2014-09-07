@@ -12,12 +12,12 @@ var Entity = (function(){
         this.stats = options.stats || this.stats;
 
         this.boosts = { //percent
-            atk: 1,
-            def: 1,
-            agi: 1,
-            tec: 1,
-            vit: 1,
-            lck: 1
+            atk: 0,
+            def: 0,
+            agi: 0,
+            tec: 0,
+            vit: 0,
+            lck: 0
         }
 
         this.skillList = options.skills || [];
@@ -75,11 +75,12 @@ var Entity = (function(){
 
     };
 
-    r.boosts = null;
+    r.boosts = {};
 
     r.skillList = [];
     r.abilities = [];
     r.buffs = [];
+    r.buffTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
 
     r.getFullName = function(){
         return this.yourSide.sideName + " " + this.name;
@@ -90,6 +91,13 @@ var Entity = (function(){
         //this.boosts[attr] += val;
         for(var stat in stats) {
             this.boosts[stat] += stats[stat];
+
+            console.log(this);
+            
+            if(this.boosts[stat] > this.buffTable.length){
+                this.boosts[stat] = this.buffTable.length -1;
+                logger.message(stat + " can't be boosted more!");
+            }
         }
         this.updateUi();
     }
@@ -191,22 +199,22 @@ var Entity = (function(){
     }
 
     r.getAtk = function(){
-        return this.stats.atk * this.boosts.atk;
+        return this.stats.atk * this.buffTable[this.boosts.atk];
     }
     r.getDef = function(){
-        return this.stats.def * this.boosts.def;
+        return this.stats.def * this.buffTable[this.boosts.def];
     }
     r.getAgi = function(){
-        return this.stats.agi * this.boosts.agi;
+        return this.stats.agi * this.buffTable[this.boosts.agi];
     }
     r.getVit = function(){
-        return this.stats.vit * this.boosts.vit;
+        return this.stats.vit * this.buffTable[this.boosts.vit];
     }
     r.getTec = function(){
-        return this.stats.tec * this.boosts.tec;
+        return this.stats.tec * this.buffTable[this.boosts.tec];
     }
     r.getLck = function(){
-        return this.stats.lck * this.boosts.lck;
+        return this.stats.lck * this.buffTable[this.boosts.lck];
     }
     r.calculatePower = function(move){
         var dmg = (move.basePower + this.getAtk());

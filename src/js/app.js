@@ -5,4 +5,10 @@ var Battle = require("./Battle.js");
 var battle = new Battle();
 
 battle.init();
+
+//debug only!
+battle.onGameOver(function(){
+    battle = new Battle();
+    battle.init();
+});
 //console.log(battle);

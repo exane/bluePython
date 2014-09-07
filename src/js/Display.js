@@ -43,15 +43,19 @@ var Display = (function(){
         var self = this;
         var coords = this.getSpriteCenter();
         var randomX, randomY;
+        var spriteContainer = this.target.uiSprite.parent();
+
+        //console.log(spriteContainer);
 
         randomX = (Math.random() * 30 | 0) - 15;
         randomY = (Math.random() * 30 | 0) - 15;
 
 
-        $("<div data-id='" + this.id + "' class='display'></div>").appendTo(".display-floating-dmg");
+        $("<div data-id='" + this.id + "' class='display'></div>").appendTo(spriteContainer);
         this.uiData = $("div[data-id=" + this.id + "]");
 
         this.uiData.addClass(this.getStyleClass(this.amount));
+        this.uiData.addClass("display-floating-dmg");
         this.uiData.text(this.getAmount());
 
         $(this.uiData).css({
@@ -71,9 +75,9 @@ var Display = (function(){
 
     r.popOut = function(next){
         var randomFactor = (Math.random() * 10 | 0) - 20;
-        var size = 60 + randomFactor;
+        var size = 50 + randomFactor;
 
-        size = this.crit ? size + 30 : size;
+        size = this.crit ? size + 20 : size;
 
         var correction = size / 2;
 

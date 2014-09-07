@@ -21,6 +21,7 @@ $height: 600px;
 .view {
   height: $height;
   position: relative;
+  cursor: default;
 }
 
 .side {
@@ -75,11 +76,17 @@ $height: 600px;
 .sprite {
   max-height: $height/2;
 
+  .sprite-img-container {
+    height: auto;
+    width: auto;
+    display: inline-block;
+  }
+
   img {
     max-height: $height/2;
-    display: block;
     margin: 0 auto;
     float: left;
+
   }
 }
 
@@ -192,13 +199,13 @@ $height: 600px;
 
 .display-floating-dmg {
   //border: 1px solid red;
-  height: $height;
-  width: $width;
+  //height: $height;
+  //width: $width;
   position: absolute;
-  top: 0;
+  //top: 0;
   font-size: 40px;
 
-  .display {
+  &.display {
     //font-style: italic;
     //border: 1px solid black;
     height: auto;
@@ -217,20 +224,34 @@ $height: 600px;
 
 
   }
-  .display-dmg {
+  &.display-dmg {
     color: #ff9a34;
     //color: #ffffff;
     //left: 450px+ 412px/2;
     //top: 0px + 300/2;
   }
-  .display-heal {
+  &.display-heal {
     color: #3dff3f;
   }
-  .display-crit {
+  &.display-crit {
     font-style: italic;
     color: #ff5f42;
 
   }
+}
+
+.tooltip {
+  position: absolute;
+  border: 1px solid red;
+  height: 100px;
+  width: 100px;
+  top: 0;
+
+}
+
+.entity-active {
+  border: 3px solid red;
+
 }
 
 

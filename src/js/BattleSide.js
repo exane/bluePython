@@ -24,7 +24,7 @@ var BattleSide = (function(){
     r.sideName = null;
 
     r.add = function(entity){
-        entity.id = this.sideId+ "_" + entity.id;
+        entity.id = this.sideId + "_" + entity.id;
         //entity.name = this.sideName + " " + entity.name;
         this.member.push(entity);
         this.uiMember.push(null);
@@ -43,18 +43,21 @@ var BattleSide = (function(){
 
 
         var sprite = "<img id='" + this.sideId + "-battle-sprite-" + entity.id + "' src='" + entity.img + "'>";
+        var spriteContainer = "<div class='sprite-img-container' id='" + this.sideId + "-battle-sprite-" + entity.id + "-container'></div>"
 
 
         $(uiName).appendTo(uiInfo);
         $(uiHp).appendTo(uiInfo);
 
-        $(sprite).appendTo(uiSprite);
+        $(spriteContainer).appendTo(uiSprite);
+        $(sprite).appendTo("#" + this.sideId + "-battle-sprite-" + entity.id + "-container");
 
-        //debugger;
 
         entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.id);
         entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.id);
         entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.id);
+
+        entity.uiSprite.attr("data-id", entity.id);
 
     }
 

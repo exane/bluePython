@@ -5,7 +5,7 @@ module.exports = {
     firearmor: {
         onTurnBegin: function(){
             //console.log("firearmor on turn begin called!", this);
-            var length = this.yourSide.length(true) / 2 | 0;
+            var length = this.yourSide.length(true);
 
             this.buff({
                 stats: {
@@ -18,6 +18,7 @@ module.exports = {
                 },
                 duration: 1
             })
+
 
             logger.message(this.getFullName() + " ignites his armor!");
 

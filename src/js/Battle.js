@@ -6,6 +6,7 @@ var moveData = require("../data/moves.js");
 var abilityData = require("../data/abilities.js");
 var logger = require("./log.js");
 var Display = require("./Display.js");
+var Tooltip = require("./Tooltip.js");
 
 "use strict";
 
@@ -31,19 +32,22 @@ var Battle = (function(){
     r.uiMenu = null;
     r.player = null;
     //r.events = {};
+    r.tooltip = null;
 
-    r.speed = 1000;
+    r.speed = 2000;
 
     r.debug = false;
+    r.debugSkipGameover = false; //doesnt work yet / buggy
 
 
     r.init = function(){
 
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewPlayer(data.exane, this.side1, this.side2);
-        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
-        this.addNewNpc(data.chernabog, this.side1, this.side2);
+        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewNpc(data.chernabog, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         this.addNewNpc(data.chernabog, this.side2, this.side1);
@@ -51,7 +55,7 @@ var Battle = (function(){
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
-        this.listTargets();
+        this.listTargets(this.player.otherSide, this.player.yourSide);
         this.listSkills();
 
         var self = this;
@@ -62,6 +66,8 @@ var Battle = (function(){
     }
 
     r.battleStart = function(){
+
+        this.tooltip = new Tooltip(this);
 
         logger.message("Battle started!");
 
@@ -120,6 +126,7 @@ var Battle = (function(){
 
     r.addNewPlayer = function(options, yourSide, otherSide){
         var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu);
+        this.checkIfEntityAlreadyExists(ally, yourSide);
         yourSide.add(ally);
     }
 
@@ -157,37 +164,91 @@ var Battle = (function(){
             return b.from.getAgi() - a.from.getAgi();
         });
 
-        //console.log(data);
+        //handle speed tie
+        this.handleSpeedTie(data);
 
         //priority check
-        //console.log(data);
         data.sort(function(a, b){
             a = moveData[a.do].priority || 0;
             b = moveData[b.do].priority || 0;
-
             return b - a;
         });
+
 
 
         return data;
     }
 
-    r.listTargets = function(){
+    r.handleSpeedTie = function(turnorder){
+        //console.log(turnorder);
+        var originalTurnorder = turnorder.slice(0); //lazy array copy
+
+        for(var i = 0; i < turnorder.length; i++) {
+            var agi = turnorder[i].from.getAgi();
+            var k = i;
+            var tmp = [];
+
+            while(turnorder[k] && agi === turnorder[k].from.getAgi()) {
+                k++;
+                tmp.push({
+                    rank: Math.random() * 100,
+                    id: k - 1
+                });
+            }
+
+            //sort here
+            tmp.sort(function(a, b){
+                return b.rank - a.rank;
+            });
+
+            //merge
+            for(var j=0; j< tmp.length; j++){
+                var index= i+j, lastIndex = k-1;
+                turnorder[index] = originalTurnorder[tmp[j].id];
+            }
+
+
+            i = k - 1;
+        }
+    }
+
+
+    r.listTargets = function(otherSide, yourSide){
         if(!this.player) return 0;
-        var ul = this.uiMenu.children(".menu-target").find("ul");
-        var n = this.side2.length();
+        var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
+        var ulAlly = this.uiMenu.children(".menu-target-ally").find("ul");
+        var npc, pointer, i;
+        //var n = this.side2.length();
+        var n = otherSide.length();
+        var m = yourSide.length();
 
-        ul.text("");
-
-        for(var i = 0; i < n; i++) {
-            var npc = this.side2.getMemberByIndex(i);
-            var pointer = $("<li>" + npc.name + "</li>");
+        ulEnemy.text("");
+        ulAlly.text("");
+        for(i = 0; i < n; i++) {
+            //var npc = this.side2.getMemberByIndex(i);
+            npc = otherSide.getMemberByIndex(i);
+            pointer = $("<li>" + npc.name + "</li>");
 
             //console.log("npc", npc);
 
-            this.side2.addDomPointerReferenceTo(npc.id, pointer);
+            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
+            otherSide.addDomPointerReferenceTo(npc.id, pointer);
 
-            $(pointer).appendTo(ul);
+            $(pointer).appendTo(ulEnemy);
+
+            $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
+        }
+        for(i = 0; i < m; i++) {
+
+            npc = yourSide.getMemberByIndex(i);
+            pointer = $("<li>" + npc.name + "</li>");
+
+            //console.log("npc", npc);
+
+            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
+            yourSide.addDomPointerReferenceTo(npc.id, pointer);
+
+            $(pointer).appendTo(ulAlly);
 
             $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
         }
@@ -316,10 +377,13 @@ var Battle = (function(){
         var target = data[i].target || null;
         var self = this;
 
+
         if(user.fainted){
             self.runEventSlow(++i, n, data);
             return 0;
         }
+        //marks user as active
+        $(user.uiSprite).addClass("entity-active");
 
         if(move.isAoe){
             //debugger;
@@ -334,6 +398,7 @@ var Battle = (function(){
 
 
         setTimeout(function(){
+            $(user.uiSprite).removeClass("entity-active");
             self.runEventSlow(++i, n, data);
         }, this.speed);
 
@@ -399,6 +464,7 @@ var Battle = (function(){
         var critChance = this.calculateCritChance(user, target, move);
         var wasFainted = target ? target.fainted : false; //target.fainted || null;
 
+
         move.isCrit = move.isCrit || this.calculateCrit(critChance);
 
         //if(isCrit){
@@ -447,7 +513,7 @@ var Battle = (function(){
     }
 
     r.calculateCrit = function(chance){
-        var crit = Math.random()*100;
+        var crit = Math.random() * 100;
 
         //console.log(crit <= chance, crit, chance);
 
@@ -476,18 +542,24 @@ var Battle = (function(){
         logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
 
         target.changeHpBy(-dmg, move.isCrit);
-        logger.message(target.getFullName() + " takes " + dmg + " damage!" + (move.isCrit?" (crit)":""));
+        logger.message(target.getFullName() + " takes " + dmg + " damage!" + (move.isCrit ? " (crit)" : ""));
 
     }
 
     r.nextTurn = function(){
         if(!this.side1.hasMemberAlive()){
             this.showGameOver(this.side2.sideName + " won!");
+            if(this.debugSkipGameover){
+                $.event.trigger("bp-gameover-skip");
+            }
             return 1;
         }
         if(!this.side2.hasMemberAlive()){
             //this.showGameOver("Won!")
             this.showGameOver(this.side1.sideName + " won!");
+            if(this.debugSkipGameover){
+                $.event.trigger("bp-gameover-skip");
+            }
             return -1;
         }
 
@@ -500,14 +572,35 @@ var Battle = (function(){
 
     }
 
+    r.onGameOver = function(cb){
+        $(document).on("bp-gameover-skip", function(){
+            cb();
+        })
+    }
+
     r.showGameOver = function(message){
         var div = $(".gameover");
         div.show();
         div.text(message);
     }
 
+    r.getEntityById = function(id){
+        var s1 = this.side1.getMemberById(id);
+        var s2 = this.side2.getMemberById(id);
+
+        if(s1){
+            return s1;
+        }
+        if(s2){
+            return s2;
+        }
+
+        return null;
+    }
+
 
     return Battle;
-})();
+})
+    ();
 
 module.exports = Battle;
