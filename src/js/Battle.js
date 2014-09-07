@@ -464,6 +464,12 @@ var Battle = (function(){
         var critChance = this.calculateCritChance(user, target, move);
         var wasFainted = target ? target.fainted : false; //target.fainted || null;
 
+        var opt = {
+            target: target,
+            yourSide: user.yourSide,
+            otherSide: user.otherSide
+        }
+
 
         move.isCrit = move.isCrit || this.calculateCrit(critChance);
 
@@ -472,28 +478,24 @@ var Battle = (function(){
         //}
 
         if(move.onBeforeAttack){
-            move.onBeforeAttack.call(user);
+            move.onBeforeAttack.call(user, opt);
         }
 
         if(move.onCast){
-            move.onCast.call(user, {
-                target: target,
-                yourSide: user.yourSide,
-                otherSide: user.otherSide
-            });
+            move.onCast.call(user, opt);
         }
 
         if(move.basePower){
-            this.calculateDmg(user, target, move)
+            this.calculateDmg(user, target, move, opt)
 
         }
 
         if(move.boost){
-            move.boost.call(user);
+            move.boost.call(user, opt);
         }
 
         if(move.onAfterAttack){
-            move.onAfterAttack.call(user);
+            move.onAfterAttack.call(user, opt);
         }
 
         //console.log(target);
@@ -521,7 +523,7 @@ var Battle = (function(){
 
     }
 
-    r.calculateDmg = function(user, target, move){
+    r.calculateDmg = function(user, target, move, opt){
         var dmg = 0;
         if(target.fainted){
 
@@ -531,11 +533,7 @@ var Battle = (function(){
         }
 
         if(move.onAttack){
-            move.onAttack.call(user, {
-                target: target,
-                yourSide: user.yourSide,
-                otherSide: user.otherSide
-            });
+            move.onAttack.call(user, opt);
         }
 
         dmg = user.calculateDmgTo(move, target);

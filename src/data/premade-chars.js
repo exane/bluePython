@@ -10,7 +10,7 @@ var data = {
             def: 80,
             agi: 100,
             tec: 100,
-            vit: 100,
+            vit: 1000,
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
