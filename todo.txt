@@ -6,6 +6,9 @@
 - accuracy einbauen
 - buff animation/visuell einbauen (ähnlich dmg/heal animation)
 - buffs auf bugs testen
+- buffs entfernen wenn entity stirbt
+- default_defense überarbeiten!
+- komplette überarbeitung der variablen. unterteilung public und private
 
 
 
