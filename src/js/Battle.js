@@ -462,6 +462,7 @@ var Battle = (function(){
         }
     }
 
+
     r.calculateTurnOf = function(user, target, move){
         var critChance = user.calculateCritChance(target, move);
         var wasFainted = target ? target.fainted : false; //target.fainted || null;
@@ -475,11 +476,6 @@ var Battle = (function(){
             otherSide: user.otherSide,
             isCrit: isCrit
         }
-
-
-        //if(isCrit){
-        //    move.isCrit = true;
-        //}
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);
@@ -501,31 +497,14 @@ var Battle = (function(){
             move.onAfterAttack.call(user, opt);
         }
 
+
         //console.log(target);
         if(target && target.fainted && !wasFainted){
+            $.event.trigger("bp-ability-onFaint", opt);
             logger.message(target.getFullName() + " fainted...");
         }
     }
-    /*
-     r.calculateCritChance = function(user, target, move){
-     var baseCrit = 500;
 
-     baseCrit += user.getLck();
-
-     //console.log(user.getLck());
-
-     return baseCrit / 100;
-     }
-
-     r.calculateCrit = function(chance){
-     var crit = Math.random() * 100;
-
-     //console.log(crit <= chance, crit, chance);
-
-     return crit <= chance;
-
-     }
-     */
     r.calculateDmg = function(user, target, move, opt){
         var dmg;
         if(target.fainted){

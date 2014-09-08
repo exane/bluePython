@@ -46,16 +46,28 @@ var BattleSide = (function(){
         var spriteContainer = "<div class='sprite-img-container' id='" + this.sideId + "-battle-sprite-" + entity.id + "-container'></div>"
 
 
+        /**
+         * ui buffs
+         */
+        var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.id);
+        //console.log($(uiBuffs));
+
+
         $(uiName).appendTo(uiInfo);
         $(uiHp).appendTo(uiInfo);
+        $(uiBuffs).appendTo(uiInfo);
 
         $(spriteContainer).appendTo(uiSprite);
         $(sprite).appendTo("#" + this.sideId + "-battle-sprite-" + entity.id + "-container");
 
 
+
+
+
         entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.id);
         entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.id);
         entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.id);
+        entity.uiBuffs = $(uiBuffs);
 
         entity.uiSprite.attr("data-id", entity.id);
 

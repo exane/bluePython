@@ -46,13 +46,14 @@ $height: 600px;
   }
 
   .bar {
+    font-size: 12px;
     width: $height/2 - $height/8;
-    height: 25px;
+    height: 12px;
     margin: 0 auto;
 
     border: 1px solid black;
     border-radius: 7px;
-    line-height: 25px;
+    line-height: 12px;
     text-align: center;
 
     margin-top: 0px;
@@ -258,6 +259,10 @@ $height: 600px;
 .entity-active {
   border: 3px solid red;
 
+}
+
+.test-buff {
+  border: 1px solid red;
 }
 
 

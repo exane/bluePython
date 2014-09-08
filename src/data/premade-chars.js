@@ -6,8 +6,8 @@ var data = {
         name: "Exane",
         id: "exane",
         stats: {
-            atk: 100,
-            def: 80,
+            atk: 150,
+            def: 50,
             agi: 100,
             tec: 100,
             vit: 1000,
@@ -48,10 +48,10 @@ var data = {
         id: "gnomemage",
         stats: {
             atk: 40,
-            def: 60,
+            def: 20,
             agi: 80,
             tec: 100,
-            vit: 80,
+            vit: 500,
             lck: 100
         },
         img: "assets/GnomeMage.png",
@@ -84,11 +84,11 @@ var data = {
         name: "Chernabog",
         id: "chernabog",
         stats: {
-            atk: 100,
-            def: 70,
+            atk: 200,
+            def: 50,
             agi: 50,
             tec: 100,
-            vit: 120,
+            vit: 1000,
             lck: 100
         },
         img: "assets/Chernabog.png",

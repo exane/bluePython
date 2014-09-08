@@ -85,7 +85,7 @@ module.exports = {
         priority: 1,
         onAttack: function(opt){
             var enemy = opt.target;
-            enemy.changeHpBy(-enemy.maxHp);
+            enemy.changeHpBy(-enemy.getMaxHp());
             logger.message(this.getFullName() + " cut " + enemy.getFullName() + "'s throat!")
         }
     },
@@ -135,11 +135,11 @@ module.exports = {
     },
 
     ultrabuffDEBUG: {
-        name: "debug buff testing",
+        name: "Attack Boost",
         id: "ultrabuffDEBUG",
         onCast: function(opt){
-            this.buff({
-                name: "buff testing",
+            this.addBuff({
+                name: "Attack boost",
                 stats: {
                     atk: 2
                 },

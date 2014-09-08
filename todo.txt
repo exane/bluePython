@@ -1,11 +1,11 @@
-- passive abilities einbauen
+
 - tooltips
 - buffs anzeigen
 - hp-balken anders anordnen (über den entities?)
 - zurück button für skill/target auswahl
 - accuracy einbauen
 - buff animation/visuell einbauen (ähnlich dmg/heal animation)
-- buffs testen
+- buffs auf bugs testen
 
 
 
