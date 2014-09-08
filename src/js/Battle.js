@@ -1,3 +1,6 @@
+$ = require("jquery");
+require("jquery-ui");
+
 var Player = require("./Player.js");
 var Npc = require("./Npc.js");
 var BattleSide = require("./BattleSide.js");
@@ -34,7 +37,7 @@ var Battle = (function(){
     //r.events = {};
     r.tooltip = null;
 
-    r.speed = 2000;
+    r.speed = 1000;
 
     r.debug = false;
     r.debugSkipGameover = false; //doesnt work yet / buggy
@@ -78,9 +81,10 @@ var Battle = (function(){
     r.startNewTurn = function(){
         $(".controller").show();
 
+        this.decrementDurationTimer();
+
         logger.line();
 
-        this.decrementDurationTimer();
 
         this.observe();
 
@@ -93,13 +97,14 @@ var Battle = (function(){
     r.decrementDurationTimer = function(){
         var n = this.side1.length();
         var m = this.side2.length();
+        var i, member;
 
-        for(var i = 0; i < n; i++) {
-            var member = this.side1.member[i];
+        for(i = 0; i < n; i++) {
+            member = this.side1.member[i];
             member.decreaseDurationTime();
         }
-        for(var i = 0; i < m; i++) {
-            var member = this.side2.member[i];
+        for(i = 0; i < m; i++) {
+            member = this.side2.member[i];
             member.decreaseDurationTime();
         }
     }
@@ -175,7 +180,6 @@ var Battle = (function(){
         });
 
 
-
         return data;
     }
 
@@ -202,8 +206,8 @@ var Battle = (function(){
             });
 
             //merge
-            for(var j=0; j< tmp.length; j++){
-                var index= i+j, lastIndex = k-1;
+            for(var j = 0; j < tmp.length; j++) {
+                var index = i + j;
                 turnorder[index] = originalTurnorder[tmp[j].id];
             }
 
@@ -275,7 +279,6 @@ var Battle = (function(){
         var n = this.side1.length(true);
         var m = this.side2.length(true);
         var k = 0;
-        var sum = n + m;
         var self = this;
 
         var collectData = [];
@@ -310,7 +313,7 @@ var Battle = (function(){
     }
 
     r.getObserveList = function(){
-        var list = [];
+        var list;
         var res = [];
         var a, b;
 
@@ -460,18 +463,19 @@ var Battle = (function(){
     }
 
     r.calculateTurnOf = function(user, target, move){
-        var dmg = 0;
-        var critChance = this.calculateCritChance(user, target, move);
+        var critChance = user.calculateCritChance(target, move);
         var wasFainted = target ? target.fainted : false; //target.fainted || null;
+        var isCrit = (move.isCrit == null || typeof move.isCrit == "undefined")
+            ? user.calculateCrit(critChance)
+            : move.isCrit;
 
         var opt = {
             target: target,
             yourSide: user.yourSide,
-            otherSide: user.otherSide
+            otherSide: user.otherSide,
+            isCrit: isCrit
         }
 
-
-        move.isCrit = move.isCrit || this.calculateCrit(critChance);
 
         //if(isCrit){
         //    move.isCrit = true;
@@ -486,11 +490,10 @@ var Battle = (function(){
         }
 
         if(move.basePower){
-            this.calculateDmg(user, target, move, opt)
-
+            this.calculateDmg(user, target, move, opt);
         }
 
-        if(move.boost){
+        if(move.boost){ //deprecated!
             move.boost.call(user, opt);
         }
 
@@ -503,28 +506,28 @@ var Battle = (function(){
             logger.message(target.getFullName() + " fainted...");
         }
     }
+    /*
+     r.calculateCritChance = function(user, target, move){
+     var baseCrit = 500;
 
-    r.calculateCritChance = function(user, target, move){
-        var baseCrit = 500;
+     baseCrit += user.getLck();
 
-        baseCrit += user.getLck();
+     //console.log(user.getLck());
 
-        //console.log(user.getLck());
+     return baseCrit / 100;
+     }
 
-        return baseCrit / 100;
-    }
+     r.calculateCrit = function(chance){
+     var crit = Math.random() * 100;
 
-    r.calculateCrit = function(chance){
-        var crit = Math.random() * 100;
+     //console.log(crit <= chance, crit, chance);
 
-        //console.log(crit <= chance, crit, chance);
+     return crit <= chance;
 
-        return crit <= chance;
-
-    }
-
+     }
+     */
     r.calculateDmg = function(user, target, move, opt){
-        var dmg = 0;
+        var dmg;
         if(target.fainted){
 
             logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
@@ -536,10 +539,10 @@ var Battle = (function(){
             move.onAttack.call(user, opt);
         }
 
-        dmg = user.calculateDmgTo(move, target);
+        dmg = user.calculateDmgTo(move, target, opt);
         logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
 
-        target.changeHpBy(-dmg, move.isCrit);
+        target.changeHpBy(-dmg, opt.isCrit);
         logger.message(target.getFullName() + " takes " + dmg + " damage!" + (move.isCrit ? " (crit)" : ""));
 
     }
@@ -598,7 +601,6 @@ var Battle = (function(){
 
 
     return Battle;
-})
-    ();
+})();
 
 module.exports = Battle;

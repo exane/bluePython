@@ -40,7 +40,7 @@ var logger = require("../js/log.js");
     die mit <0 sind sogar nach allen standard attacken drann)
  - genauigkeit is in prozent
  - noTarget is eine flag für den player das er kein
-    target aussuchen muss)
+    target aussuchen muss
  */
 
 
@@ -139,6 +139,7 @@ module.exports = {
         id: "ultrabuffDEBUG",
         onCast: function(opt){
             this.buff({
+                name: "buff testing",
                 stats: {
                     atk: 2
                 },

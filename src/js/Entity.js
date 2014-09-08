@@ -11,7 +11,7 @@ var Entity = (function(){
         this.img = (options && options.img) || null;
         this.stats = options.stats || this.stats;
 
-        this.boosts = { //percent
+        this.boosts = {
             atk: 0,
             def: 0,
             agi: 0,
@@ -35,8 +35,6 @@ var Entity = (function(){
         this.turnAction = {};
 
 
-
-
         this.nextTurnListener();
     }
     var r = Entity.prototype;
@@ -49,9 +47,7 @@ var Entity = (function(){
     r.uiSprite = null;
     r.uiName = null;
     r.uiHp = null;
-    //r.uiInfo = null;
 
-    //r.currTurn = 0;
     r.hasChosen = false;
     r.turnAction = {};
 
@@ -63,7 +59,6 @@ var Entity = (function(){
     r.turnAction = null;
 
 
-    //r.events = null;
 
     r.stats = {
         atk: 50,
@@ -88,14 +83,14 @@ var Entity = (function(){
 
 
     r.boost = function(stats){
-        //this.boosts[attr] += val;
+
         for(var stat in stats) {
             this.boosts[stat] += stats[stat];
 
-            console.log(this);
-            
+            //console.log(this);
+
             if(this.boosts[stat] > this.buffTable.length){
-                this.boosts[stat] = this.buffTable.length -1;
+                this.boosts[stat] = this.buffTable.length - 1;
                 logger.message(stat + " can't be boosted more!");
             }
         }
@@ -105,20 +100,76 @@ var Entity = (function(){
     r.buff = function(opt){
         var stats = opt.stats;
         var duration = opt.duration;
+        var name = opt.name;
+
+        if(!name){
+            throw new Error("Missing name property! @skill")
+        }
+        if(!stats){
+            throw new Error("Missing stats property! @skill")
+        }
+        if(!duration){
+            throw new Error("Missing duration property! @skill")
+        }
 
         //console.log(this);
 
         //debugger;
+        new Display({buffName: name, buffStats: stats, buffDuration: duration, target: this});
+
 
         this.buffs.push(opt);
+
+        //merge buff & extend duration
+        this.mergeBuffs();
+
         this.boost(stats);
+    }
+
+    r.mergeBuffs = function(){
+        var n = this.buffs.length;
+
+        for(var i = 0; i < n; i++) {
+            var buff = this.buffs[i];
+
+            for(var j = i + 1; j < n; j++) {
+                if(buff.name === this.buffs[j].name){
+                    var buff2 = this.buffs[j];
+
+                    var tmp = {};
+
+                    tmp.name = buff.name;
+                    tmp.duration = buff.duration > buff2.duration ? buff.duration : buff2.duration;
+                    tmp.stats = {};
+
+                    //stats
+                    for(var stat in buff.stats) {
+                        if((buff.stats[stat] + buff2.stats[stat]) < this.buffTable.length){
+                            tmp.stats[stat] = buff.stats[stat] + buff2.stats[stat];
+                        }
+                        else {
+                            tmp.stats[stat] = this.buffTable.length - 1;
+                        }
+                    }
+
+                    this.buffs.splice(j, 1);
+                    this.buffs.splice(i, 1);
+
+                    this.buffs.push(tmp);
+
+
+                    return this.mergeBuffs();
+                }
+            }
+        }
     }
 
     r.decreaseDurationTime = function(){
         var n = this.buffs.length;
+        var i;
 
 
-        for(var i = 0; i < n; i++) {
+        for(i = 0; i < n; i++) {
             var buff = this.buffs[i];
             if(buff.duration - 1 === 0){
                 this.buffRemove(buff, i);
@@ -126,13 +177,17 @@ var Entity = (function(){
             }
         }
 
-        for(var i = 0; i < n; i++) {
+        for(i = 0; i < n; i++) {
             this.buffs[i].duration--;
         }
+
+        console.log(this.getFullName(), this.boosts);
     }
 
     r.buffRemove = function(buff, index){
+        //console.log(buff, index);
         this.buffs.splice(index, 1);
+        logger.message(buff.name + " wears off.");
         for(var stat in buff.stats) {
             this.boosts[stat] -= buff.stats[stat];
         }
@@ -160,7 +215,7 @@ var Entity = (function(){
         crit = crit || false;
 
         //console.log("entity", this);
-        var d = new Display(this, value, crit);
+        new Display(/*this, value, crit*/ {target: this, amount: value, isCrit: crit});
 
         this.currHp = this.getHp() + value;
         if(this.currHp > this.getMaxHp()){
@@ -187,15 +242,36 @@ var Entity = (function(){
         $.event.trigger("bp-battle-chosen", {data: data});
     }
 
-    r.calculateDmgTo = function(move, target){
+    r.calculateDmgTo = function(move, target, opt){
         var dmg = this.calculatePower(move);
         var def = target.calculateDef(move);
+
+        if(opt.isCrit){
+            dmg *= 2;
+        }
 
         var diff = dmg - def;
 
         diff = diff >= 0 ? diff : 0;
 
         return diff;
+    }
+
+    r.calculateCritChance = function(target, move){
+        var baseCrit = 500;
+
+        baseCrit += this.getLck();
+
+        return baseCrit / 100;
+    }
+
+    r.calculateCrit = function(chance){
+        var crit = Math.random() * 100;
+
+        //console.log(crit <= chance, crit, chance);
+
+        return crit <= chance;
+
     }
 
     r.getAtk = function(){
@@ -219,9 +295,9 @@ var Entity = (function(){
     r.calculatePower = function(move){
         var dmg = (move.basePower + this.getAtk());
 
-        if(move.isCrit){
-            dmg *= 2;
-        }
+        /*if(move.isCrit){
+         dmg *= 2;
+         }*/
 
         return dmg;
     }

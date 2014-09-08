@@ -8,6 +8,7 @@ module.exports = {
             var length = this.yourSide.length(true);
 
             this.buff({
+                name: "Fire Armor",
                 stats: {
                     def: length,
                     atk: length,

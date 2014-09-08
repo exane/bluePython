@@ -224,6 +224,12 @@ $height: 600px;
 
 
   }
+  &.display-buff {
+    border: 1px solid red;
+    background: rgba(244, 244, 244, 0.9);
+    //font-size: 5px;
+  }
+
   &.display-dmg {
     color: #ff9a34;
     //color: #ffffff;

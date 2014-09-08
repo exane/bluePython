@@ -1,12 +1,30 @@
 var Display = (function(){
 
-    var Display = function(target, amount, crit){
-        this.target = target;
-        this.amount = amount;
-        this.crit = crit || false;
+    var Display = function(options){
+        this.target = options.target || null;
+        this.amount = options.amount;
+        this.crit = options.isCrit || false;
+
+        this.buffName = options.buffName || null;
+        this.buffStats = options.buffStats || null;
+        this.buffDuration = options.buffDuration || null;
+
         this.id = (new Date()).getSeconds() * 1000 + (new Date()).getMilliseconds();
 
-        this.start();
+        if(!this.target){
+            throw new Error("target property must be defined!");
+        }
+
+        if(typeof this.amount == "undefined"){
+            this.amount = null;
+        }
+
+        if(this.amount != null){
+            this.start("number");
+        }
+        if(this.buffName){
+            this.start("buff");
+        }
     }
     var r = Display.prototype;
 
@@ -15,6 +33,7 @@ var Display = (function(){
     r.crit = null;
     r.id = null;
     r.uiData = null;
+    r.displayDuration = 1000;
 
     r.getSpriteCenter = function(){
         var sprite = this.target.uiSprite;
@@ -32,14 +51,26 @@ var Display = (function(){
         return this.amount * -1;
     }
 
-    r.getStyleClass = function(amount){
-        var styleClass = amount <= 0 ? "display-dmg" : "display-heal";
-        styleClass += this.crit ? " display-crit" : "";
+    r.getStyleClass = function(type){
+        var styleClass;
+
+        if(typeof type == "string" && type === "buff"){
+            styleClass = "display-buff";
+        }
+        else if(typeof type == "number"){
+            var amount = type;
+
+            styleClass = amount <= 0 ? "display-dmg" : "display-heal";
+            styleClass += this.crit ? " display-crit" : "";
+        }
+        else {
+            styleClass = "";
+        }
 
         return styleClass;
     }
 
-    r.start = function(){
+    r.start = function(type){
         var self = this;
         var coords = this.getSpriteCenter();
         var randomX, randomY;
@@ -54,28 +85,37 @@ var Display = (function(){
         $("<div data-id='" + this.id + "' class='display'></div>").appendTo(spriteContainer);
         this.uiData = $("div[data-id=" + this.id + "]");
 
-        this.uiData.addClass(this.getStyleClass(this.amount));
         this.uiData.addClass("display-floating-dmg");
-        this.uiData.text(this.getAmount());
+
 
         $(this.uiData).css({
-            "top": coords.y /*+ this.target.uiSprite.height()/ 2 - 50 */ + randomY + "px",
-            "left": coords.x /*+ this.target.uiSprite.width() / 2 */ + randomX + "px"
+            "top": coords.y - this.uiData.height()/ 2 + randomY + "px",
+            "left": coords.x - this.uiData.width()/ 2 + randomX + "px"
         });
 
+        if(type === "buff"){
+            this.uiData.addClass(this.getStyleClass("buff"));
+            this.uiData.text(this.buffName + " buff");
+            this.popOut();
+        }
+        if(type === "number"){
+            this.uiData.addClass(this.getStyleClass(this.amount));
+            this.uiData.text(this.getAmount());
+            this.popOut(this.flyAbove);
+        }
 
-        this.popOut(this.flyAbove);
-        this.flyAbove();
 
 
         setTimeout(function(){
             $(self.uiData).remove();
-        }, 2000);
+        }, this.displayDuration);
     }
 
     r.popOut = function(next){
         var randomFactor = (Math.random() * 10 | 0) - 20;
         var size = 50 + randomFactor;
+        var self = this;
+        next = next || function(){};
 
         size = this.crit ? size + 20 : size;
 
@@ -88,16 +128,16 @@ var Display = (function(){
         }, {
             duration: 200,
             easing: "linear",
-            complete: next
+            complete: next.bind(self)
         });
     }
 
     r.flyAbove = function(){
         $(this.uiData).animate({
-            "top": "-=80",
+            "top": "-=20",
             "opacity": "0.75"
         }, {
-            duration: 2000,
+            duration: this.displayDuration,
             easing: "easeOutCirc"
         })
     }

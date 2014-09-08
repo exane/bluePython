@@ -3,7 +3,7 @@
 var Tooltip = (function(){
     var Tooltip = function(battle){
         this.battle = battle;
-        this.start();
+        //this.start();
 
     }
     var r = Tooltip.prototype;
