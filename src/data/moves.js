@@ -11,6 +11,7 @@ var logger = require("../js/log.js");
  * accuracy 100
  * isAoe false | true
  * noTarget false | true
+ * costs false | number | function
  *
  * possible events: (context: user | params: opt.target, opt.yourSide, opt.otherSide)
  * onTurnBegin
@@ -22,25 +23,25 @@ var logger = require("../js/log.js");
 
  also:
  - id muss und sollte extakt gleich heißen wie
-    die object notation ( test { id: "test"} )
+ die object notation ( test { id: "test"} )
  - überall wo kein required dabei steht können
-    weggelassen werden. die ersten werte sind immer
-    die default werte falls man sie nicht mit angibt.
-    im falle von basePower wird default null sein
-    (falls man ein buff kreieren will, oder ne
-    attacke ohne anzugreifen/dmg zu machen)
+ weggelassen werden. die ersten werte sind immer
+ die default werte falls man sie nicht mit angibt.
+ im falle von basePower wird default null sein
+ (falls man ein buff kreieren will, oder ne
+ attacke ohne anzugreifen/dmg zu machen)
  - isCrit is nur dazu da um einen crit zu erzwingen..
-    oder eben genau das gegenteil: wenn wert weggelassen wird
-    (also weder true noch false) dann wird für die attacke
-    ganz normal crit kalkuliert
+ oder eben genau das gegenteil: wenn wert weggelassen wird
+ (also weder true noch false) dann wird für die attacke
+ ganz normal crit kalkuliert
  - priority is die erzwungende angriffsreihenfolge.
-    0 is standard und alles darunter und drüber wird
-    extra bei der angriffsreihenfolge berechnet
-    (also jemand mit 1 greift vor allen an die < 1 haben,
-    die mit <0 sind sogar nach allen standard attacken drann)
+ 0 is standard und alles darunter und drüber wird
+ extra bei der angriffsreihenfolge berechnet
+ (also jemand mit 1 greift vor allen an die < 1 haben,
+ die mit <0 sind sogar nach allen standard attacken drann)
  - genauigkeit is in prozent
  - noTarget is eine flag für den player das er kein
-    target aussuchen muss
+ target aussuchen muss
  */
 
 
@@ -66,15 +67,17 @@ module.exports = {
     heal: {
         name: "Heal",
         id: "heal",
+        costs: 100,
         onCast: function(opt){
+            var val;
             if(opt.target.isFainted()){
                 logger.message(this.getFullName() + " uses Heal on " + opt.target.getFullName());
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
             }
-            opt.target.changeHpBy(200);
+            opt.target.changeHpBy(val = 200 + this.getSpecialAttackPower());
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
-                + " by 200 hp!");
+                + " by " + val + " hp!");
         },
         target: "friendly"
     },
@@ -83,6 +86,9 @@ module.exports = {
         name: "Assassination (instant kill)",
         basePower: 100,
         priority: 1,
+        costs: function(){
+            return this.getMaxMana()*60/100 | 0;
+        },
         onAttack: function(opt){
             var enemy = opt.target;
             enemy.changeHpBy(-enemy.getMaxHp());
@@ -95,18 +101,20 @@ module.exports = {
         accuracy: 90,
         priority: 2,
         isCrit: true,
+        costs: 25,
         id: "quick_attack"
     },
     revive: {
         name: "Revive",
         id: "revive",
+        costs: 200,
         onCast: function(opt){
             var target = opt.target;
             logger.message(this.getFullName() + " revives " + target.getFullName() + "!");
             if(!target.isFainted()){
                 return logger.message(this.getFullName() + "'s revive failed! Target is alive.");
             }
-            target.revive(1);
+            target.revive(1 + this.getSpecialAttackPower() * 0.25);
         },
         target: "friendly"
     },
@@ -131,7 +139,8 @@ module.exports = {
         accuracy: 100,
         id: "burnslash",
         isAoe: true,
-        priority: 0
+        priority: 0,
+        costs: 150
     },
 
     ultrabuffDEBUG: {
@@ -141,12 +150,12 @@ module.exports = {
             this.addBuff({
                 name: "Attack boost",
                 stats: {
-                    atk: 2
+                    str: 2
                 },
                 duration: 5
             });
 
-            logger.message("atk boosted by 2. total atk boosts: " + this.getBoostLevel("atk"));
+            logger.message("str boosted by 2. total str boosts: " + this.getBoostLevel("str"));
         },
         noTarget: true
     }

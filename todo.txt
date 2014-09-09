@@ -8,8 +8,9 @@
 - buffs auf bugs testen
 - buffs entfernen wenn entity stirbt
 - default_defense überarbeiten!
-- komplette überarbeitung der variablen. unterteilung public und private
+- komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 - dmg & crit dmg überarbeiten! (berechnung)
+- mana(oder ausdauer?) hinzufügen
 
 
 

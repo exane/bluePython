@@ -32,45 +32,72 @@ var BattleSide = (function(){
         this.createInfoUi(entity);
     }
 
-    r.createInfoUi = function(entity){
-        var uiInfo = $(this.uiSide).find(".battle-info");
+    r._createUiSprite = function(entity){
         var uiSprite = $(this.uiSide).find(".sprite");
+        var sprite = $("<img>");
+        var spriteContainer = $("<div></div>");
 
-        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.getId() + "' class='battle-name'>" + entity.getFullName() + "</div>";
+        $(sprite).attr("id", this.sideId + "-battle-sprite-" + entity.getId());
+        $(sprite).attr("src", entity.getImg());
 
-        var uiHp = "<div id='" + this.sideId + "-battle-hp-" + entity.getId() + "' class='bar bar-hp'>" +
-            entity.getHp() + " / " + entity.getMaxHp() +
-            "</div>";
-
-
-        var sprite = "<img id='" + this.sideId + "-battle-sprite-" + entity.getId() + "' src='" + entity.getImg() + "'>";
-        var spriteContainer = "<div class='sprite-img-container' id='" + this.sideId + "-battle-sprite-" + entity.getId() + "-container'></div>"
-
-
-        /**
-         * ui buffs
-         */
-        var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.getId());
-        //console.log($(uiBuffs));
-
-
-        $(uiName).appendTo(uiInfo);
-        $(uiHp).appendTo(uiInfo);
-        $(uiBuffs).appendTo(uiInfo);
+        $(spriteContainer).attr("id", this.sideId + "-battle-sprite-" + entity.getId() + "-container");
+        $(spriteContainer).addClass("sprite-img-container");
 
         $(spriteContainer).appendTo(uiSprite);
-        $(sprite).appendTo("#" + this.sideId + "-battle-sprite-" + entity.getId() + "-container");
+        $(sprite).appendTo(spriteContainer);
 
-
-
-
-
-        entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.getId());
-        entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.getId());
-        entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.getId());
-        entity.uiBuffs = $(uiBuffs);
-
+        entity.uiSprite = $(sprite);
         entity.uiSprite.attr("data-id", entity.getId());
+    }
+
+    r._createUiName = function(entity, uiInfo){
+        //var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.getId() + "' class='battle-name'>" + entity.getFullName() + "</div>";
+        var uiName = $("<div class='battle-name'></div>");
+
+        $(uiName).attr("id", this.sideId + "-battle-name-" + entity.getId());
+        $(uiName).text(entity.getFullName());
+
+        $(uiName).appendTo(uiInfo);
+        entity.uiName = $(uiName);
+    }
+
+    r._createUiBuffs = function(entity, uiInfo){
+        var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.getId());
+        $(uiBuffs).appendTo(uiInfo);
+        entity.uiBuffs = $(uiBuffs);
+    }
+
+    r._createUiHp = function(entity, uiInfo){
+        var uiHp = $("<div class='bar bar-hp'></div>");
+
+        $(uiHp).attr("id", this.sideId + "-battle-hp-" + entity.getId());
+        $(uiHp).text(entity.getHp() + " / " + entity.getMaxHp());
+
+
+        $(uiHp).appendTo(uiInfo);
+        entity.uiHp = $(uiHp);
+
+    }
+    r._createUiMana = function(entity, uiInfo){
+        var uiMana = $("<div class='bar bar-mana'></div>");
+
+        $(uiMana).attr("id", this.sideId + "-battle-mana-" + entity.getId());
+        $(uiMana).text(entity.getMana() + " / " + entity.getMaxMana());
+
+
+        $(uiMana).appendTo(uiInfo);
+        entity.uiMana = $(uiMana);
+
+    }
+
+    r.createInfoUi = function(entity){
+        var uiInfo = $(this.uiSide).find(".battle-info");
+
+        this._createUiName(entity, uiInfo);
+        this._createUiHp(entity, uiInfo);
+        this._createUiMana(entity, uiInfo);
+        this._createUiBuffs(entity, uiInfo);
+        this._createUiSprite(entity);
 
     }
 
@@ -101,7 +128,7 @@ var BattleSide = (function(){
         }
 
         for(var i = 0; i < this.member.length; i++) {
-            if(!this.member[i].fainted){
+            if(!this.member[i].isFainted()){
                 k++;
             }
         }
@@ -123,7 +150,7 @@ var BattleSide = (function(){
         var n = this.member.length;
 
         for(var i = 0; i < n; i++) {
-            if(!this.member[i].fainted){
+            if(!this.member[i].isFainted()){
                 return true;
             }
         }
@@ -135,7 +162,7 @@ var BattleSide = (function(){
         var n = this.member.length;
 
         for(var i = 0; i < n; i++) {
-            if(this.member[i].fainted){
+            if(this.member[i].isFainted()){
                 return true;
             }
         }
@@ -154,7 +181,7 @@ var BattleSide = (function(){
             return this.member[index];
         }
 
-        if(!this.member[index].fainted === alive){
+        if(!this.member[index].isFainted() === alive){
             return this.member[index];
         }
 
@@ -167,7 +194,7 @@ var BattleSide = (function(){
         var tmp = [];
 
         for(var i = 0; i < n; i++) {
-            if(!this.member[i].fainted){
+            if(!this.member[i].isFainted()){
                 tmp.push(this.member[i]);
             }
         }

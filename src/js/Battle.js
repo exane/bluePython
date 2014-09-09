@@ -241,7 +241,7 @@ var Battle = (function(){
         for(i = 0; i < m; i++) {
 
             npc = yourSide.getMemberByIndex(i);
-            pointer = $("<li>" + npc.name + "</li>");
+            pointer = $("<li>" + npc.getName() + "</li>");
 
             //console.log("npc", npc);
 
@@ -379,6 +379,27 @@ var Battle = (function(){
         //marks user as active
         $(user.uiSprite).addClass("entity-active");
 
+        if(typeof move.costs != "undefined"){
+            var costs, usable;
+
+            costs = move.costs;
+
+            if(typeof move.costs == "function"){
+                costs = move.costs.call(user);
+            }
+
+            usable = user.changeManaBy(-costs);
+            if(usable === false){
+                logger.message(user.getFullName() + " has not enough Mana!");
+
+                setTimeout(function(){
+                    $(user.uiSprite).removeClass("entity-active");
+                    self.runEventSlow(++i, n, data);
+                }, this.speed);
+                return -1;
+            }
+        }
+
         if(move.isAoe){
             //debugger;
             var t = user.getOtherside().length();
@@ -467,6 +488,24 @@ var Battle = (function(){
             otherSide: user.getOtherside(),
             isCrit: isCrit
         }
+
+        /*
+        if(typeof move.costs != "undefined"){
+            var costs, usable;
+
+            costs = move.costs;
+
+            if(typeof move.costs == "function"){
+                costs = move.costs.call(user);
+            }
+
+            usable = user.changeManaBy(-costs);
+            if(usable === false){
+                logger.message("Not enough Mana!");
+                return -1;
+            }
+        }
+        */
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);

@@ -10,14 +10,17 @@ module.exports = self = {
             //console.log(this);
             var currMaxHp = this.getMaxHp();
             var currHp = this.getHp();
+            var currMaxMana = this.getMaxMana();
+            var currMana = this.getMana();
 
             var percentageOfHp = 100*currHp/currMaxHp;
+            var percentageOfMana = 100*currMana/currMaxMana;
 
             this.setBuffTo({
                 name: "Fire Armor",
                 stats: {
                     def: length,
-                    atk: length,
+                    str: length,
                     agi: length,
                     vit: length,
                     tec: length,
@@ -27,8 +30,10 @@ module.exports = self = {
             })
 
             var newCurrMaxHp = this.getMaxHp();
+            var newCurrMaxMana = this.getMaxMana();
 
             this.setHpTo(newCurrMaxHp*percentageOfHp/100);
+            this.setManaTo(newCurrMaxMana*percentageOfMana/100);
 
 
             logger.message(this.getFullName() + " ignites his armor!");
@@ -41,5 +46,10 @@ module.exports = self = {
             self.firearmor.onTurnBegin.call(this);
         }
 
+    },
+    prayer: {
+        onTurnEnd: function(){
+            this.changeManaBy(20);
+        }
     }
 }

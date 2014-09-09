@@ -2,8 +2,8 @@
 
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro);
 
-$width: 1200px;
-$height: 600px;
+$width: 1300px;
+$height: 700px;
 
 * {
   padding: 0;
@@ -240,6 +240,9 @@ $height: 600px;
   &.display-heal {
     color: #3dff3f;
   }
+  &.display-mana {
+    color: #297eff;
+  }
   &.display-crit {
     font-style: italic;
     color: #ff5f42;
@@ -263,6 +266,7 @@ $height: 600px;
 
 .test-buff {
   border: 1px solid red;
+  line-height: 12px;
 }
 
 

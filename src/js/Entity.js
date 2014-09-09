@@ -13,7 +13,7 @@ var Entity = (function(){
         this._stats = options.stats || this._stats;
 
         this._boosts = {
-            atk: 0,
+            str: 0,
             def: 0,
             agi: 0,
             tec: 0,
@@ -30,6 +30,7 @@ var Entity = (function(){
         this._yourSide = yourSide;
         this._otherSide = otherSide;
         this._maxHp = this._currHp = this.getMaxHp();
+        this._maxMana = this._mana = this.getMaxMana();
 
         this._buffs = [];
 
@@ -60,6 +61,8 @@ var Entity = (function(){
     r._buffs = [];
     r._boosts = {};
     r._buffTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+    r._mana = 1;
+    r._maxMana = 1;
 
     /**
      * UI Properties
@@ -67,6 +70,7 @@ var Entity = (function(){
     r.uiSprite = null;
     r.uiName = null;
     r.uiHp = null;
+    r.uiMana = null;
     r.uiBuffs = null;
 
     r.turnAction = null;
@@ -78,6 +82,45 @@ var Entity = (function(){
     r.getAttr = function(attr){
         attr = attr.toLowerCase();
         return this._stats[attr] * this._buffTable[this._boosts[attr]];
+    }
+    r.getBaseAttr = function(attr){
+        attr = attr.toLowerCase();
+        return this._stats[attr];
+    }
+    r.getHp = function(){
+        return this._currHp;
+    }
+    r.getMaxHp = function(){
+        return this.getAttr("Vit") * 10;
+    }
+    r.getMana = function(){
+        return this._mana;
+    }
+    r.getMaxMana = function(){
+        return this.getAttr("tec") * 10;
+    }
+    r.getSpecialAttackPower = function(){
+        var tec = this.getAttr("tec") * 2;
+
+        return tec;
+    }
+    r.getPhysicalAttackPower = function(){
+        var str = this.getAttr("str") * 2;
+
+        return str;
+    }
+    r.getAttackPower = function(type){
+        if(type == "physical") {
+            return this.getPhysicalAttackPower();
+        }
+        if(type == "special"){
+            return this.getSpecialAttackPower();
+        }
+    }
+    r.getCritRate = function(){
+        var baseCrit = 500;
+        baseCrit += this.getAttr("Lck") * 1.5;
+        return baseCrit / 100;
     }
     r.getFullName = function(){
         return this._yourSide.sideName + " " + this._name;
@@ -99,10 +142,6 @@ var Entity = (function(){
     r.getImg = function(){
         return this._img;
     }
-    r.getHp = function(){
-        //return (this._currHp * this.stats.vit) * 10;
-        return this._currHp;
-    }
     r.getBuff = function(name){
         var n = this._buffs.length;
 
@@ -120,9 +159,6 @@ var Entity = (function(){
     }
     r.getName = function(){
         return this._name;
-    }
-    r.getMaxHp = function(){
-        return this.getAttr("Vit") * 10;
     }
     r.getStats = function(){
         return this._stats;
@@ -185,7 +221,18 @@ var Entity = (function(){
             this._currHp = this.getMaxHp();
         }
 
-        this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
+        //this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
+        this.updateUi();
+    }
+    r.setManaTo = function(value){
+        if(this.isFainted()) return 0;
+
+        this._mana = value | 0;
+
+        if(this.getMana() > this.getMaxMana()){
+            this._mana = this.getMaxMana();
+        }
+        this.updateUi();
     }
 
     /**
@@ -239,9 +286,11 @@ var Entity = (function(){
     }
     r.updateUi = function(){
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
+        this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
         this._renderBuffs();
     }
     r.revive = function(hp){
+        hp = hp | 0;
         this.setFainted(false);
         this.uiSprite.removeClass("fainted");
         this.changeHpBy(hp);
@@ -262,12 +311,13 @@ var Entity = (function(){
         return diff;
     }
     r.calculateCritChance = function(target, move){
-        var baseCrit = 500;
-
-        baseCrit += this.getAttr("Lck");
-
-        return baseCrit / 100;
-    }
+        //var baseCrit = 500;
+//
+        //baseCrit += this.getAttr("Lck");
+//
+        //return baseCrit / 100;
+        return this.getCritRate();
+    } //deprecated!
     r.calculateCrit = function(chance){
         var crit = Math.random() * 100;
 
@@ -277,7 +327,7 @@ var Entity = (function(){
 
     }
     r.calculatePower = function(move){
-        var dmg = (move.basePower + this.getAttr("Atk"));
+        var dmg = (move.basePower + this.getAttr("str"));
 
         /*if(move.isCrit){
          dmg *= 2;
@@ -312,6 +362,24 @@ var Entity = (function(){
         }
 
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
+    }
+    r.changeManaBy = function(value){
+        if(this.getMana() + value < 0){
+            return false;
+        }
+
+        this._mana = this.getMana() + value;
+
+        if(this.getMana() > this.getMaxMana()){
+            this._mana = this.getMaxMana();
+        }
+
+        new Display({target: this, amount: value, isMana: true});
+
+
+        this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
+
+        return true;
     }
     r.ready = function(data){
         data = data || {};

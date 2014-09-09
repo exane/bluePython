@@ -11,4 +11,3 @@ battle.onGameOver(function(){
     battle = new Battle();
     battle.init();
 });
-//console.log(battle);

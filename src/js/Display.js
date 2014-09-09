@@ -4,6 +4,7 @@ var Display = (function(){
         this.target = options.target || null;
         this.amount = options.amount;
         this.crit = options.isCrit || false;
+        this.isMana = options.isMana || false;
 
         this.buffName = options.buffName || null;
         this.buffStats = options.buffStats || null;
@@ -47,6 +48,7 @@ var Display = (function(){
     }
 
     r.getAmount = function(){
+        if(this.isMana) return this.amount;
         if(this.amount > 0) return this.amount;
         return this.amount * -1;
     }
@@ -59,8 +61,14 @@ var Display = (function(){
         }
         else if(typeof type == "number"){
             var amount = type;
+            if(this.isMana){
+                styleClass = "display-mana";
+            }
+            else {
+                styleClass = amount <= 0 ? "display-dmg" : "display-heal";
+            }
 
-            styleClass = amount <= 0 ? "display-dmg" : "display-heal";
+
             styleClass += this.crit ? " display-crit" : "";
         }
         else {

@@ -1,4 +1,6 @@
 var logger = require("../js/log.js");
+var util = require("../js/Util.js");
+var moveData = require("./moves.js");
 
 
 var data = {
@@ -6,10 +8,10 @@ var data = {
         name: "Exane",
         id: "exane",
         stats: {
-            atk: 150,
+            str: 150,
             def: 50,
             agi: 100,
-            tec: 100,
+            tec: 1000,
             vit: 1000,
             lck: 100
         },
@@ -20,7 +22,7 @@ var data = {
         name: "Boss",
         id: "boss",
         stats: {
-            atk: 100,
+            str: 100,
             def: 0,
             agi: 100,
             tec: 10,
@@ -33,7 +35,7 @@ var data = {
         name: "Big Boss",
         id: "boss2",
         stats: {
-            atk: 100,
+            str: 100,
             def: 50,
             agi: 100,
             tec: 10,
@@ -47,10 +49,10 @@ var data = {
         name: "Gnome Mage",
         id: "gnomemage",
         stats: {
-            atk: 40,
+            str: 40,
             def: 20,
             agi: 80,
-            tec: 100,
+            tec: 50,
             vit: 500,
             lck: 100
         },
@@ -67,7 +69,7 @@ var data = {
 
 
             var m = this.getYourside().getRandomMember(true);
-            if(m.getHp() < m.getMaxHp()){
+            if(m.getHp() < m.getMaxHp() && this.getMana() >= moveData["heal"].costs){
                 this.turnAction.do = "heal";
                 this.turnAction.target = m;
                 return 0;
@@ -77,14 +79,15 @@ var data = {
             this.turnAction.do = "default_attack";
 
         },
-        skills: ["quick_attack","revive", "heal"]
+        skills: ["quick_attack","revive", "heal"],
+        abilities: ["prayer"]
 
     },
     chernabog: {
         name: "Chernabog",
         id: "chernabog",
         stats: {
-            atk: 200,
+            str: 200,
             def: 50,
             agi: 50,
             tec: 100,
@@ -95,7 +98,15 @@ var data = {
         abilities: ["firearmor"],
         skills: ["burnslash"],
         ai: function(){
-            this.turnAction.do = "burnslash";
+
+            var moves = [{chance: 25, id: "burnslash"}, {chance: 75, id: "default_attack"}];
+            this.turnAction.do = util.random(moves);
+
+            if(this.getMana() < moveData["burnslash"].costs){
+                this.turnAction.do = "default_attack";
+
+            }
+
         }
 
     }
