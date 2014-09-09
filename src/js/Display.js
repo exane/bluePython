@@ -12,7 +12,7 @@ var Display = (function(){
         this.id = (new Date()).getSeconds() * 1000 + (new Date()).getMilliseconds();
 
         if(!this.target){
-            throw new Error("target property must be defined!");
+            throw new Error("target property must be defined!!!"); // !!! 
         }
 
         if(typeof this.amount == "undefined"){
