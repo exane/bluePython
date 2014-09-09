@@ -12,7 +12,6 @@ var Player = (function(){
         this.uiMenuSkill = $("#menu-skill");
         this.uiMenu  = uiMenu;
 
-        this.fainted = false;
 
         //this.events = events;
 
@@ -74,7 +73,7 @@ var Player = (function(){
 
 
     r.resetMenu = function(){
-        if(this.fainted) return 0;
+        if(this.isFainted()) return 0;
         this.uiMenu.children(".menu-main").show();
         this.uiMenu.children(".menu-target-enemy").hide();
         this.uiMenu.children(".menu-target-ally").hide();
@@ -84,7 +83,7 @@ var Player = (function(){
 
     r.onSkillClick = function(skill){
         //console.log(skill);
-        if(this.hasChosen) return 0;
+        if(this.hasChosen()) return 0;
 
 
 
@@ -96,7 +95,7 @@ var Player = (function(){
 
         if(skill.isAoe || skill.noTarget){
             //this.onTargetClick(this.otherSide.member);
-            if(this.hasChosen) return 0;
+            if(this.hasChosen()) return 0;
             this.setChosen(true);
             this.ready(this.turnAction);
             return 0;
@@ -115,11 +114,11 @@ var Player = (function(){
         if(value){
             $(".controller").hide();
         }
-        this.hasChosen = value;
+        this._hasChosen = value;
     }
 
     r.onTargetClick = function(target){
-        if(this.hasChosen) return 0;
+        if(this.hasChosen()) return 0;
 
         this.turnAction.target = target;
         this.turnAction.from = this;

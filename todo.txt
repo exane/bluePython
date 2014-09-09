@@ -9,6 +9,7 @@
 - buffs entfernen wenn entity stirbt
 - default_defense überarbeiten!
 - komplette überarbeitung der variablen. unterteilung public und private
+- dmg & crit dmg überarbeiten! (berechnung)
 
 
 

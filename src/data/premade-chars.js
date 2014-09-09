@@ -57,8 +57,8 @@ var data = {
         img: "assets/GnomeMage.png",
         ai: function(){
 
-            if(this.yourSide.hasDeadMember()){
-                var member = this.yourSide.getRandomMember(false);
+            if(this.getYourside().hasDeadMember()){
+                var member = this.getYourside().getRandomMember(false);
                 this.turnAction.do = "revive";
                 this.turnAction.target = member;
                 return 0;
@@ -66,7 +66,7 @@ var data = {
 
 
 
-            var m = this.yourSide.getRandomMember(true);
+            var m = this.getYourside().getRandomMember(true);
             if(m.getHp() < m.getMaxHp()){
                 this.turnAction.do = "heal";
                 this.turnAction.target = m;

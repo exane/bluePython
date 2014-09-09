@@ -24,7 +24,8 @@ var BattleSide = (function(){
     r.sideName = null;
 
     r.add = function(entity){
-        entity.id = this.sideId + "_" + entity.id;
+        //entity.id = this.sideId + "_" + entity.id;
+        entity.setId(this.sideId + "_" + entity.getId());
         //entity.name = this.sideName + " " + entity.name;
         this.member.push(entity);
         this.uiMember.push(null);
@@ -35,21 +36,21 @@ var BattleSide = (function(){
         var uiInfo = $(this.uiSide).find(".battle-info");
         var uiSprite = $(this.uiSide).find(".sprite");
 
-        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.id + "' class='battle-name'>" + entity.getFullName() + "</div>";
+        var uiName = "<div id='" + this.sideId + "-battle-name-" + entity.getId() + "' class='battle-name'>" + entity.getFullName() + "</div>";
 
-        var uiHp = "<div id='" + this.sideId + "-battle-hp-" + entity.id + "' class='bar bar-hp'>" +
-            entity.currHp + " / " + entity.maxHp +
+        var uiHp = "<div id='" + this.sideId + "-battle-hp-" + entity.getId() + "' class='bar bar-hp'>" +
+            entity.getHp() + " / " + entity.getMaxHp() +
             "</div>";
 
 
-        var sprite = "<img id='" + this.sideId + "-battle-sprite-" + entity.id + "' src='" + entity.img + "'>";
-        var spriteContainer = "<div class='sprite-img-container' id='" + this.sideId + "-battle-sprite-" + entity.id + "-container'></div>"
+        var sprite = "<img id='" + this.sideId + "-battle-sprite-" + entity.getId() + "' src='" + entity.getImg() + "'>";
+        var spriteContainer = "<div class='sprite-img-container' id='" + this.sideId + "-battle-sprite-" + entity.getId() + "-container'></div>"
 
 
         /**
          * ui buffs
          */
-        var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.id);
+        var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.getId());
         //console.log($(uiBuffs));
 
 
@@ -58,25 +59,25 @@ var BattleSide = (function(){
         $(uiBuffs).appendTo(uiInfo);
 
         $(spriteContainer).appendTo(uiSprite);
-        $(sprite).appendTo("#" + this.sideId + "-battle-sprite-" + entity.id + "-container");
+        $(sprite).appendTo("#" + this.sideId + "-battle-sprite-" + entity.getId() + "-container");
 
 
 
 
 
-        entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.id);
-        entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.id);
-        entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.id);
+        entity.uiSprite = $("#" + this.sideId + "-battle-sprite-" + entity.getId());
+        entity.uiName = $("#" + this.sideId + "-battle-name-" + entity.getId());
+        entity.uiHp = $("#" + this.sideId + "-battle-hp-" + entity.getId());
         entity.uiBuffs = $(uiBuffs);
 
-        entity.uiSprite.attr("data-id", entity.id);
+        entity.uiSprite.attr("data-id", entity.getId());
 
     }
 
     r.getMemberById = function(id){
         var n = this.member.length;
         for(var i = 0; i < n; i++) {
-            if(this.member[i].id !== id) continue;
+            if(this.member[i].getId() !== id) continue;
             return this.member[i];
         }
         return null;
@@ -85,7 +86,7 @@ var BattleSide = (function(){
     r.getMemberIndexById = function(id){
         var n = this.member.length;
         for(var i = 0; i < n; i++) {
-            if(this.member[i].id !== id) continue;
+            if(this.member[i].getId() !== id) continue;
             return i;
         }
         return -1;

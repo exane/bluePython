@@ -5,7 +5,7 @@ module.exports = self = {
     firearmor: {
         onTurnBegin: function(){
             //console.log("firearmor on turn begin called!", this);
-            var length = this.yourSide.length(true);
+            var length = this.getYourside().length(true);
 
             //console.log(this);
             var currMaxHp = this.getMaxHp();

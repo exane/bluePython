@@ -13,12 +13,6 @@ var Tooltip = require("./Tooltip.js");
 
 "use strict";
 
-/*
- phase 1 = choose menu
- phase 2 = choose target
- phase 3 = wait until every "member" has chosen
- */
-
 var Battle = (function(){
     var Battle = function(){
         this.side1 = new BattleSide($(".side-ally"), "s1", "Team Yolo");
@@ -58,7 +52,7 @@ var Battle = (function(){
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
-        this.listTargets(this.player.otherSide, this.player.yourSide);
+        this.listTargets(this.player.getOtherside(), this.player.getYourside());
         this.listSkills();
 
         var self = this;
@@ -144,18 +138,20 @@ var Battle = (function(){
 
     r.checkIfEntityAlreadyExists = function(entity, yourSide){
         var k = 1;
-        var originalName = entity.name;
-        var originalId = entity.id;
+        var originalName = entity.getName();
+        var originalId = entity.getId();
         var member;
 
 
         for(var i = 0; i < yourSide.length(); i++) {
             member = yourSide.getMemberByIndex(i);
 
-            if(entity.name === member.name){
+            if(entity.getName() === member.getName()){
                 k++;
-                entity.name = originalName + " " + k;
-                entity.id = originalId + k;
+                //entity.name = originalName + " " + k;
+                entity.setName(originalName + " " + k);
+                //entity.id = originalId + k;
+                entity.setId(originalId + k);
             }
         }
 
@@ -166,7 +162,7 @@ var Battle = (function(){
 
 
         data.sort(function(a, b){
-            return b.from.getAgi() - a.from.getAgi();
+            return b.from.getAttr("agi") - a.from.getAttr("agi");
         });
 
         //handle speed tie
@@ -188,11 +184,11 @@ var Battle = (function(){
         var originalTurnorder = turnorder.slice(0); //lazy array copy
 
         for(var i = 0; i < turnorder.length; i++) {
-            var agi = turnorder[i].from.getAgi();
+            var agi = turnorder[i].from.getAttr("agi");
             var k = i;
             var tmp = [];
 
-            while(turnorder[k] && agi === turnorder[k].from.getAgi()) {
+            while(turnorder[k] && agi === turnorder[k].from.getAttr("agi")) {
                 k++;
                 tmp.push({
                     rank: Math.random() * 100,
@@ -231,12 +227,12 @@ var Battle = (function(){
         for(i = 0; i < n; i++) {
             //var npc = this.side2.getMemberByIndex(i);
             npc = otherSide.getMemberByIndex(i);
-            pointer = $("<li>" + npc.name + "</li>");
+            pointer = $("<li>" + npc.getName() + "</li>");
 
             //console.log("npc", npc);
 
             //this.side2.addDomPointerReferenceTo(npc.id, pointer);
-            otherSide.addDomPointerReferenceTo(npc.id, pointer);
+            otherSide.addDomPointerReferenceTo(npc.getId(), pointer);
 
             $(pointer).appendTo(ulEnemy);
 
@@ -250,7 +246,7 @@ var Battle = (function(){
             //console.log("npc", npc);
 
             //this.side2.addDomPointerReferenceTo(npc.id, pointer);
-            yourSide.addDomPointerReferenceTo(npc.id, pointer);
+            yourSide.addDomPointerReferenceTo(npc.getId(), pointer);
 
             $(pointer).appendTo(ulAlly);
 
@@ -261,11 +257,11 @@ var Battle = (function(){
     r.listSkills = function(){
         if(!this.player) return 0;
         var ul = $(".menu-skills ul");
-        var n = this.player.skillList.length;
+        var n = this.player.getSkillList().length;
 
         for(var i = 0; i < n; i++) {
             //moves.push(moveData[this.player.skillList[i]].name);
-            var data = moveData[this.player.skillList[i]];
+            var data = moveData[this.player.getSkillList(i)];
             var li = "<li value='" + data.id + "'>" + data.name + "</li>";
             ul.append(li);
 
@@ -288,14 +284,9 @@ var Battle = (function(){
         $(document).on("bp-battle-chosen", function(e, data){
             k++;
 
-            self.removeFromObserveList(observeList, data.data.from.id);
-            //console.log(observeList, data.data);
-
-
+            self.removeFromObserveList(observeList, data.data.from.getId());
             collectData.push(data.data);
 
-
-            //if(k === sum){
             if(!observeList.length){
                 $(document).unbind("bp-battle-chosen");
                 self.runEvent(collectData);
@@ -323,7 +314,7 @@ var Battle = (function(){
         list = a.concat(b);
 
         for(var i = 0; i < list.length; i++) {
-            res.push(list[i].id);
+            res.push(list[i].getId());
         }
 
         return res;
@@ -349,7 +340,7 @@ var Battle = (function(){
                 var user = data[i].from;
                 var target = data[i].target || null;
 
-                if(user.fainted){
+                if(user.isFainted()){
                     continue;
                 }
 
@@ -381,7 +372,7 @@ var Battle = (function(){
         var self = this;
 
 
-        if(user.fainted){
+        if(user.isFainted()){
             self.runEventSlow(++i, n, data);
             return 0;
         }
@@ -390,9 +381,9 @@ var Battle = (function(){
 
         if(move.isAoe){
             //debugger;
-            var t = user.otherSide.length();
+            var t = user.getOtherside().length();
             for(var k = 0; k < t; k++) {
-                this.calculateTurnOf(user, user.otherSide.member[k], move);
+                this.calculateTurnOf(user, user.getOtherside().member[k], move);
             }
         }
         else {
@@ -421,8 +412,8 @@ var Battle = (function(){
             }
 
             //abilities
-            for(var k = 0; k < data[i].from.abilities.length; k++) {
-                var ability = abilityData[data[i].from.abilities[k]];
+            for(var k = 0; k < data[i].from.getAbilities().length; k++) {
+                var ability = abilityData[data[i].from.getAbilities(k)];
                 //var self = data[i].from;
 
                 if(ability.onTurnEnd){
@@ -449,8 +440,8 @@ var Battle = (function(){
             //console.log("yoyo",data[i].from.abilities.length);
 
             //abilities
-            for(var k = 0; k < data[i].from.abilities.length; k++) {
-                var ability = abilityData[data[i].from.abilities[k]];
+            for(var k = 0; k < data[i].from.getAbilities().length; k++) {
+                var ability = abilityData[data[i].from.getAbilities(k)];
                 //var self = data[i].from;
 
                 if(ability.onTurnBegin){
@@ -465,15 +456,15 @@ var Battle = (function(){
 
     r.calculateTurnOf = function(user, target, move){
         var critChance = user.calculateCritChance(target, move);
-        var wasFainted = target ? target.fainted : false; //target.fainted || null;
+        var wasFainted = target ? target.isFainted() : false; //target.isFainted() || null;
         var isCrit = (move.isCrit == null || typeof move.isCrit == "undefined")
             ? user.calculateCrit(critChance)
             : move.isCrit;
 
         var opt = {
             target: target,
-            yourSide: user.yourSide,
-            otherSide: user.otherSide,
+            yourSide: user.getYourside(),
+            otherSide: user.getOtherside(),
             isCrit: isCrit
         }
 
@@ -499,7 +490,7 @@ var Battle = (function(){
 
 
         //console.log(target);
-        if(target && target.fainted && !wasFainted){
+        if(target && target.isFainted() && !wasFainted){
             $.event.trigger("bp-ability-onFaint", opt);
             logger.message(target.getFullName() + " fainted...");
         }
@@ -507,7 +498,7 @@ var Battle = (function(){
 
     r.calculateDmg = function(user, target, move, opt){
         var dmg;
-        if(target.fainted){
+        if(target.isFainted()){
 
             logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
             logger.message("but there is no target alive...");

@@ -6,7 +6,6 @@ var Npc = (function(){
     var Npc = function(options, yourSide, otherSide){
         Entity.call(this, options, yourSide, otherSide);
 
-        this.fainted = false;
 
         this.ai = options.ai || this.ai;
 
@@ -16,7 +15,7 @@ var Npc = (function(){
     r.ai = true;
 
     r.startAi = function(){
-        if(this.fainted) return 0;
+        if(this.isFainted()) return 0;
 
         this.turnAction.from = this;
         this.turnAction.target = this.chooseTarget();
@@ -45,7 +44,7 @@ var Npc = (function(){
     }
 
     r.chooseTarget = function(){
-        var target = this.otherSide.getRandomMember(true);
+        var target = this.getOtherside().getRandomMember(true);
         return target;
     }
 

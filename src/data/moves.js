@@ -55,11 +55,11 @@ module.exports = {
         name: "Default Defense",
         priority: 1,
         boost: function(){ //deprecated!
-            this.boosts.def += 2;
+            this._boosts.def += 2;
             logger.message(this.name + " defends himself!");
         },
         onTurnEnd: function(){
-            this.boosts.def -= 2;
+            this._boosts.def -= 2;
         },
         id: "default_defense"
     },
@@ -67,7 +67,7 @@ module.exports = {
         name: "Heal",
         id: "heal",
         onCast: function(opt){
-            if(opt.target.fainted){
+            if(opt.target.isFainted()){
                 logger.message(this.getFullName() + " uses Heal on " + opt.target.getFullName());
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
@@ -103,7 +103,7 @@ module.exports = {
         onCast: function(opt){
             var target = opt.target;
             logger.message(this.getFullName() + " revives " + target.getFullName() + "!");
-            if(!target.fainted){
+            if(!target.isFainted()){
                 return logger.message(this.getFullName() + "'s revive failed! Target is alive.");
             }
             target.revive(1);
@@ -146,7 +146,7 @@ module.exports = {
                 duration: 5
             });
 
-            logger.message("atk boosted by 2. total atk boosts: " + this.boosts.atk);
+            logger.message("atk boosted by 2. total atk boosts: " + this.getBoostLevel("atk"));
         },
         noTarget: true
     }
