@@ -1,16 +1,12 @@
 
 - tooltips
-- buffs anzeigen
-- hp-balken anders anordnen (über den entities?)
+- debuffs einbauen
 - zurück button für skill/target auswahl
 - accuracy einbauen
-- buff animation/visuell einbauen (ähnlich dmg/heal animation)
-- buffs auf bugs testen
 - buffs entfernen wenn entity stirbt
-- default_defense überarbeiten!
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
-- dmg & crit dmg überarbeiten! (berechnung)
-- mana(oder ausdauer?) hinzufügen
+//- dmg & crit dmg überarbeiten! (berechnung) (vorerst erledigt)
+- nach tod kein mana bekommen / verlieren
 
 
 

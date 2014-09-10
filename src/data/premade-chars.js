@@ -8,22 +8,22 @@ var data = {
         name: "Exane",
         id: "exane",
         stats: {
-            str: 150,
-            def: 50,
+            str: 100,
+            def: 100,
             agi: 100,
             tec: 1000,
-            vit: 1000,
+            vit: 10000,
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["heal", "ultrabuffDEBUG", "quick_attack", "assassination", "burnslash"]
+        skills: ["heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
     },
     boss: {
         name: "Boss",
         id: "boss",
         stats: {
             str: 100,
-            def: 0,
+            def: 100,
             agi: 100,
             tec: 10,
             vit: 150,
@@ -36,7 +36,7 @@ var data = {
         id: "boss2",
         stats: {
             str: 100,
-            def: 50,
+            def: 100,
             agi: 100,
             tec: 10,
             vit: 500,
@@ -50,7 +50,7 @@ var data = {
         id: "gnomemage",
         stats: {
             str: 40,
-            def: 20,
+            def: 40,
             agi: 80,
             tec: 50,
             vit: 500,

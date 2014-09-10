@@ -2,8 +2,8 @@
 
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro);
 
-$width: 1300px;
-$height: 700px;
+$width: 1200px;
+$height: 600px;
 
 * {
   padding: 0;
@@ -57,11 +57,37 @@ $height: 700px;
     text-align: center;
 
     margin-top: 0px;
+    //position: absolute;
+    max-width: $width/4;
+  }
+
+  .bar-hp {
+    background: #00b900;
+  }
+  .bar-mana {
+    background: #297eff;
   }
 }
 
 .battle-view {
   width: $width - $height/2;
+  display: table;
+}
+
+.battle-buffs {
+  width: ($width - $height/2)/4/2;
+  height: auto;
+  //border: 1px solid red;
+  //line-height: 12px;
+  display: inline-block;
+
+  img {
+    height: 20px;
+    float: left;
+    display: block;
+    border-radius: 3px;
+    padding: 1px;
+  }
 }
 
 .battle-info {
@@ -76,17 +102,23 @@ $height: 700px;
 
 .sprite {
   max-height: $height/2;
+  display: table-cell;
+
+  vertical-align: middle;
 
   .sprite-img-container {
     height: auto;
-    width: auto;
+    width: ($width - $height/2)/4;
+    //auto;
     display: inline-block;
   }
 
   img {
-    max-height: $height/2;
+    //max-height: $height/3;
+    max-width: ($width - $height/2)/4;
     margin: 0 auto;
-    float: left;
+    //float: left;
+    display: block;
 
   }
 }
@@ -96,7 +128,6 @@ $height: 700px;
     max-height: $height/4;
   }
 }
-
 
 .controller {
   position: absolute;
@@ -126,7 +157,6 @@ $height: 700px;
 
 }
 
-
 #exane {
   &:hover {
     //border: 4px solid red;
@@ -137,11 +167,11 @@ $height: 700px;
 .border-debug-on {
   border: 4px solid red;
 }
+
 .border-debug-off {
   border: 4px solid red;
 
 }
-
 
 .log-console {
   margin-top: 25px;
@@ -162,7 +192,6 @@ $height: 700px;
   }
 }
 
-
 .menu {
   &:first-child {
     display: block;
@@ -178,7 +207,6 @@ $height: 700px;
   -ms-user-select: none;
   user-select: none;
 }
-
 
 .gameover {
   height: 200px;
@@ -222,8 +250,6 @@ $height: 700px;
     font-size: 1px;
     //font-style: italic;
 
-
-
   }
   &.display-buff {
     border: 1px solid red;
@@ -251,11 +277,21 @@ $height: 700px;
 }
 
 .tooltip {
-  position: absolute;
+  //position: absolute;
   border: 1px solid red;
-  height: 100px;
-  width: 100px;
-  top: 0;
+  height: $height;
+  width: $height/2 - 2;
+  float: left;
+  //top: 0;
+
+  .tooltip-icon{
+    img {
+      width: 128px;
+    }
+  }
+  .tooltip-name {
+
+  }
 
 }
 
@@ -265,8 +301,6 @@ $height: 700px;
 }
 
 .test-buff {
-  border: 1px solid red;
-  line-height: 12px;
 }
 
 

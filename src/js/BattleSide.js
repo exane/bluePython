@@ -48,6 +48,7 @@ var BattleSide = (function(){
 
         entity.uiSprite = $(sprite);
         entity.uiSprite.attr("data-id", entity.getId());
+        entity.uiSprite.attr("data-type", "entity");
     }
 
     r._createUiName = function(entity, uiInfo){
@@ -63,7 +64,10 @@ var BattleSide = (function(){
 
     r._createUiBuffs = function(entity, uiInfo){
         var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.getId());
-        $(uiBuffs).appendTo(uiInfo);
+        //$(uiBuffs).appendTo(uiInfo);
+        $(uiBuffs).appendTo(entity.uiSprite.parent());
+        $(uiBuffs).addClass("battle-buffs");
+        //entity.uiBuffs = $(uiBuffs);
         entity.uiBuffs = $(uiBuffs);
     }
 
@@ -73,11 +77,14 @@ var BattleSide = (function(){
         $(uiHp).attr("id", this.sideId + "-battle-hp-" + entity.getId());
         $(uiHp).text(entity.getHp() + " / " + entity.getMaxHp());
 
-
-        $(uiHp).appendTo(uiInfo);
+        //uiSprite
+        //console.log(entity.uiSprite.parent());
+        //$(uiHp).appendTo(uiInfo);
+        $(uiHp).appendTo(entity.uiSprite.parent());
         entity.uiHp = $(uiHp);
 
     }
+
     r._createUiMana = function(entity, uiInfo){
         var uiMana = $("<div class='bar bar-mana'></div>");
 
@@ -85,7 +92,8 @@ var BattleSide = (function(){
         $(uiMana).text(entity.getMana() + " / " + entity.getMaxMana());
 
 
-        $(uiMana).appendTo(uiInfo);
+        //$(uiMana).appendTo(uiInfo);
+        $(uiMana).appendTo(entity.uiSprite.parent());
         entity.uiMana = $(uiMana);
 
     }
@@ -93,11 +101,11 @@ var BattleSide = (function(){
     r.createInfoUi = function(entity){
         var uiInfo = $(this.uiSide).find(".battle-info");
 
+        this._createUiSprite(entity);
         this._createUiName(entity, uiInfo);
         this._createUiHp(entity, uiInfo);
         this._createUiMana(entity, uiInfo);
         this._createUiBuffs(entity, uiInfo);
-        this._createUiSprite(entity);
 
     }
 

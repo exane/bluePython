@@ -47,7 +47,7 @@ var logger = require("../js/log.js");
 
 module.exports = {
     default_attack: {
-        basePower: 30,
+        basePower: 40,
         accuracy: 100,
         name: "Default Attack",
         id: "default_attack"
@@ -55,12 +55,12 @@ module.exports = {
     default_defense: {
         name: "Default Defense",
         priority: 1,
-        boost: function(){ //deprecated!
-            this._boosts.def += 2;
-            logger.message(this.name + " defends himself!");
+        onTurnBegin: function(){
+            this.changeIncomingDmgMultiplierBy(.25);
+            logger.message(this.getFullName() + " defends himself!");
         },
         onTurnEnd: function(){
-            this._boosts.def -= 2;
+            this.changeIncomingDmgMultiplierBy(4);
         },
         id: "default_defense"
     },
@@ -96,7 +96,7 @@ module.exports = {
         }
     },
     quick_attack: {
-        basePower: 50,
+        basePower: 80,
         name: "Quick Attack (first hit guaranteed)",
         accuracy: 90,
         priority: 2,
@@ -134,7 +134,7 @@ module.exports = {
     },
 
     burnslash: {
-        basePower: 20,
+        basePower: 30,
         name: "Burnslash (Aoe)",
         accuracy: 100,
         id: "burnslash",
@@ -143,19 +143,39 @@ module.exports = {
         costs: 150
     },
 
-    ultrabuffDEBUG: {
+    attackboost: {
         name: "Attack Boost",
-        id: "ultrabuffDEBUG",
+        id: "attackboost",
+        costs: 100,
         onCast: function(opt){
             this.addBuff({
                 name: "Attack boost",
                 stats: {
                     str: 2
                 },
-                duration: 5
+                duration: 5,
+                icon: "assets/muscle-up.png"
             });
 
             logger.message("str boosted by 2. total str boosts: " + this.getBoostLevel("str"));
+        },
+        noTarget: true
+    },
+    defboost: {
+        name: "Defense Boost",
+        id: "defboost",
+        costs: 100,
+        onCast: function(opt){
+            this.addBuff({
+                name: "Defense boost",
+                stats: {
+                    def: 2
+                },
+                duration: 5,
+                icon: "assets/aura.png"
+            });
+
+            logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
         },
         noTarget: true
     }

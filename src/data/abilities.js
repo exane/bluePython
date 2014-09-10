@@ -26,7 +26,8 @@ module.exports = self = {
                     tec: length,
                     lck: length
                 },
-                duration: -1
+                duration: -1,
+                icon: "assets/burning-passion.png"
             })
 
             var newCurrMaxHp = this.getMaxHp();

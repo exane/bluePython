@@ -39,10 +39,10 @@ var Battle = (function(){
 
     r.init = function(){
 
-        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         this.addNewPlayer(data.exane, this.side1, this.side2);
-        this.addNewNpc(data.gnomemage, this.side1, this.side2);
-        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
@@ -56,6 +56,7 @@ var Battle = (function(){
         this.listSkills();
 
         var self = this;
+        this.tooltip = new Tooltip(this);
         setTimeout(function(){
             self.battleStart();
         }, 100);
@@ -64,7 +65,6 @@ var Battle = (function(){
 
     r.battleStart = function(){
 
-        this.tooltip = new Tooltip(this);
 
         logger.message("Battle started!");
 
@@ -124,13 +124,13 @@ var Battle = (function(){
     }
 
     r.addNewPlayer = function(options, yourSide, otherSide){
-        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu);
+        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         this.checkIfEntityAlreadyExists(ally, yourSide);
         yourSide.add(ally);
     }
 
     r.addNewNpc = function(options, yourSide, otherSide){
-        var npc = new Npc(options, yourSide, otherSide);
+        var npc = new Npc(options, yourSide, otherSide, this.tooltip);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
         yourSide.add(npc);
@@ -330,7 +330,7 @@ var Battle = (function(){
         this.checkEventOnTurnBegin(data);
         this.createTurnorder(data);
 
-
+        /*
         if(this.debug){
 
             for(var i = 0; i < n; i++) {
@@ -355,6 +355,9 @@ var Battle = (function(){
             $(".controller").hide();
             this.runEventSlow(0, n, data);
         }
+        */
+        $(".controller").hide();
+        this.runEventSlow(0, n, data);
 
 
     }
@@ -432,18 +435,8 @@ var Battle = (function(){
                 move.onTurnEnd.call(self);
             }
 
-            //abilities
-            for(var k = 0; k < data[i].from.getAbilities().length; k++) {
-                var ability = abilityData[data[i].from.getAbilities(k)];
-                //var self = data[i].from;
-
-                if(ability.onTurnEnd){
-                    ability.onTurnEnd.call(self);
-                }
-            }
-
-
         }
+        $.event.trigger("bp-ability-onTurnEnd");
     }
 
     r.checkEventOnTurnBegin = function(data){
@@ -458,20 +451,10 @@ var Battle = (function(){
             if(move.onTurnBegin){
                 move.onTurnBegin.call(self);
             }
-            //console.log("yoyo",data[i].from.abilities.length);
-
-            //abilities
-            for(var k = 0; k < data[i].from.getAbilities().length; k++) {
-                var ability = abilityData[data[i].from.getAbilities(k)];
-                //var self = data[i].from;
-
-                if(ability.onTurnBegin){
-                    ability.onTurnBegin.call(self);
-                }
-            }
 
 
         }
+        $.event.trigger("bp-ability-onTurnBegin");
     }
 
 
@@ -488,40 +471,27 @@ var Battle = (function(){
             otherSide: user.getOtherside(),
             isCrit: isCrit
         }
-
-        /*
-        if(typeof move.costs != "undefined"){
-            var costs, usable;
-
-            costs = move.costs;
-
-            if(typeof move.costs == "function"){
-                costs = move.costs.call(user);
-            }
-
-            usable = user.changeManaBy(-costs);
-            if(usable === false){
-                logger.message("Not enough Mana!");
-                return -1;
-            }
-        }
-        */
+        var dmg = this.calculateDmg(user, target, move, opt);
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);
         }
+
 
         if(move.onCast){
             move.onCast.call(user, opt);
         }
 
         if(move.basePower){
-            this.calculateDmg(user, target, move, opt);
+            if(move.onAttack){
+                move.onAttack.call(user, opt);
+            }
+            target.changeHpBy(-dmg, opt.isCrit);
         }
 
-        if(move.boost){ //deprecated!
-            move.boost.call(user, opt);
-        }
+        //if(move.boost){ //deprecated!
+        //    move.boost.call(user, opt);
+        //}
 
         if(move.onAfterAttack){
             move.onAfterAttack.call(user, opt);
@@ -537,6 +507,7 @@ var Battle = (function(){
 
     r.calculateDmg = function(user, target, move, opt){
         var dmg;
+        if(!target) return 0;
         if(target.isFainted()){
 
             logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
@@ -544,16 +515,13 @@ var Battle = (function(){
             return 0;
         }
 
-        if(move.onAttack){
-            move.onAttack.call(user, opt);
-        }
 
         dmg = user.calculateDmgTo(move, target, opt);
         logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
 
-        target.changeHpBy(-dmg, opt.isCrit);
+        //target.changeHpBy(-dmg, opt.isCrit);
         logger.message(target.getFullName() + " takes " + dmg + " damage!" + (move.isCrit ? " (crit)" : ""));
-
+        return dmg;
     }
 
     r.nextTurn = function(){

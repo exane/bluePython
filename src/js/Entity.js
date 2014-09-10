@@ -40,6 +40,8 @@ var Entity = (function(){
 
 
         this._nextTurnListener();
+
+        console.log(this);
     }
     var r = Entity.prototype;
 
@@ -63,6 +65,8 @@ var Entity = (function(){
     r._buffTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
     r._mana = 1;
     r._maxMana = 1;
+    r._incomingDmgMultiplier = 1;
+    r._outgoingDmgMultiplier = 1;
 
     /**
      * UI Properties
@@ -163,6 +167,12 @@ var Entity = (function(){
     r.getStats = function(){
         return this._stats;
     }
+    r.getIncomingDmgMultiplier = function(){
+        return this._incomingDmgMultiplier;
+    }
+    r.getOutgoingDmgMultiplier = function(){
+        return this._outgoingDmgMultiplier;
+    }
 
     /**
      * Setter
@@ -234,6 +244,12 @@ var Entity = (function(){
         }
         this.updateUi();
     }
+    r.setIncomingDmgMultiplier = function(val){
+        this._incomingDmgMultiplier = val;
+    }
+    r.setOutgoingDmgMultiplier = function(val){
+        this._outgoingDmgMultiplier = val;
+    }
 
     /**
      * Public Methods
@@ -259,6 +275,14 @@ var Entity = (function(){
             throw new Error("Missing duration property! @skill")
         }
 
+        //if(opt.addAbilities){
+        //    //this.addAbility()
+        //    for(var i=0; i<opt.addAbilities.length; i++){
+        //        this.addAbility(opt.addAbilities[i]);
+        //    }
+        //}
+
+
         //console.log(this);
 
         //debugger;
@@ -282,12 +306,33 @@ var Entity = (function(){
         for(var stat in buff.stats) {
             this._boosts[stat] -= buff.stats[stat];
         }
+        //for(var i=0; i<buff.addAbilities.length; i++){
+        //    this.removeAbility(buff.addAbilities[i]);
+        //}
         this._renderBuffs();
     }
+    /*
+    r.addAbility = function(ability){
+        for(var event in abilityData[ability]){
+            $(document).on("bp-ability-" + event, abilityData[ability][event].bind(self));
+        }
+        this._abilities.push(ability);
+    }
+    r.removeAbility = function(name){
+        for(var i=0; i<this._abilities.length; i++){
+            if(this._abilities[i] == name){
+                this._abilities.splice(i, 1);
+                return this.removeAbility(name); //just in case
+            }
+        }
+
+    }
+    */
     r.updateUi = function(){
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
         this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
         this._renderBuffs();
+        $.event.trigger("bp-tooltip-update");
     }
     r.revive = function(hp){
         hp = hp | 0;
@@ -297,27 +342,29 @@ var Entity = (function(){
         $.event.trigger("bp-ability-onRevive");
     }
     r.calculateDmgTo = function(move, target, opt){
-        var dmg = this.calculatePower(move);
+        //var dmg = this.calculatePower(move) * this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
+        var dmg = this.calculatePower(move); //* this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
         var def = target.calculateDef(move);
+        var rnd = 0;
+        dmg = (((((200/5) + 2)*dmg*8 / def) / 50) + 2)* this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
+        rnd = Math.random()*(dmg*10/100) - (dmg*20/100);
+
+        dmg += rnd | 0;
 
         if(opt.isCrit){
             dmg *= 2;
         }
 
-        var diff = dmg - def;
+        //var diff = dmg - def;
 
-        diff = diff >= 0 ? diff : 0;
+        //diff = diff >= 0 ? diff : 0;
 
-        return diff;
+        return dmg;
     }
     r.calculateCritChance = function(target, move){
-        //var baseCrit = 500;
-//
-        //baseCrit += this.getAttr("Lck");
-//
-        //return baseCrit / 100;
+
         return this.getCritRate();
-    } //deprecated!
+    }
     r.calculateCrit = function(chance){
         var crit = Math.random() * 100;
 
@@ -327,11 +374,7 @@ var Entity = (function(){
 
     }
     r.calculatePower = function(move){
-        var dmg = (move.basePower + this.getAttr("str"));
-
-        /*if(move.isCrit){
-         dmg *= 2;
-         }*/
+        var dmg = (move.basePower * this.getAttr("str"));
 
         return dmg;
     }
@@ -412,6 +455,13 @@ var Entity = (function(){
 
         //console.log(this.getFullName(), this._boosts);
         this._renderBuffs();
+        this.updateUi();
+    }
+    r.changeIncomingDmgMultiplierBy = function(val){
+        this.setIncomingDmgMultiplier(this.getIncomingDmgMultiplier() * val);
+    }
+    r.changeOutgoingDmgMultiplierBy = function(val){
+        this.setOutgoingDmgMultiplier(this.getOutgoingDmgMultiplier() * val);
     }
 
     /**
@@ -455,6 +505,7 @@ var Entity = (function(){
                     tmp.name = buff.name;
                     tmp.duration = buff.duration > buff2.duration ? buff.duration : buff2.duration;
                     tmp.stats = {};
+                    tmp.icon = buff.icon;
 
                     //stats
                     for(var stat in buff.stats) {
@@ -486,13 +537,24 @@ var Entity = (function(){
             if(abilityData[this.getAbilities(i)].onRevive){
                 $(document).on("bp-ability-onRevive", abilityData[this.getAbilities(i)].onRevive.bind(self));
             }
+            if(abilityData[this.getAbilities(i)].onTurnEnd){
+                $(document).on("bp-ability-onTurnEnd", abilityData[this.getAbilities(i)].onTurnEnd.bind(self));
+            }
+            if(abilityData[this.getAbilities(i)].onTurnBegin){
+                $(document).on("bp-ability-onTurnBegin", abilityData[this.getAbilities(i)].onTurnBegin.bind(self));
+            }
+            if(abilityData[this.getAbilities(i)].onBeforeAttack){
+                $(document).on("bp-ability-onBeforeAttack", abilityData[this.getAbilities(i)].onBeforeAttack.bind(self));
+            }
         }
     }
     r._renderBuffs = function(){
         //console.log($(this.uiBuffs));
         var buff = $("<div></div>");
         $(this.uiBuffs).empty();
-        $(buff).addClass("test-buff");
+        //$(buff).addClass("test-buff");
+        //var tmp = "";
+        var tmp = $("<img>");
 
         var n = this._buffs.length;
         for(var i = 0; i < n; i++) {
@@ -503,17 +565,30 @@ var Entity = (function(){
                 stats2string += stat + ": " + b.stats[stat] + "; ";
             }
 
-            $(buff).html(b.name + "<br>" + stats2string + "<br>" + b.duration);
+            /*
+            //$(buff).html(b.name + "<br>" + stats2string + "<br>" + b.duration);
+            tmp += b.name + "<br>" + stats2string + "<br>" + b.duration + "<br>";
+
+
+             */
+
+            if(!this._buffs[i].icon) continue;
+            $(tmp).attr("src", this._buffs[i].icon)
+            $(tmp).attr("data-id", this.getId());
+            $(tmp).attr("data-value", b.name);
+            $(tmp).attr("data-type", "buff");
+            $(this.uiBuffs).append(tmp);
 
         }
 
-        $(this.uiBuffs).append(buff);
+
+        //$(buff).html(tmp);
 
     }
     r._nextTurnListener = function(){
         var self = this;
         $(document).on("bp-battle-nextTurn", function(){
-            if(self.fainted) self.ready();
+            if(self.isFainted()) self.ready();
 
             //self._hasChosen = false;
             self.setChosen(false);
