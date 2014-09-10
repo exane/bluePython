@@ -16,7 +16,7 @@ var data = {
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
+        skills: ["fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
     },
     boss: {
         name: "Boss",

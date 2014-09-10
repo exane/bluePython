@@ -178,5 +178,28 @@ module.exports = {
             logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
         },
         noTarget: true
+    },
+    fumeboost: {
+        name: "Fume Boost",
+        id: "fumeboost",
+        costs: 500,
+        onCast: function(opt){
+            this.addBuff({
+                name: "Fume boost",
+                stats: {
+                    def: 6,
+                    str: 6,
+                    agi: 6,
+                    vit: 6,
+                    tec: 6,
+                    lck: 6
+                },
+                duration: 20,
+                icon: "assets/devfake.jpg"
+            });
+
+            logger.message("each stat increased by 300%! ");
+        },
+        noTarget: true
     }
 }
