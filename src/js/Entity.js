@@ -41,7 +41,7 @@ var Entity = (function(){
 
         this._nextTurnListener();
 
-        console.log(this);
+        //console.log(this);
     }
     var r = Entity.prototype;
 
@@ -552,14 +552,13 @@ var Entity = (function(){
         //console.log($(this.uiBuffs));
         var buff = $("<div></div>");
         $(this.uiBuffs).empty();
-        //$(buff).addClass("test-buff");
-        //var tmp = "";
-        var tmp = $("<img>");
+
 
         var n = this._buffs.length;
         for(var i = 0; i < n; i++) {
             var b = this._buffs[i];
             var stats2string = "";
+            var tmp = $("<img>");
 
             for(var stat in b.stats) {
                 stats2string += stat + ": " + b.stats[stat] + "; ";
@@ -573,12 +572,13 @@ var Entity = (function(){
              */
 
             if(!this._buffs[i].icon) continue;
-            $(tmp).attr("src", this._buffs[i].icon)
+
+            $(tmp).attr("src", b.icon)
             $(tmp).attr("data-id", this.getId());
             $(tmp).attr("data-value", b.name);
             $(tmp).attr("data-type", "buff");
-            $(this.uiBuffs).append(tmp);
 
+            $(this.uiBuffs).append(tmp);
         }
 
 

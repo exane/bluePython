@@ -31,7 +31,7 @@ var Battle = (function(){
     //r.events = {};
     r.tooltip = null;
 
-    r.speed = 1000;
+    r.speed = 100;
 
     r.debug = false;
     r.debugSkipGameover = false; //doesnt work yet / buggy
