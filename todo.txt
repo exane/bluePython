@@ -2,6 +2,7 @@
 - tooltips
 - zurück button für skill/target auswahl
 - accuracy einbauen
+- bufftable erweitern (von -6 bis +6)
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 //- dmg & crit dmg überarbeiten! (berechnung) (vorerst erledigt)
 
