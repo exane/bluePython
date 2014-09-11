@@ -103,7 +103,7 @@ var Display = (function(){
 
         if(type === "buff"){
             this.uiData.addClass(this.getStyleClass("buff"));
-            this.uiData.text(this.buffName + " buff");
+            this.uiData.text(this.buffName);
             this.popOut();
         }
         if(type === "number"){

@@ -70,6 +70,14 @@ var BattleSide = (function(){
         //entity.uiBuffs = $(uiBuffs);
         entity.uiBuffs = $(uiBuffs);
     }
+    r._createUiDebuffs = function(entity, uiInfo){
+        var uiDebuffs = $("<div></div>").attr("id", this.sideId + "-battle-debuffs-" + entity.getId());
+        //$(uiBuffs).appendTo(uiInfo);
+        $(uiDebuffs).appendTo(entity.uiSprite.parent());
+        $(uiDebuffs).addClass("battle-debuffs");
+        //entity.uiBuffs = $(uiBuffs);
+        entity.uiDebuffs = $(uiDebuffs);
+    }
 
     r._createUiHp = function(entity, uiInfo){
         var uiHp = $("<div class='bar bar-hp'></div>");
@@ -106,6 +114,7 @@ var BattleSide = (function(){
         this._createUiHp(entity, uiInfo);
         this._createUiMana(entity, uiInfo);
         this._createUiBuffs(entity, uiInfo);
+        this._createUiDebuffs(entity, uiInfo);
 
     }
 

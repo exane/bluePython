@@ -281,6 +281,7 @@ var Battle = (function(){
         var observeList = this.getObserveList();
 
 
+        /*
         $(document).on("bp-battle-chosen", function(e, data){
             k++;
 
@@ -289,7 +290,20 @@ var Battle = (function(){
 
             if(!observeList.length){
                 $(document).unbind("bp-battle-chosen");
-                self.runEvent(collectData);
+                self.runStartEvent(collectData);
+            }
+        })
+        */
+        var handle = pubsub.subscribe("/bp/battle/chosen", function(data){
+            k++;
+
+            self.removeFromObserveList(observeList, data.from.getId());
+            collectData.push(data);
+
+            if(!observeList.length){
+                //$(document).unbind("bp-battle-chosen");
+                pubsub.unsubscribe(handle);
+                self.runStartEvent(collectData);
             }
         })
     }
@@ -320,7 +334,7 @@ var Battle = (function(){
         return res;
     }
 
-    r.runEvent = function(data){
+    r.runStartEvent = function(data){
         //calculate stuff and simulate game, then starts next turn
 
         var n = data.length;
@@ -330,39 +344,13 @@ var Battle = (function(){
         this.checkEventOnTurnBegin(data);
         this.createTurnorder(data);
 
-        /*
-        if(this.debug){
-
-            for(var i = 0; i < n; i++) {
-
-
-                var move = moveData[data[i].do];
-                var user = data[i].from;
-                var target = data[i].target || null;
-
-                if(user.isFainted()){
-                    continue;
-                }
-
-                this.calculateTurnOf(user, target, move);
-
-            }
-
-            this.checkEventOnTurnEnd(data);
-            this.nextTurn();
-        }
-        else {
-            $(".controller").hide();
-            this.runEventSlow(0, n, data);
-        }
-        */
         $(".controller").hide();
-        this.runEventSlow(0, n, data);
+        this.runEvent(0, n, data);
 
 
     }
 
-    r.runEventSlow = function(i, n, data){
+    r.runEvent = function(i, n, data){
         if(i >= n){
             this.checkEventOnTurnEnd(data);
             this.nextTurn();
@@ -376,7 +364,7 @@ var Battle = (function(){
 
 
         if(user.isFainted()){
-            self.runEventSlow(++i, n, data);
+            self.runEvent(++i, n, data);
             return 0;
         }
         //marks user as active
@@ -397,7 +385,7 @@ var Battle = (function(){
 
                 setTimeout(function(){
                     $(user.uiSprite).removeClass("entity-active");
-                    self.runEventSlow(++i, n, data);
+                    self.runEvent(++i, n, data);
                 }, this.speed);
                 return -1;
             }
@@ -417,7 +405,7 @@ var Battle = (function(){
 
         setTimeout(function(){
             $(user.uiSprite).removeClass("entity-active");
-            self.runEventSlow(++i, n, data);
+            self.runEvent(++i, n, data);
         }, this.speed);
 
 
@@ -436,7 +424,8 @@ var Battle = (function(){
             }
 
         }
-        $.event.trigger("bp-ability-onTurnEnd");
+        //$.event.trigger("bp-ability-onTurnEnd");
+        pubsub.publish("/bp/battle/onTurnEnd");
     }
 
     r.checkEventOnTurnBegin = function(data){
@@ -454,7 +443,8 @@ var Battle = (function(){
 
 
         }
-        $.event.trigger("bp-ability-onTurnBegin");
+        //$.event.trigger("bp-ability-onTurnBegin");
+        pubsub.publish("/bp/battle/onTurnBegin");
     }
 
 
@@ -487,6 +477,8 @@ var Battle = (function(){
                 move.onAttack.call(user, opt);
             }
             target.changeHpBy(-dmg, opt.isCrit);
+            pubsub.publish("/bp/battle/onGetHit/" + target.getId());
+            pubsub.publish("/bp/battle/onHit/" + user.getId());
         }
 
         //if(move.boost){ //deprecated!
@@ -500,14 +492,15 @@ var Battle = (function(){
 
         //console.log(target);
         if(target && target.isFainted() && !wasFainted){
-            $.event.trigger("bp-ability-onFaint", opt);
+            //$.event.trigger("bp-ability-onFaint", opt);
+            pubsub.publish("/bp/battle/onFaint", [opt]);
             logger.message(target.getFullName() + " fainted...");
         }
     }
 
     r.calculateDmg = function(user, target, move, opt){
         var dmg;
-        if(!target) return 0;
+        if(!target || move.target == "friendly") return 0;
         if(target.isFainted()){
 
             logger.message(user.getFullName() + " uses " + move.name + " to attack " + target.getFullName());
@@ -527,33 +520,22 @@ var Battle = (function(){
     r.nextTurn = function(){
         if(!this.side1.hasMemberAlive()){
             this.showGameOver(this.side2.sideName + " won!");
-            if(this.debugSkipGameover){
-                $.event.trigger("bp-gameover-skip");
-            }
             return 1;
         }
         if(!this.side2.hasMemberAlive()){
             //this.showGameOver("Won!")
             this.showGameOver(this.side1.sideName + " won!");
-            if(this.debugSkipGameover){
-                $.event.trigger("bp-gameover-skip");
-            }
             return -1;
         }
 
         this.turn++;
-        $.event.trigger("bp-battle-nextTurn");
+        //$.event.trigger("bp-battle-nextTurn");
+        pubsub.publish("/bp/battle/nextTurn");
         if(this.player){
             this.player.resetMenu();
         }
         this.startNewTurn();
 
-    }
-
-    r.onGameOver = function(cb){
-        $(document).on("bp-gameover-skip", function(){
-            cb();
-        })
     }
 
     r.showGameOver = function(message){

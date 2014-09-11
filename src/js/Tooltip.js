@@ -22,7 +22,8 @@ var Tooltip = (function(){
         //$(".view .sprite .sprite-img-container").hover(this.onMouseover.bind(this), this.onMouseout.bind(this));
         $(".view .sprite .sprite-img-container").on("mouseover", self.onMouseover.bind(self));
         //$(".view .sprite .sprite-img-container").on("mouseout", this.onMouseover.bind(this));
-        $(document).on("bp-tooltip-update", this.render.bind(this));
+        //$(document).on("bp-tooltip-update", this.render.bind(this));
+        pubsub.subscribe("/bp/tooltip/update", this.render.bind(this));
     }
 
     r.onMouseover = function(e){

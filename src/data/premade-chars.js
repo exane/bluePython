@@ -16,7 +16,7 @@ var data = {
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
+        skills: ["rend", "hot_test","fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
     },
     boss: {
         name: "Boss",
@@ -59,7 +59,7 @@ var data = {
         img: "assets/GnomeMage.png",
         ai: function(){
 
-            if(this.getYourside().hasDeadMember()){
+            if(this.getYourside().hasDeadMember() && this.getMana() >= moveData["revive"].costs){
                 var member = this.getYourside().getRandomMember(false);
                 this.turnAction.do = "revive";
                 this.turnAction.target = member;

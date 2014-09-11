@@ -1,48 +1,6 @@
 var logger = require("../js/log.js");
+var buffData = require("./buffs.js");
 
-/*
- *
- * id required
- * name required
- * basePower null | number
- * isCrit false | true
- * priority 0
- * target "enemy" | "friendly"
- * accuracy 100
- * isAoe false | true
- * noTarget false | true
- * costs false | number | function
- *
- * possible events: (context: user | params: opt.target, opt.yourSide, opt.otherSide)
- * onTurnBegin
- * onBeforeAttack
- * onAttack
- * onCast // alternative to onAttack, without basePower attr
- * onAfterAttack
- * onTurnEnd
-
- also:
- - id muss und sollte extakt gleich heißen wie
- die object notation ( test { id: "test"} )
- - überall wo kein required dabei steht können
- weggelassen werden. die ersten werte sind immer
- die default werte falls man sie nicht mit angibt.
- im falle von basePower wird default null sein
- (falls man ein buff kreieren will, oder ne
- attacke ohne anzugreifen/dmg zu machen)
- - isCrit is nur dazu da um einen crit zu erzwingen..
- oder eben genau das gegenteil: wenn wert weggelassen wird
- (also weder true noch false) dann wird für die attacke
- ganz normal crit kalkuliert
- - priority is die erzwungende angriffsreihenfolge.
- 0 is standard und alles darunter und drüber wird
- extra bei der angriffsreihenfolge berechnet
- (also jemand mit 1 greift vor allen an die < 1 haben,
- die mit <0 sind sogar nach allen standard attacken drann)
- - genauigkeit is in prozent
- - noTarget is eine flag für den player das er kein
- target aussuchen muss
- */
 
 
 module.exports = {
@@ -87,7 +45,7 @@ module.exports = {
         basePower: 100,
         priority: 1,
         costs: function(){
-            return this.getMaxMana()*60/100 | 0;
+            return 1;//this.getMaxMana()*60/100 | 0;
         },
         onAttack: function(opt){
             var enemy = opt.target;
@@ -148,14 +106,7 @@ module.exports = {
         id: "attackboost",
         costs: 100,
         onCast: function(opt){
-            this.addBuff({
-                name: "Attack boost",
-                stats: {
-                    str: 2
-                },
-                duration: 5,
-                icon: "assets/muscle-up.png"
-            });
+            this.addBuff(buffData.load("attackboost"));
 
             logger.message("str boosted by 2. total str boosts: " + this.getBoostLevel("str"));
         },
@@ -166,14 +117,7 @@ module.exports = {
         id: "defboost",
         costs: 100,
         onCast: function(opt){
-            this.addBuff({
-                name: "Defense boost",
-                stats: {
-                    def: 2
-                },
-                duration: 5,
-                icon: "assets/aura.png"
-            });
+            this.addBuff(buffData.load("defenseboost"));
 
             logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
         },
@@ -184,22 +128,30 @@ module.exports = {
         id: "fumeboost",
         costs: 500,
         onCast: function(opt){
-            this.addBuff({
-                name: "Fume boost",
-                stats: {
-                    def: 6,
-                    str: 6,
-                    agi: 6,
-                    vit: 6,
-                    tec: 6,
-                    lck: 6
-                },
-                duration: 20,
-                icon: "assets/devfake.jpg"
-            });
+            this.addBuff(buffData.load("fumeboost"));
 
             logger.message("each stat increased by 300%! ");
         },
         noTarget: true
+    },
+    hot_test: {
+        name: "HoT",
+        id: "hot_test",
+        target: "friendly",
+        onCast: function(){
+            logger.message(this.getFullName() + " casts HoT!");
+            this.addBuff(buffData.load("hot_test"));
+            this.addBuff(buffData.load("onHit_test"));
+        }
+    },
+    rend: {
+        name: "rend (dot)(debuff)",
+        basePower: 20,
+        id: "rend",
+        onCast: function(opt){
+            logger.message(this.getFullName() + " rend his target!");
+            opt.target.addDebuff(buffData.load("test_dot"));
+        }
+
     }
 }

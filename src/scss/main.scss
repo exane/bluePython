@@ -74,7 +74,7 @@ $height: 600px;
   display: table;
 }
 
-.battle-buffs {
+.battle-buffs, .battle-debuffs {
   width: ($width - $height/2)/4/2;
   height: auto;
   //border: 1px solid red;
@@ -86,8 +86,15 @@ $height: 600px;
     float: left;
     display: block;
     border-radius: 3px;
-    padding: 1px;
+    //padding: 1px;
+    //background: green;
+    border: 2px solid green;
   }
+  &.battle-debuffs img {
+    border: 1px solid red;
+    //background: red;
+  }
+
 }
 
 .battle-info {
@@ -138,6 +145,8 @@ $height: 600px;
 
   background-color: rgba(0, 220, 2, 0.61);
   border: 1px solid black;
+
+  overflow-y: auto;
 
   ul {
     list-style: none;

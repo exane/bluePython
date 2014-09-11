@@ -1,0 +1,45 @@
+
+
+ - id required
+ - name required
+ - basePower null | number
+ - isCrit false | true
+ - priority 0
+ - target "enemy" | "friendly"
+ - accuracy 100
+ - isAoe false | true
+ - noTarget false | true
+ - costs false | number | function
+
+ - possible events: (context: user | params: opt.target, opt.yourSide, opt.otherSide)
+ - onTurnBegin
+ - onBeforeAttack
+ - onAttack
+ - onCast // alternative to onAttack, without basePower attr
+ - onAfterAttack
+ - onTurnEnd
+ - onGetHit
+ - onHit
+ - onInit
+
+ also:
+ - id muss und sollte extakt gleich heißen wie
+ die object notation ( test { id: "test"} )
+ - überall wo kein required dabei steht können
+ weggelassen werden. die ersten werte sind immer
+ die default werte falls man sie nicht mit angibt.
+ im falle von basePower wird default null sein
+ (falls man ein buff kreieren will, oder ne
+ attacke ohne anzugreifen/dmg zu machen)
+ - isCrit is nur dazu da um einen crit zu erzwingen..
+ oder eben genau das gegenteil: wenn wert weggelassen wird
+ (also weder true noch false) dann wird für die attacke
+ ganz normal crit kalkuliert
+ - priority is die erzwungende angriffsreihenfolge.
+ 0 is standard und alles darunter und drüber wird
+ extra bei der angriffsreihenfolge berechnet
+ (also jemand mit 1 greift vor allen an die < 1 haben,
+ die mit <0 sind sogar nach allen standard attacken drann)
+ - genauigkeit is in prozent
+ - noTarget is eine flag für den player das er kein
+ target aussuchen muss

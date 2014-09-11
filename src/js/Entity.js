@@ -2,6 +2,7 @@
 
 var logger = require("./log.js");
 var abilityData = require("../data/abilities.js");
+var buffData = require("../data/buffs.js");
 
 var Entity = (function(){
     var Display = require("./Display.js");
@@ -33,10 +34,12 @@ var Entity = (function(){
         this._maxMana = this._mana = this.getMaxMana();
 
         this._buffs = [];
+        this._debuffs = [];
 
         this.turnAction = {};
 
         this._abilityListener();
+        this._buffListener();
 
 
         this._nextTurnListener();
@@ -61,6 +64,7 @@ var Entity = (function(){
     r._skillList = [];
     r._abilities = [];
     r._buffs = [];
+    r._debuffs = [];
     r._boosts = {};
     r._buffTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
     r._mana = 1;
@@ -76,6 +80,7 @@ var Entity = (function(){
     r.uiHp = null;
     r.uiMana = null;
     r.uiBuffs = null;
+    r.uiDebuffs = null;
 
     r.turnAction = null;
 
@@ -114,7 +119,7 @@ var Entity = (function(){
         return str;
     }
     r.getAttackPower = function(type){
-        if(type == "physical") {
+        if(type == "physical"){
             return this.getPhysicalAttackPower();
         }
         if(type == "special"){
@@ -182,6 +187,8 @@ var Entity = (function(){
     }
     r.setFainted = function(bool){
         this._fainted = bool;
+        this.removeAllBuffs();
+        this.removeAllDebuffs();
     }
     r.setImg = function(img){
         this._img = img;
@@ -207,7 +214,7 @@ var Entity = (function(){
             throw new Error("Missing duration property! @skill")
         }
 
-        if(!this._hasBuff(name)){
+        if(!this.hasBuff(name)){
             return this.addBuff(opt);
         }
 
@@ -254,16 +261,32 @@ var Entity = (function(){
     /**
      * Public Methods
      */
+    r.removeAllBuffs = function(){
+        for(var i = 0; i < this._buffs.length; i++) {
+            this.removeBuff(this._buffs[i], i);
+        }
+    }
+    r.removeAllDebuffs = function(){
+        for(var i = 0; i < this._debuffs.length; i++) {
+            this.removeDebuff(this._debuffs[i], i);
+        }
+    }
     r.hasChosen = function(){
         return this._hasChosen;
     }
     r.isFainted = function(){
         return this._fainted;
     }
-    r.addBuff = function(opt){
-        var stats = opt.stats;
-        var duration = opt.duration;
-        var name = opt.name;
+    r.addBuffOnce = function(buff){
+        if(this.hasBuff(buff.name)) return 0;
+        this.addBuff(buff);
+    }
+    r.addBuff = function(buff){
+        var stats = buff.stats;
+        var duration = buff.duration;
+        var name = buff.name;
+
+        if(this.isFainted()) return 0;
 
         if(!name){
             throw new Error("Missing name property! @skill")
@@ -275,32 +298,89 @@ var Entity = (function(){
             throw new Error("Missing duration property! @skill")
         }
 
-        //if(opt.addAbilities){
-        //    //this.addAbility()
-        //    for(var i=0; i<opt.addAbilities.length; i++){
-        //        this.addAbility(opt.addAbilities[i]);
-        //    }
-        //}
+        this._buffEvents(buff);
 
+        if(!this.hasBuff(name))
+            new Display({buffName: name, buffStats: stats, buffDuration: duration, target: this});
 
-        //console.log(this);
-
-        //debugger;
-        /**
-         * visuell
-         */
-        new Display({buffName: name, buffStats: stats, buffDuration: duration, target: this});
-
-        this._buffs.push(opt);
+        var t = this._buffs.push(buff);
 
         //merge buff & extend duration
-        this._mergeBuffs();
+        this._mergeBuffs(this._buffs);
 
         this._boost(stats);
         this._renderBuffs();
+        pubsub.publish("/bp/battle/onInit/" + this.getId());
     }
-    r.buffRemove = function(buff, index){
-        //console.log(buff, index);
+    r.addDebuff = function(debuff){
+        var stats = debuff.stats;
+        var duration = debuff.duration;
+        var name = debuff.name;
+        if(this.isFainted()) return 0;
+
+        if(!name){
+            throw new Error("Missing name property! @skill")
+        }
+        if(!stats){
+            throw new Error("Missing stats property! @skill")
+        }
+        if(!duration){
+            throw new Error("Missing duration property! @skill")
+        }
+
+        /*
+         if(debuff.effects){
+         var __h = debuff.__handler = [];
+         if(debuff.effects.onTurnEnd){
+         __h.push(pubsub.subscribe("/bp/battle/onTurnEnd",
+         debuff.effects.onTurnEnd.bind(this)));
+         }
+         if(debuff.effects.onTurnBegin){
+         __h.push(pubsub.subscribe("/bp/battle/onTurnBegin",
+         debuff.effects.onTurnBegin.bind(this)));
+         }
+         if(debuff.effects.onFaint){
+         __h.push(pubsub.subscribe("/bp/battle/onFaint",
+         debuff.effects.onFaint.bind(this)));
+         }
+         if(debuff.effects.onRevive){
+         __h.push(pubsub.subscribe("/bp/battle/onRevive",
+         debuff.effects.onRevive.bind(this)));
+         }
+         if(debuff.effects.onGetHit){
+         __h.push(pubsub.subscribe("/bp/battle/onGetHit/" + this.getId(),
+         debuff.effects.onGetHit.bind(this)));
+         }
+         if(debuff.effects.onHit){
+         __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId(),
+         buff.effects.onHit.bind(this)));
+         }
+         }
+         */
+        this._buffEvents(debuff);
+
+        if(!this.hasDebuff(name))
+        new Display({buffName: name, buffStats: stats, buffDuration: duration, target: this});
+
+        var t = this._debuffs.push(debuff);
+
+        //merge buff & extend duration
+        this._mergeBuffs(this._debuffs);
+
+        this._boost(stats);
+        this._renderBuffs();
+
+        pubsub.publish("/bp/battle/onInit/" + this.getId());
+
+    }
+    r.removeBuff = function(buff, index){
+
+        if(buff.__handler){
+            for(var i = 0; i < buff.__handler.length; i++) {
+                pubsub.unsubscribe(buff.__handler[i]);
+            }
+        }
+
         this._buffs.splice(index, 1);
         logger.message(buff.name + " wears off.");
         for(var stat in buff.stats) {
@@ -311,43 +391,65 @@ var Entity = (function(){
         //}
         this._renderBuffs();
     }
-    /*
-    r.addAbility = function(ability){
-        for(var event in abilityData[ability]){
-            $(document).on("bp-ability-" + event, abilityData[ability][event].bind(self));
-        }
-        this._abilities.push(ability);
-    }
-    r.removeAbility = function(name){
-        for(var i=0; i<this._abilities.length; i++){
-            if(this._abilities[i] == name){
-                this._abilities.splice(i, 1);
-                return this.removeAbility(name); //just in case
+    r.removeDebuff = function(debuff, index){
+        console.log(debuff, index);
+
+        if(debuff.__handler){
+            for(var i = 0; i < debuff.__handler.length; i++) {
+                pubsub.unsubscribe(debuff.__handler[i]);
             }
         }
 
+        this._debuffs.splice(index, 1);
+        logger.message(debuff.name + " wears off.");
+        for(var stat in debuff.stats) {
+            this._boosts[stat] -= debuff.stats[stat];
+        }
+        //for(var i=0; i<debuff.addAbilities.length; i++){
+        //    this.removeAbility(debuff.addAbilities[i]);
+        //}
+        this._renderBuffs();
     }
-    */
+    /*
+     r.addAbility = function(ability){
+     for(var event in abilityData[ability]){
+     $(document).on("bp-ability-" + event, abilityData[ability][event].bind(self));
+     }
+     this._abilities.push(ability);
+     }
+     r.removeAbility = function(name){
+     for(var i=0; i<this._abilities.length; i++){
+     if(this._abilities[i] == name){
+     this._abilities.splice(i, 1);
+     return this.removeAbility(name); //just in case
+     }
+     }
+
+     }
+     */
     r.updateUi = function(){
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
         this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
         this._renderBuffs();
-        $.event.trigger("bp-tooltip-update");
+        //$.event.trigger("bp-tooltip-update");
+        pubsub.publish("/bp/tooltip/update");
     }
     r.revive = function(hp){
         hp = hp | 0;
         this.setFainted(false);
         this.uiSprite.removeClass("fainted");
         this.changeHpBy(hp);
-        $.event.trigger("bp-ability-onRevive");
+        //$.event.trigger("bp-ability-onRevive");
+        pubsub.publish("/bp/battle/onRevive");
     }
+
     r.calculateDmgTo = function(move, target, opt){
         //var dmg = this.calculatePower(move) * this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
         var dmg = this.calculatePower(move); //* this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
-        var def = target.calculateDef(move);
+        var def = (target && target.calculateDef(move)) || 1;
         var rnd = 0;
-        dmg = (((((200/5) + 2)*dmg*8 / def) / 50) + 2)* this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
-        rnd = Math.random()*(dmg*10/100) - (dmg*20/100);
+        dmg = (((((200 / 5) + 2) * dmg * 8 / def) / 50) + 2) * this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
+        rnd = Math.random() * (dmg * 10 / 100) - (dmg * 20 / 100);
 
         dmg += rnd | 0;
 
@@ -407,6 +509,7 @@ var Entity = (function(){
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
     }
     r.changeManaBy = function(value){
+        if(this.isFainted()) return 0;
         if(this.getMana() + value < 0){
             return false;
         }
@@ -431,29 +534,14 @@ var Entity = (function(){
             data.fainted = true;
             data.from = this;
         }
-        $.event.trigger("bp-battle-chosen", {data: data});
+        //$.event.trigger("bp-battle-chosen", {data: data});
+        pubsub.publish("/bp/battle/chosen", [data]);
     }
     r.decreaseDurationTime = function(){
-        var n = this._buffs.length;
-        var i;
 
+        this._decreaseBuffTime();
+        this._decreaseDebuffTime();
 
-        for(i = 0; i < n; i++) {
-            var buff = this._buffs[i];
-
-            //buff.duration = -1 => no duration
-            if(buff.duration != -1 && buff.duration - 1 === 0){
-                this.buffRemove(buff, i);
-                return this.decreaseDurationTime();
-            }
-        }
-
-        for(i = 0; i < n; i++) {
-            if(buff.duration === -1) continue;
-            this._buffs[i].duration--;
-        }
-
-        //console.log(this.getFullName(), this._boosts);
         this._renderBuffs();
         this.updateUi();
     }
@@ -463,14 +551,31 @@ var Entity = (function(){
     r.changeOutgoingDmgMultiplierBy = function(val){
         this.setOutgoingDmgMultiplier(this.getOutgoingDmgMultiplier() * val);
     }
+    r.eachBuff = function(cb){
+        for(var i = 0; i < this._buffs.length; i++) {
+            cb.call(this, this._buffs[i]);
+        }
+    }
 
     /**
      * Private Methods
      */
-    r._hasBuff = function(buffName){
+    r.hasBuff = function(buffName){
+        if(this.isFainted()) return false;
+
         var n = this._buffs.length;
         for(var i = 0; i < n; i++) {
             if(this._buffs[i].name === buffName)
+                return true;
+        }
+
+        return false;
+    }
+    r.hasDebuff = function(debuffName){
+        if(this.isFainted()) return false;
+        var n = this._debuffs.length;
+        for(var i = 0; i < n; i++) {
+            if(this._debuffs[i].name === debuffName)
                 return true;
         }
 
@@ -483,29 +588,36 @@ var Entity = (function(){
 
             //console.log(this);
 
-            if(this._boosts[stat] > this._buffTable.length){
+            if(this._boosts[stat] >= this._buffTable.length){
                 this._boosts[stat] = this._buffTable.length - 1;
                 logger.message(stat + " can't be boosted more!");
             }
         }
         this.updateUi();
     }
-    r._mergeBuffs = function(){
-        var n = this._buffs.length;
+    r._removeHandlers = function(buff){
+        for(var i = 0; i < buff.__handler.length; i++) {
+            pubsub.unsubscribe(buff.__handler[i]);
+        }
+        delete buff.__handler;
+    }
+    r._mergeBuffs = function(buffs){
+        var n = buffs.length;
 
         for(var i = 0; i < n; i++) {
-            var buff = this._buffs[i];
+            var buff = buffs[i];
 
             for(var j = i + 1; j < n; j++) {
-                if(buff.name === this._buffs[j].name){
-                    var buff2 = this._buffs[j];
+                if(buff.name === buffs[j].name){
+                    var buff2 = buffs[j];
 
                     var tmp = {};
 
-                    tmp.name = buff.name;
+                    for(var obj in buff) {
+                        tmp[obj] = buff[obj];
+                    }
                     tmp.duration = buff.duration > buff2.duration ? buff.duration : buff2.duration;
-                    tmp.stats = {};
-                    tmp.icon = buff.icon;
+
 
                     //stats
                     for(var stat in buff.stats) {
@@ -517,13 +629,16 @@ var Entity = (function(){
                         }
                     }
 
-                    this._buffs.splice(j, 1);
-                    this._buffs.splice(i, 1);
-
-                    this._buffs.push(tmp);
+                    this._removeHandlers(buff2);
 
 
-                    return this._mergeBuffs();
+                    buffs.splice(j, 1);
+                    buffs.splice(i, 1);
+
+                    buffs.push(tmp);
+
+
+                    return this._mergeBuffs(buffs);
                 }
             }
         }
@@ -532,41 +647,51 @@ var Entity = (function(){
         var self = this;
         for(var i = 0; i < this.getAbilities().length; i++) {
             if(abilityData[this.getAbilities(i)].onFaint){
-                $(document).on("bp-ability-onFaint", abilityData[this.getAbilities(i)].onFaint.bind(self));
+                //$(document).on("bp-ability-onFaint", abilityData[this.getAbilities(i)].onFaint.bind(self));
+                pubsub.subscribe("/bp/battle/onFaint", abilityData[this.getAbilities(i)].onFaint.bind(this))
             }
             if(abilityData[this.getAbilities(i)].onRevive){
-                $(document).on("bp-ability-onRevive", abilityData[this.getAbilities(i)].onRevive.bind(self));
+                //$(document).on("bp-ability-onRevive", abilityData[this.getAbilities(i)].onRevive.bind(self));
+                pubsub.subscribe("/bp/battle/onRevive", abilityData[this.getAbilities(i)].onRevive.bind(this))
             }
             if(abilityData[this.getAbilities(i)].onTurnEnd){
-                $(document).on("bp-ability-onTurnEnd", abilityData[this.getAbilities(i)].onTurnEnd.bind(self));
+                //$(document).on("bp-ability-onTurnEnd", abilityData[this.getAbilities(i)].onTurnEnd.bind(self));
+                pubsub.subscribe("/bp/battle/onTurnEnd", abilityData[this.getAbilities(i)].onTurnEnd.bind(this))
             }
             if(abilityData[this.getAbilities(i)].onTurnBegin){
-                $(document).on("bp-ability-onTurnBegin", abilityData[this.getAbilities(i)].onTurnBegin.bind(self));
+                //$(document).on("bp-ability-onTurnBegin", abilityData[this.getAbilities(i)].onTurnBegin.bind(self));
+                pubsub.subscribe("/bp/battle/onTurnBegin", abilityData[this.getAbilities(i)].onTurnBegin.bind(this))
             }
             if(abilityData[this.getAbilities(i)].onBeforeAttack){
-                $(document).on("bp-ability-onBeforeAttack", abilityData[this.getAbilities(i)].onBeforeAttack.bind(self));
+                //$(document).on("bp-ability-onBeforeAttack", abilityData[this.getAbilities(i)].onBeforeAttack.bind(self));
+                pubsub.subscribe("/bp/battle/onBeforeAttack", abilityData[this.getAbilities(i)].onBeforeAttack.bind(this))
             }
         }
     }
     r._renderBuffs = function(){
         //console.log($(this.uiBuffs));
         var buff = $("<div></div>");
+        var debuff = $("<div></div>");
+        var i, b, stats2string, tmp, stat;
         $(this.uiBuffs).empty();
+        $(this.uiDebuffs).empty();
 
 
         var n = this._buffs.length;
-        for(var i = 0; i < n; i++) {
-            var b = this._buffs[i];
-            var stats2string = "";
-            var tmp = $("<img>");
+        var m = this._debuffs.length;
 
-            for(var stat in b.stats) {
+        for(i = 0; i < n; i++) {
+            b = this._buffs[i];
+            stats2string = "";
+            tmp = $("<img>");
+
+            for(stat in b.stats) {
                 stats2string += stat + ": " + b.stats[stat] + "; ";
             }
 
             /*
-            //$(buff).html(b.name + "<br>" + stats2string + "<br>" + b.duration);
-            tmp += b.name + "<br>" + stats2string + "<br>" + b.duration + "<br>";
+             //$(buff).html(b.name + "<br>" + stats2string + "<br>" + b.duration);
+             tmp += b.name + "<br>" + stats2string + "<br>" + b.duration + "<br>";
 
 
              */
@@ -581,19 +706,131 @@ var Entity = (function(){
             $(this.uiBuffs).append(tmp);
         }
 
+        for(i = 0; i < m; i++) {
+            b = this._debuffs[i];
+            stats2string = "";
+            tmp = $("<img>");
+
+            for(stat in b.stats) {
+                stats2string += stat + ": " + b.stats[stat] + "; ";
+            }
+
+
+            if(!this._debuffs[i].icon) continue;
+
+            $(tmp).attr("src", b.icon)
+            $(tmp).attr("data-id", this.getId());
+            $(tmp).attr("data-value", b.name);
+            $(tmp).attr("data-type", "buff");
+
+            $(this.uiDebuffs).append(tmp);
+        }
+
 
         //$(buff).html(tmp);
 
     }
     r._nextTurnListener = function(){
         var self = this;
-        $(document).on("bp-battle-nextTurn", function(){
+        /*
+         $(document).on("bp-battle-nextTurn", function(){
+         if(self.isFainted()) self.ready();
+
+         //self._hasChosen = false;
+         self.setChosen(false);
+         self.turnAction = {};
+         })
+         */
+        pubsub.subscribe("/bp/battle/nextTurn", function(){
             if(self.isFainted()) self.ready();
 
             //self._hasChosen = false;
             self.setChosen(false);
             self.turnAction = {};
+            //console.log(this);
         })
+    }
+    r._buffListener = function(){
+        //pubsub.subscribe("/bp/battle/onTurnEnd")
+        /*
+         this.eachBuff(function(buff){
+         if(!buff.effects) return 0;
+         if(buff.effects.onTurnEnd){
+         console.log("buff test", this, buff);
+         //pubsub.subscribe("/bp/battle/onTurnEnd", buffData.load())
+         }
+         });
+         */
+    }
+    r._decreaseBuffTime = function(){
+        var n = this._buffs.length;
+        var i;
+
+        for(i = 0; i < n; i++) {
+            var buff = this._buffs[i];
+
+            //buff.duration = -1 => no duration
+            if(buff.duration != -1 && buff.duration - 1 === 0){
+                this.removeBuff(buff, i);
+                return this.decreaseDurationTime();
+            }
+        }
+        for(i = 0; i < n; i++) {
+            if(buff.duration === -1) continue;
+            this._buffs[i].duration--;
+        }
+    }
+    r._decreaseDebuffTime = function(){
+        var n = this._debuffs.length;
+        var i;
+
+        for(i = 0; i < n; i++) {
+            var debuff = this._debuffs[i];
+
+            //debuff.duration = -1 => no duration
+            if(debuff.duration != -1 && debuff.duration - 1 === 0){
+                this.removeDebuff(debuff, i);
+                return this.decreaseDurationTime();
+            }
+        }
+        for(i = 0; i < n; i++) {
+            if(debuff.duration === -1) continue;
+            this._debuffs[i].duration--;
+        }
+    }
+    r._buffEvents = function(buff){
+        if(buff.effects){
+            var __h = buff.__handler = [];
+            if(buff.effects.onTurnEnd){
+                __h.push(pubsub.subscribe("/bp/battle/onTurnEnd",
+                    buff.effects.onTurnEnd.bind(this)));
+            }
+            if(buff.effects.onTurnBegin){
+                __h.push(pubsub.subscribe("/bp/battle/onTurnBegin",
+                    buff.effects.onTurnBegin.bind(this)));
+            }
+            if(buff.effects.onFaint){
+                __h.push(pubsub.subscribe("/bp/battle/onFaint",
+                    buff.effects.onFaint.bind(this)));
+            }
+            if(buff.effects.onRevive){
+                __h.push(pubsub.subscribe("/bp/battle/onRevive",
+                    buff.effects.onRevive.bind(this)));
+            }
+            if(buff.effects.onGetHit){
+                __h.push(pubsub.subscribe("/bp/battle/onGetHit/" + this.getId(),
+                    buff.effects.onGetHit.bind(this)));
+            }
+            if(buff.effects.onHit){
+                __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId(),
+                    buff.effects.onHit.bind(this)));
+            }
+            if(buff.effects.onInit){
+                __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId(),
+                    buff.effects.onInit.bind(this)));
+            }
+        }
+
     }
 
     return Entity;

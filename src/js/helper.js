@@ -4,7 +4,7 @@
 
 
 
-__extends = this.__extends || function(d, b){
+__extends = window.__extends || function(d, b){
     for(var p in b) if(b.hasOwnProperty(p)) d[p] = b[p];
     function __(){
         this.constructor = d;
@@ -14,4 +14,6 @@ __extends = this.__extends || function(d, b){
     d.prototype = new __();
 };
 
-module.exports = __extends;
+
+
+
