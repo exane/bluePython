@@ -16,7 +16,7 @@ var data = {
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["aimwater","rend", "hot_test","fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"],
+        skills: ["aimwater","rend", "hot_test","fumeboost", "heal", "quick_attack", "assassination", "burnslash"],
         ai: function(){
             var moves = [
                 {chance: 100/5 + 100/5/2 + 100/5/2, id: "rend"},

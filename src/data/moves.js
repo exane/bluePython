@@ -138,7 +138,6 @@ module.exports = {
         name: "HoT",
         id: "hot_test",
         target: "friendly",
-        isAoe: true,
         onCast: function(opt){
 
             logger.message(this.getFullName() + " casts HoT!");
