@@ -17,12 +17,6 @@ module.exports = self = {
 
 
 
-        },
-        onFaint: function(e, opt){
-            //self.firearmor.onTurnBegin.call(this);
-        },
-        onRevive: function(e, opt){
-            //self.firearmor.onTurnBegin.call(this);
         }
 
     },

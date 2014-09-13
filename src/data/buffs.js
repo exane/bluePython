@@ -3,11 +3,13 @@ var logger = require("../js/log.js");
 var self;
 module.exports = self = {
     load: function(id){
-        return Object.create(self[id]);
+        //return Object.create(self[id]);
+        return $.extend(true, {}, self[id]);
     },
     fumeboost: {
         name: "Fume boost",
         id: "fumeboost",
+        desc: "Increasing each stat by 300%.",
         stats: {
             def: 6,
             str: 6,
@@ -39,6 +41,8 @@ module.exports = self = {
     },
     firearmor: {
         name: "Fire Armor",
+        id: "firearmor",
+        desc: "Target inflames his body. All stats are increased by 50% for each ally.",
         stats: {
             def: 0,
             str: 0,
@@ -64,6 +68,7 @@ module.exports = self = {
                 var percentageOfHp = 100 * currHp / currMaxHp;
                 var percentageOfMana = 100 * currMana / currMaxMana;
 
+
                 var firearmor = self.load("firearmor");
 
                 firearmor.stats = {
@@ -77,6 +82,7 @@ module.exports = self = {
 
 
                 this.setBuffTo(firearmor);
+
 
                 var newCurrMaxHp = this.getMaxHp();
                 var newCurrMaxMana = this.getMaxMana();
@@ -97,40 +103,68 @@ module.exports = self = {
     hot_test: {
         name: "HoT (Heal over Time)",
         id: "hot_test",
+        desc: "Healing of the target at end of each turn.",
         icon: "assets/lotus-flower.png",
         stats: {},
         duration: 5,
         effects: {
-            onTurnEnd: function(){
-                this.changeHpBy(100);
+            onTurnEnd: function(opt){ //opt = buff properties
+                //debugger;
+                this.changeHpBy(opt.from.getAttr("tec"));
             }
         }
     },
     onHit_test: {
         name: "onHit_test",
         id: "onHit_test",
+        desc: "If target got hit, then he immediately regenerates some hp.",
         icon: "assets/aura.png",
         stats: {},
         duration: 5,
         effects: {
-            onGetHit: function(){
-                this.changeHpBy(50);
+            onGetHit: function(opt){
+                this.changeHpBy(opt.from.getAttr("tec")/3);
             },
-            onHit: function(){
-                this.changeHpBy(-50);
+            onHit: function(opt){
+                //this.changeHpBy(this.getAttr("tec"));
             }
         }
     },
     test_dot: {
         name: "Rend (dot)",
         id: "test_dot",
+        desc: "Target bleeds for x dmg each turn. Each Dmg on this target is also increased by 20%.",
         icon: "assets/ragged-wound.png",
         stats: {},
         duration: 5,
         effects: {
-            onTurnEnd: function(){
+            onTurnEnd: function(opt){
                 //var dmg = this.calculateDmg()
-                this.changeHpBy(-3000);
+                this.changeHpBy(-500);
+            },
+            onInit: function(opt){
+                this.changeIncomingDmgMultiplierBy(0.2);
+            },
+            onEnd: function(opt){
+                this.changeIncomingDmgMultiplierBy(-0.2);
+            }
+        }
+    },
+    aimwater_buff: {
+        name: "Aimwater",
+        id: "aimwater_buff",
+        desc: "Increases crit chance by 50% and crit dmg by 200%",
+        icon: "assets/beer-stein.png",
+        stats: {},
+        duration: 5,
+        effects: {
+            onInit: function(opt){
+                this.increaseCritChancesBy(50);
+                this.increaseCritDmgBy(200);
+            },
+            onEnd: function(opt){
+                this.decreaseCritChancesBy(50);
+                this.decreaseCritDmgBy(200);
             }
         }
     }

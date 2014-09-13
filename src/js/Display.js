@@ -86,8 +86,8 @@ var Display = (function(){
 
         //console.log(spriteContainer);
 
-        randomX = (Math.random() * 30 | 0) - 15;
-        randomY = (Math.random() * 30 | 0) - 15;
+        randomX = (Math.random() * 60 | 0) - 30;
+        randomY = (Math.random() * 60 | 0) - 30;
 
 
         $("<div data-id='" + this.id + "' class='display'></div>").appendTo(spriteContainer);

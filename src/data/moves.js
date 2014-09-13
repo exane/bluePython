@@ -138,20 +138,33 @@ module.exports = {
         name: "HoT",
         id: "hot_test",
         target: "friendly",
-        onCast: function(){
+        isAoe: true,
+        onCast: function(opt){
+
             logger.message(this.getFullName() + " casts HoT!");
-            this.addBuff(buffData.load("hot_test"));
-            this.addBuff(buffData.load("onHit_test"));
+            opt.target.addBuff(buffData.load("hot_test"), this);
+            opt.target.addBuff(buffData.load("onHit_test"), this);
         }
     },
     rend: {
         name: "rend (dot)(debuff)",
         basePower: 20,
         id: "rend",
+        isAoe: true,
         onCast: function(opt){
             logger.message(this.getFullName() + " rend his target!");
             opt.target.addDebuff(buffData.load("test_dot"));
         }
 
+    },
+    aimwater: {
+        name: "Aimwater(buff)",
+        id: "aimwater",
+        target: "friendly",
+        costs: 100,
+        onCast: function(opt){
+            logger.message(this.getFullName() + " drinks aimwater! critical chance increased!");
+            opt.target.addBuff(buffData.load("aimwater_buff"));
+        }
     }
 }

@@ -62,11 +62,14 @@ $height: 600px;
   }
 
   .bar-hp {
-    background: #00b900;
+    //background: #00b900;
+    background: linear-gradient(to right, #00b900 100%, rgba(0,0,0,0) 0%);
   }
   .bar-mana {
-    background: #297eff;
+    //background: #297eff;
+    background: linear-gradient(to right, #297eff 100%, rgba(0,0,0,0) 0%);
   }
+
 }
 
 .battle-view {

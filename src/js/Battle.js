@@ -31,7 +31,7 @@ var Battle = (function(){
     //r.events = {};
     r.tooltip = null;
 
-    r.speed = 1000;
+    r.speed = 100;
 
     r.debug = false;
     r.debugSkipGameover = false; //doesnt work yet / buggy
@@ -40,8 +40,9 @@ var Battle = (function(){
     r.init = function(){
 
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewPlayer(data.exane, this.side1, this.side2);
         this.addNewPlayer(data.exane, this.side1, this.side2);
-        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
@@ -52,8 +53,10 @@ var Battle = (function(){
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
-        this.listTargets(this.player.getOtherside(), this.player.getYourside());
-        this.listSkills();
+        if(this.player){
+            this.listTargets(this.player.getOtherside(), this.player.getYourside());
+            this.listSkills();
+        }
 
         var self = this;
         this.tooltip = new Tooltip(this);
@@ -212,7 +215,6 @@ var Battle = (function(){
         }
     }
 
-
     r.listTargets = function(otherSide, yourSide){
         if(!this.player) return 0;
         var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
@@ -294,7 +296,7 @@ var Battle = (function(){
             }
         })
         */
-        var handle = pubsub.subscribe("/bp/battle/chosen", function(data){
+        var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
 
             self.removeFromObserveList(observeList, data.from.getId());
@@ -350,17 +352,19 @@ var Battle = (function(){
 
     }
 
-    r.runEvent = function(i, n, data){
+    r.runEvent = function(i, n, data, k){
         if(i >= n){
             this.checkEventOnTurnEnd(data);
             this.nextTurn();
             return 0;
         }
+        k = k || 0;
 
         var move = moveData[data[i].do];
         var user = data[i].from;
         var target = data[i].target || null;
         var self = this;
+        move.target = move.target || "enemy";
 
 
         if(user.isFainted()){
@@ -370,7 +374,7 @@ var Battle = (function(){
         //marks user as active
         $(user.uiSprite).addClass("entity-active");
 
-        if(typeof move.costs != "undefined"){
+        if(typeof move.costs != "undefined" && !k){
             var costs, usable;
 
             costs = move.costs;
@@ -391,14 +395,26 @@ var Battle = (function(){
             }
         }
 
-        if(move.isAoe){
-            //debugger;
-            var t = user.getOtherside().length();
-            for(var k = 0; k < t; k++) {
-                this.calculateTurnOf(user, user.getOtherside().member[k], move);
-            }
+
+        if(move.isAoe && move.target === "friendly" && k < user.getYourside().length()){
+            setTimeout(function(){
+                self.calculateTurnOf(user, user.getYourside().member[k], move);
+                k++;
+                self.runEvent(i, n, data, k);
+            }, 250);
+            return;
         }
-        else {
+
+        if(move.isAoe  && move.target === "enemy" && k < user.getOtherside().length()){
+            setTimeout(function(){
+                self.calculateTurnOf(user, user.getOtherside().member[k], move);
+                k++;
+                self.runEvent(i, n, data, k);
+            }, 250);
+            return;
+        }
+
+        if(!move.isAoe) {
             this.calculateTurnOf(user, target, move);
         }
 
@@ -425,7 +441,7 @@ var Battle = (function(){
 
         }
         //$.event.trigger("bp-ability-onTurnEnd");
-        pubsub.publish("/bp/battle/onTurnEnd");
+        pubsub.publish("/bp/battle/onTurnEnd/");
     }
 
     r.checkEventOnTurnBegin = function(data){
@@ -444,9 +460,8 @@ var Battle = (function(){
 
         }
         //$.event.trigger("bp-ability-onTurnBegin");
-        pubsub.publish("/bp/battle/onTurnBegin");
+        pubsub.publish("/bp/battle/onTurnBegin/");
     }
-
 
     r.calculateTurnOf = function(user, target, move){
         var critChance = user.calculateCritChance(target, move);
@@ -493,7 +508,7 @@ var Battle = (function(){
         //console.log(target);
         if(target && target.isFainted() && !wasFainted){
             //$.event.trigger("bp-ability-onFaint", opt);
-            pubsub.publish("/bp/battle/onFaint", [opt]);
+            pubsub.publish("/bp/battle/onFaint/", [opt]);
             logger.message(target.getFullName() + " fainted...");
         }
     }
@@ -530,7 +545,7 @@ var Battle = (function(){
 
         this.turn++;
         //$.event.trigger("bp-battle-nextTurn");
-        pubsub.publish("/bp/battle/nextTurn");
+        pubsub.publish("/bp/battle/nextTurn/");
         if(this.player){
             this.player.resetMenu();
         }

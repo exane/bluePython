@@ -1,4 +1,5 @@
 var Entity = require("./Entity.js");
+var moveData = require("../data/moves.js");
 "use strict";
 
 
@@ -18,17 +19,31 @@ var Npc = (function(){
         if(this.isFainted()) return 0;
 
         this.turnAction.from = this;
-        this.turnAction.target = this.chooseTarget();
 
 
         if(typeof this.ai == "function"){
             this.ai.call(this);
+
+            if(!this.turnAction.target){
+
+                this.turnAction.target = this.chooseTarget();
+                this.checkMove();
+            }
 
             this.ready(this.turnAction);
         }
 
         else {
             this.doAttack();
+        }
+
+    }
+
+    r.checkMove = function(){
+        var move = moveData[this.turnAction.do];
+
+        if(move.target === "friendly"){
+            this.turnAction.target = this.chooseTarget(true);
         }
 
     }
@@ -43,8 +58,11 @@ var Npc = (function(){
         })
     }
 
-    r.chooseTarget = function(){
+    r.chooseTarget = function(isFriendly){
         var target = this.getOtherside().getRandomMember(true);
+        if(isFriendly){
+            target = this.getYourside().getRandomMember(true);
+        }
         return target;
     }
 

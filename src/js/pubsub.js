@@ -1,16 +1,15 @@
-
 /*!
  * MinPubSub
  * Copyright(c) 2011 Daniel Lamb <daniellmb.com>
  * MIT Licensed
  */
-(function (context) {
+(function(context){
     var MinPubSub = {};
 
     // the topic/subscription hash
     var cache = context.c_ || {}; //check for 'c_' cache for unit testing
 
-    MinPubSub.publish = function ( /* String */ topic, /* Array? */ args) {
+    MinPubSub.publish = function(/* String */ topic, /* Array? */ args){
         // summary:
         //    Publish some data on a named topic.
         // topic: String
@@ -29,12 +28,13 @@
             len = subs ? subs.length : 0;
 
         //can change loop or reverse array if the order matters
-        while (len--) {
-            subs[len].apply(context, args || []);
+        while(len--) {
+            if(subs[len])
+                subs[len].apply(context, args || []);
         }
     };
 
-    MinPubSub.subscribe = function ( /* String */ topic, /* Function */ callback) {
+    MinPubSub.subscribe = function(/* String */ topic, /* Function */ callback){
         // summary:
         //    Register a callback on a named topic.
         // topic: String
@@ -50,14 +50,14 @@
         // example:
         //    subscribe('/some/topic', function(a, b, c){ /* handle data */ });
 
-        if (!cache[topic]) {
+        if(!cache[topic]){
             cache[topic] = [];
         }
         cache[topic].push(callback);
         return [topic, callback]; // Array
     };
 
-    MinPubSub.unsubscribe = function ( /* Array */ handle, /* Function? */ callback) {
+    MinPubSub.unsubscribe = function(/* Array */ handle, /* Function? */ callback){
         // summary:
         //    Disconnect a subscribed function for a topic.
         // handle: Array
@@ -70,23 +70,25 @@
             callback = callback || handle[1],
             len = subs ? subs.length : 0;
 
-        while (len--) {
-            if (subs[len] === callback) {
+        while(len--) {
+            if(subs[len] === callback){
                 subs.splice(len, 1);
             }
         }
     };
 
     // UMD definition to allow for CommonJS, AMD and legacy window
-    if (typeof module === 'object' && module.exports) {
+    if(typeof module === 'object' && module.exports){
         // CommonJS, just export
         module.exports = exports = MinPubSub;
-    } else if (typeof define === 'function' && define.amd) {
+    }
+    else if(typeof define === 'function' && define.amd){
         // AMD support
-        define(function () {
+        define(function(){
             return MinPubSub;
         });
-    } else if (typeof context === 'object') {
+    }
+    else if(typeof context === 'object'){
         // If no AMD and we are in the browser, attach to window
         context.publish = MinPubSub.publish;
         context.subscribe = MinPubSub.subscribe;

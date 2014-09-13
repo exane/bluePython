@@ -4,6 +4,10 @@
 - accuracy einbauen
 - bufftable erweitern (von -6 bis +6)
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
+- auswahl menü ändern. vll auf den boden? mal schaun
+
+
+
 //- dmg & crit dmg überarbeiten! (berechnung) (vorerst erledigt)
 
 

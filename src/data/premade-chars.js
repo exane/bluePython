@@ -12,11 +12,22 @@ var data = {
             def: 100,
             agi: 100,
             tec: 1000,
-            vit: 10000,
+            vit: 2000,
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["rend", "hot_test","fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"]
+        skills: ["aimwater","rend", "hot_test","fumeboost", "heal", "attackboost", "defboost", "quick_attack", "assassination", "burnslash"],
+        ai: function(){
+            var moves = [
+                {chance: 100/5 + 100/5/2 + 100/5/2, id: "rend"},
+                {chance: 100/5, id: "hot_test"},
+                {chance: 100/5, id: "heal"},
+                {chance: 100/5/2, id: "quick_attack"},
+                {chance: 100/5/2, id: "burnslash"}
+            ];
+
+            this.turnAction.do = util.random(moves);
+        }
     },
     boss: {
         name: "Boss",
@@ -52,8 +63,8 @@ var data = {
             str: 40,
             def: 40,
             agi: 80,
-            tec: 50,
-            vit: 500,
+            tec: 200,
+            vit: 750,
             lck: 100
         },
         img: "assets/GnomeMage.png",
