@@ -188,7 +188,7 @@ module.exports = self = {
     battle_shout: {
         name: "Battle Shout",
         id: "battle_shout",
-        desc: "",
+        desc: "Increase strength and vitality.",
         icon: "assets/sonic-shout.png",
         stats: {
             str: 1,
@@ -199,13 +199,16 @@ module.exports = self = {
     endless_rage: {
         name: "Endless Rage",
         id: "endless_rage",
-        desc: "Gain 50 mana for each hit.",
+        desc: "With each hit, you get mana depends on damage you deal. You also get mana for each hit which you get.",
         icon: "assets/muscle-up.png",
         stats: {},
         duration: -1,
         effects: {
-            onHit: function(opt){
-                this.changeHpBy(50);
+            onHit: function(opt, dmg){
+                this.changeManaBy(dmg/100);
+            },
+            onGetHit: function(opt, dmg){
+                this.changeManaBy(dmg*10/100);
             }
         }
     }

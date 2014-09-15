@@ -43,13 +43,14 @@ var Battle = (function(){
         //this.addNewPlayer(data.exane, this.side1, this.side2);
         this.addNewPlayer(data.warrior, this.side1, this.side2);
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
-        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
-        //this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        this.addNewNpc(data.gnomemage, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
@@ -62,6 +63,7 @@ var Battle = (function(){
         this.tooltip = new Tooltip(this);
         setTimeout(function(){
             self.battleStart();
+            pubsub.publish("/bp/battle/onBattleStart/");
         }, 100);
         //this.battleStart();
     }
@@ -506,13 +508,14 @@ var Battle = (function(){
         }
 
         if(move.basePower){
+            //dmg = this.calculateDmg(user, target, move, opt);
             if(move.onAttack){
                 move.onAttack.call(user, opt);
             }
             dmg = this.calculateDmg(user, target, move, opt);
             target.changeHpBy(-dmg, opt.isCrit);
-            pubsub.publish("/bp/battle/onGetHit/" + target.getId());
-            pubsub.publish("/bp/battle/onHit/" + user.getId());
+            pubsub.publish("/bp/battle/onGetHit/" + target.getId(),[dmg]);
+            pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]);
         }
 
         //if(move.boost){ //deprecated!
@@ -520,7 +523,7 @@ var Battle = (function(){
         //}
 
         if(move.onAfterAttack){
-            move.onAfterAttack.call(user, opt);
+            move.onAfterAttack.call(user, opt, [dmg]);
         }
 
 

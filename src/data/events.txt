@@ -20,8 +20,8 @@
  - onCast // alternative to onAttack, without basePower attr
  - onAfterAttack
  - onTurnEnd
- - onGetHit
- - onHit
+ - onGetHit ( + dmg argument)
+ - onHit ( + dmg argument)
  - onInit
  - onReceiveHeal
 

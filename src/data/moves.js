@@ -19,11 +19,11 @@ module.exports = self = {
         name: "Default Defense",
         priority: 1,
         onTurnBegin: function(){
-            this.changeIncomingDmgMultiplierBy(.25);
+            this.changeIncomingDmgMultiplierBy(-0.75);
             logger.message(this.getFullName() + " defends himself!");
         },
         onTurnEnd: function(){
-            this.changeIncomingDmgMultiplierBy(4);
+            this.changeIncomingDmgMultiplierBy(0.75);
         },
         id: "default_defense",
         icon: "assets/ace.png"
@@ -175,10 +175,10 @@ module.exports = self = {
     mortal_strike: {
         name: "Mortal Strike",
         id: "mortal_strike",
-        basePower: 80,
+        basePower: 90,
         target: "enemy",
-        desc: "Causes enormous damage and reduces all incoming healing on target by 50%.",
-        costs: 100,
+        desc: "Causes enormous damage and reduces all incoming healing on target by 50%. Costs 50 Mana.",
+        costs: 50,
         onCast: function(opt){
             logger.message(opt.target.getFullName() + " suffers great pain! Received healing is reduced by 50%.");
             opt.target.addDebuff(buffData.load("mortal_strike_debuff"));
@@ -187,10 +187,11 @@ module.exports = self = {
     },
     rend: {
         name: "Rend (Aoe)",
-        desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%.",
-        basePower: 20,
+        desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%. Costs 20 Mana.",
+        basePower: 10,
         id: "rend",
         isAoe: true,
+        costs: 20,
         onCast: function(opt){
             logger.message(this.getFullName() + " rend his target!");
             opt.target.addDebuff(buffData.load("rend_debuff"));
@@ -199,27 +200,30 @@ module.exports = self = {
     },
     bloodthirst: {
         name: "Bloodthirst",
-        desc: "Instantly attack the target and restoring 1% of your health. Bloodthirst has double the normal chance to be a critical strike.",
+        desc: "Instantly attack the target and restoring 1% of your health. Bloodthirst has double the normal chance to be a critical strike. Costs 30 Mana.",
         basePower: 50,
         id: "bloodthirst",
         target: "enemy",
-        costs: 50,
-        onCast: function(opt){
-            var val = this.getMaxHp() / 100;
+        costs: 30,
+        onBeforeAttack: function(opt){
+            opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
+        },
+        onAfterAttack: function(opt, dmg){
+            var val = dmg *30 / 100;
             this.changeHpBy(val);
 
-            opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
+            //opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
         },
         icon: "assets/swallow.png"
     },
     bladestorm: {
         name: "Bladestorm (Aoe)",
-        desc: "You become a whirling storm of destructive force, hitting all targets 5 times.",
-        basePower: 30,
+        desc: "You become a whirling storm of destructive force, hitting all targets 5 times. Costs 20 Mana each spin.",
+        basePower: 15,
         id: "bladestorm",
         target: "enemy",
         isAoe: true,
-        costs: 50,
+        costs: 20,
         multiple: 5,
         onCast: function(opt){
 
@@ -228,13 +232,14 @@ module.exports = self = {
     },
     battle_shout: {
         name: "Battle Shout",
-        desc: "",
+        desc: "Increase strength and vitality by 1 level. Additionally you gain 20 mana.",
         id: "battle_shout",
         target: "friendly",
         isAoe: true,
-        costs: 50,
+        //costs: 50,
         onCast: function(opt){
             opt.target.addBuff(buffData.load("battle_shout"));
+            this.changeManaBy(5);
         },
         icon: "assets/sonic-shout.png"
     }

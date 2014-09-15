@@ -26,7 +26,7 @@ var data = {
                 {chance: 100 / 5 / 2, id: "burnslash"}
             ];
 
-            this.turnAction.do = util.random(moves);
+            //this.turnAction.do = util.random(moves);
         }
     },
     gnomemage: {
@@ -108,16 +108,19 @@ var data = {
             str: 100,
             def: 100,
             agi: 100,
-            tec: 100,
+            tec: 10,
             vit: 100,
-            lck: 100
+            lck: 1000
         },
         img: "assets/warrior_11.png",
-        skills: ["hot_test", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"], //, "bladestorm", "battle_shout"],
+        skills: ["mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"], //, "bladestorm", "battle_shout"],
         ai: function(){
 
         },
-        abilities: ["endless_rage"]
+        abilities: ["endless_rage"],
+        onBattleStart: function(){
+            this.changeManaBy(-this.getMaxMana());
+        }
     }
 }
 

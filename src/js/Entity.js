@@ -44,6 +44,11 @@ var Entity = (function(){
 
         this._nextTurnListener();
 
+        if(options.onBattleStart){
+            //options.onBattleStart.call(this);
+            pubsub.subscribe("/bp/battle/onBattleStart/", options.onBattleStart.bind(this));
+        }
+
         //console.log(this);
     }
     var r = Entity.prototype;
@@ -403,7 +408,8 @@ var Entity = (function(){
         //for(var i=0; i<buff.addAbilities.length; i++){
         //    this.removeAbility(buff.addAbilities[i]);
         //}
-        this._renderBuffs();
+        //this._renderBuffs();
+        this.updateUi();
     }
     r.removeDebuff = function(debuff, index){
         //console.log(debuff, index);
@@ -426,6 +432,10 @@ var Entity = (function(){
         this._renderBuffs();
     }
     r.updateUi = function(){
+
+        if(this.getHp() > this.getMaxHp()){
+            this._currHp = this.getMaxHp();
+        }
         this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
         this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
         this.uiHp.css({
@@ -517,7 +527,7 @@ var Entity = (function(){
         value = value | 0;
         crit = crit || false;
 
-        if(value >= 0){
+        if(value > 0){
             value *= this.getHealMultiplier();
             value = value | 0;
             pubsub.publish("/bp/battle/onReceiveHeal/" + this.getId())
@@ -546,6 +556,7 @@ var Entity = (function(){
     }
     r.changeManaBy = function(value){
         if(this.isFainted()) return 0;
+        value = value | 0;
         if(this.getMana() + value < 0){
             return false;
         }
@@ -867,12 +878,11 @@ var Entity = (function(){
                     buff.effects.onRevive.bind(this, buff)));
             }
             if(buff.effects.onGetHit){
-                __h.push(pubsub.subscribe("/bp/battle/onGetHit/" + this.getId() + "/"+ buff.id,
+                __h.push(pubsub.subscribe("/bp/battle/onGetHit/" + this.getId(), // + "/"+ buff.id,
                     buff.effects.onGetHit.bind(this, buff)));
             }
             if(buff.effects.onHit){
-                console.log(buff);
-                __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId() + "/"+ buff.id,
+                __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId(), // + "/"+ buff.id,
                     buff.effects.onHit.bind(this, buff)));
             }
             if(buff.effects.onInit){
