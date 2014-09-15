@@ -73,6 +73,7 @@ var Entity = (function(){
     r._outgoingDmgMultiplier = 1;
     r._critDmgMultiplicator = 2;
     r._additionalCritChances = 0;
+    r._healMultiplier = 1;
 
     /**
      * UI Properties
@@ -198,6 +199,9 @@ var Entity = (function(){
     r.getCritDmgMultiplicator = function(){
         return this._critDmgMultiplicator;
     }
+    r.getHealMultiplier = function(){
+        return this._healMultiplier;
+    }
 
     /**
      * Setter
@@ -280,6 +284,9 @@ var Entity = (function(){
     }
     r.setCritDmgMultiplicator = function(number){
         this._critDmgMultiplicator = number;
+    }
+    r.setHealMultiplier = function(number){
+        this._healMultiplier = number;
     }
 
     /**
@@ -510,6 +517,12 @@ var Entity = (function(){
         value = value | 0;
         crit = crit || false;
 
+        if(value >= 0){
+            value *= this.getHealMultiplier();
+            value = value | 0;
+            pubsub.publish("/bp/battle/onReceiveHeal/" + this.getId())
+        }
+
         //console.log("entity", this);
         new Display({target: this, amount: value, isCrit: crit});
 
@@ -595,6 +608,13 @@ var Entity = (function(){
     }
     r.decreaseCritDmgBy = function(prozent){
         this._critDmgMultiplicator -= prozent/100;
+    }
+    r.increaseHealMultiplierBy = function(prozent){
+        //50 = 50%, 20 = 20%
+        this._healMultiplier += prozent/100;
+    }
+    r.decreaseHealMultiplierBy = function(prozent){
+        this._healMultiplier  -= prozent/100;
     }
 
     /**
@@ -851,6 +871,7 @@ var Entity = (function(){
                     buff.effects.onGetHit.bind(this, buff)));
             }
             if(buff.effects.onHit){
+                console.log(buff);
                 __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId() + "/"+ buff.id,
                     buff.effects.onHit.bind(this, buff)));
             }
@@ -861,6 +882,10 @@ var Entity = (function(){
             if(buff.effects.onEnd){
                 __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/"+ buff.id,
                     buff.effects.onEnd.bind(this, buff)));
+            }
+            if(buff.effects.onReceiveHeal){
+                __h.push(pubsub.subscribe("/bp/battle/onReceiveHeal/" + this.getId(),
+                    buff.effects.onReceiveHeal.bind(this, buff)));
             }
         }
 

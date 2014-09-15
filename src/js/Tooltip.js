@@ -1,4 +1,5 @@
 var charData = require("../data/premade-chars.js");
+var moveData = require("../data/moves.js");
 
 var Tooltip = (function(){
     var Tooltip = function(battle){
@@ -23,9 +24,14 @@ var Tooltip = (function(){
         var self = this;
         //$(".view .sprite .sprite-img-container").hover(this.onMouseover.bind(this), this.onMouseout.bind(this));
         $(".view .sprite .sprite-img-container").on("mouseover", self.onMouseover.bind(self));
-        //$(".view .sprite .sprite-img-container").on("mouseout", this.onMouseover.bind(this));
+        $(".menu-skills li").on("mouseover", self.onMouseoverSkills.bind(self));
         //$(document).on("bp-tooltip-update", this.render.bind(this));
         pubsub.subscribe("/bp/tooltip/update/", this.render.bind(this));
+    }
+
+    r.onMouseoverSkills = function(e){
+
+        this.renderSkill(e);
     }
 
     r.onMouseover = function(e){
@@ -92,6 +98,22 @@ var Tooltip = (function(){
                 uiSelf.find(".tooltip-skills").append(entity.getSkillList(i) + "; ");
             }
 
+        });
+    }
+
+    r.renderSkill = function(e){
+        var type = $(e.target).attr("data-type");
+        var id = $(e.target).attr("value");
+        if(!id) return 0;
+        var move = moveData[id];
+
+
+
+        this.uiTooltip.load("./tpl/skill-tpl.html", function(){
+            var self = $(this);
+            self.find(".tooltip-icon img").attr("src", move.icon);
+            self.find(".tooltip-name").text(move.name);
+            self.find(".tooltip-desc").text(move.desc);
         });
     }
 

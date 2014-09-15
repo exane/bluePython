@@ -130,10 +130,45 @@ module.exports = self = {
             }
         }
     },
-    test_dot: {
+    aimwater_buff: {
+        name: "Aimwater",
+        id: "aimwater_buff",
+        desc: "Increase crit chances by 50% and crit dmg by 200%",
+        icon: "assets/beer-stein.png",
+        stats: {},
+        duration: 5,
+        effects: {
+            onInit: function(opt){
+                this.increaseCritChancesBy(50);
+                this.increaseCritDmgBy(200);
+            },
+            onEnd: function(opt){
+                this.decreaseCritChancesBy(50);
+                this.decreaseCritDmgBy(200);
+            }
+        }
+    },
+
+    mortal_strike_debuff: {
+        name: "Mortal Strike",
+        id: "mortal_strike_debuff",
+        desc: "Reduce received healing by 50%.",
+        icon: "assets/battered-axe.png",
+        stats: {},
+        duration: 5,
+        effects: {
+            onInit: function(opt){
+                this.decreaseHealMultiplierBy(50);
+            },
+            onEnd: function(opt){
+                this.increaseHealMultiplierBy(50);
+            }
+        }
+    },
+    rend_debuff: {
         name: "Rend (dot)",
-        id: "test_dot",
-        desc: "Target bleeds for x dmg each turn. Each Dmg on this target is also increased by 20%.",
+        id: "rend_debuff",
+        desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%.",
         icon: "assets/ragged-wound.png",
         stats: {},
         duration: 5,
@@ -150,21 +185,27 @@ module.exports = self = {
             }
         }
     },
-    aimwater_buff: {
-        name: "Aimwater",
-        id: "aimwater_buff",
-        desc: "Increases crit chance by 50% and crit dmg by 200%",
-        icon: "assets/beer-stein.png",
+    battle_shout: {
+        name: "Battle Shout",
+        id: "battle_shout",
+        desc: "",
+        icon: "assets/sonic-shout.png",
+        stats: {
+            str: 1,
+            vit: 1
+        },
+        duration: 5
+    },
+    endless_rage: {
+        name: "Endless Rage",
+        id: "endless_rage",
+        desc: "Gain 50 mana for each hit.",
+        icon: "assets/muscle-up.png",
         stats: {},
-        duration: 5,
+        duration: -1,
         effects: {
-            onInit: function(opt){
-                this.increaseCritChancesBy(50);
-                this.increaseCritDmgBy(200);
-            },
-            onEnd: function(opt){
-                this.decreaseCritChancesBy(50);
-                this.decreaseCritDmgBy(200);
+            onHit: function(opt){
+                this.changeHpBy(50);
             }
         }
     }

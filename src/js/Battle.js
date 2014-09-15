@@ -41,15 +41,15 @@ var Battle = (function(){
 
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewPlayer(data.exane, this.side1, this.side2);
-        this.addNewPlayer(data.exane, this.side1, this.side2);
+        this.addNewPlayer(data.warrior, this.side1, this.side2);
         this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
-        this.addNewNpc(data.chernabog, this.side2, this.side1);
-        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        //this.addNewNpc(data.chernabog, this.side2, this.side1);
+        //this.addNewNpc(data.gnomemage, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
 
@@ -264,7 +264,9 @@ var Battle = (function(){
         for(var i = 0; i < n; i++) {
             //moves.push(moveData[this.player.skillList[i]].name);
             var data = moveData[this.player.getSkillList(i)];
-            var li = "<li value='" + data.id + "'>" + data.name + "</li>";
+            var li = $("<li data-type='skill' value='" + data.id + "'></li>");
+            $(li).append("<img src='"+data.icon+"'>");
+            $(li).append("<p>" + data.name + "</p>");
             ul.append(li);
 
             //console.log("yolo", );
@@ -352,13 +354,16 @@ var Battle = (function(){
 
     }
 
-    r.runEvent = function(i, n, data, k){
+    r.runEvent = function(i, n, data, k, multiple){
+        var t;
+
         if(i >= n){
             this.checkEventOnTurnEnd(data);
             this.nextTurn();
             return 0;
         }
         k = k || 0;
+        multiple = multiple || 0;
 
         var move = moveData[data[i].do];
         var user = data[i].from;
@@ -400,7 +405,7 @@ var Battle = (function(){
             setTimeout(function(){
                 self.calculateTurnOf(user, user.getYourside().member[k], move);
                 k++;
-                self.runEvent(i, n, data, k);
+                self.runEvent(i, n, data, k, multiple);
             }, 250);
             return;
         }
@@ -409,15 +414,28 @@ var Battle = (function(){
             setTimeout(function(){
                 self.calculateTurnOf(user, user.getOtherside().member[k], move);
                 k++;
-                self.runEvent(i, n, data, k);
+                self.runEvent(i, n, data, k, multiple);
             }, 250);
             return;
+        }
+
+        if(move.target === "self"){
+            target = user;
         }
 
         if(!move.isAoe) {
             this.calculateTurnOf(user, target, move);
         }
 
+        if(move.multiple && multiple < move.multiple - 1){
+            setTimeout(function(){
+                $(user.uiSprite).removeClass("entity-active");
+                multiple++;
+                self.runEvent(i, n, data, 0, multiple);
+            }, this.speed/6);
+
+            return;
+        }
 
         setTimeout(function(){
             $(user.uiSprite).removeClass("entity-active");
@@ -476,7 +494,7 @@ var Battle = (function(){
             otherSide: user.getOtherside(),
             isCrit: isCrit
         }
-        var dmg = this.calculateDmg(user, target, move, opt);
+        var dmg;// = this.calculateDmg(user, target, move, opt);
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);
@@ -491,6 +509,7 @@ var Battle = (function(){
             if(move.onAttack){
                 move.onAttack.call(user, opt);
             }
+            dmg = this.calculateDmg(user, target, move, opt);
             target.changeHpBy(-dmg, opt.isCrit);
             pubsub.publish("/bp/battle/onGetHit/" + target.getId());
             pubsub.publish("/bp/battle/onHit/" + user.getId());

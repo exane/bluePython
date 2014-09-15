@@ -35,6 +35,7 @@ var Player = (function(){
     r.setOpen = function(bool){
         this._isOpen = bool;
     }
+
     r.isOpen = function(){
         return this._isOpen;
     }
@@ -141,7 +142,7 @@ var Player = (function(){
         this.turnAction.from = this;
         this.uiMenu.children(".menu-skills").hide();
 
-        if(skill.isAoe || skill.noTarget){
+        if(skill.isAoe || skill.target === "self"){
             //this.onTargetClick(this.otherSide.member);
             if(this.hasChosen()) return 0;
             this.setChosen(true);

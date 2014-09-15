@@ -24,5 +24,22 @@ module.exports = self = {
         onTurnEnd: function(){
             this.changeManaBy(20);
         }
+    },
+    endless_rage: {
+        onTurnBegin: function(){
+
+
+            if(this.hasBuff("Endless Rage") || this.isFainted()){
+                return 0;
+            }
+            var endless_rage = buffData.load("endless_rage");
+
+            logger.message(this.getFullName() + " is shouting out loud!");
+
+            this.addBuffOnce(endless_rage);
+
+
+
+        }
     }
 }

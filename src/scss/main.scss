@@ -154,7 +154,7 @@ $height: 600px;
   ul {
     list-style: none;
     font-size: 35px;
-    text-align: center;
+    //text-align: center;
 
     li {
       padding: 15px 0;
@@ -190,13 +190,6 @@ $height: 600px;
   }
 }
 
-#exane {
-  &:hover {
-    //border: 4px solid red;
-  }
-
-}
-
 .border-debug-on {
   border: 4px solid red;
 }
@@ -211,6 +204,18 @@ $height: 600px;
     display: block;
   }
   display: none;
+}
+
+.menu-skills {
+  p {
+    display: block;
+  }
+  img {
+    max-width:32px;
+    display: block;
+    float: left;
+    margin: 5px;
+  }
 }
 
 .unselectable {

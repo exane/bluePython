@@ -2,13 +2,18 @@ var logger = require("../js/log.js");
 var buffData = require("./buffs.js");
 
 
+var self;
 
-module.exports = {
+module.exports = self = {
+    load: function(id){
+        return $.extend(true, {}, self[id]);
+    },
     default_attack: {
         basePower: 40,
         accuracy: 100,
         name: "Default Attack",
-        id: "default_attack"
+        id: "default_attack",
+        icon: "assets/ace.png"
     },
     default_defense: {
         name: "Default Defense",
@@ -20,7 +25,8 @@ module.exports = {
         onTurnEnd: function(){
             this.changeIncomingDmgMultiplierBy(4);
         },
-        id: "default_defense"
+        id: "default_defense",
+        icon: "assets/ace.png"
     },
     heal: {
         name: "Heal",
@@ -37,7 +43,8 @@ module.exports = {
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
                 + " by " + val + " hp!");
         },
-        target: "friendly"
+        target: "friendly",
+        icon: "assets/ace.png"
     },
     assassination: {
         id: "assassination",
@@ -51,7 +58,8 @@ module.exports = {
             var enemy = opt.target;
             enemy.changeHpBy(-enemy.getMaxHp());
             logger.message(this.getFullName() + " cut " + enemy.getFullName() + "'s throat!")
-        }
+        },
+        icon: "assets/ace.png"
     },
     quick_attack: {
         basePower: 80,
@@ -60,7 +68,8 @@ module.exports = {
         priority: 2,
         isCrit: true,
         costs: 25,
-        id: "quick_attack"
+        id: "quick_attack",
+        icon: "assets/ace.png"
     },
     revive: {
         name: "Revive",
@@ -74,9 +83,9 @@ module.exports = {
             }
             target.revive(1 + this.getSpecialAttackPower() * 0.25);
         },
-        target: "friendly"
+        target: "friendly",
+        icon: "assets/ace.png"
     },
-
     sacrifice: {
         basePower: 300,
         name: "sacrifice",
@@ -88,9 +97,9 @@ module.exports = {
         },
         onAfterAttack: function(opt){
             this.changeHpBy(-this.maxHp);
-        }
+        },
+        icon: "assets/ace.png"
     },
-
     burnslash: {
         basePower: 30,
         name: "Burnslash (Aoe)",
@@ -98,9 +107,9 @@ module.exports = {
         id: "burnslash",
         isAoe: true,
         priority: 0,
-        costs: 150
+        costs: 150,
+        icon: "assets/ace.png"
     },
-
     attackboost: {
         name: "Attack Boost",
         id: "attackboost",
@@ -121,18 +130,20 @@ module.exports = {
 
             logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
         },
-        noTarget: true
+        noTarget: true,
+        icon: "assets/ace.png"
     },
     fumeboost: {
         name: "Fume Boost",
         id: "fumeboost",
         costs: 500,
         onCast: function(opt){
-            this.addBuff(buffData.load("fumeboost"));
+            opt.target.addBuff(buffData.load("fumeboost"));
 
             logger.message("each stat increased by 300%! ");
         },
-        noTarget: true
+        target: "self",
+        icon: "assets/ace.png"
     },
     hot_test: {
         name: "HoT",
@@ -143,27 +154,88 @@ module.exports = {
             logger.message(this.getFullName() + " casts HoT!");
             opt.target.addBuff(buffData.load("hot_test"), this);
             opt.target.addBuff(buffData.load("onHit_test"), this);
-        }
+        },
+        icon: "assets/ace.png"
+    },
+    aimwater: {
+        name: "Aimwater(buff)",
+        id: "aimwater",
+        //noTarget: true,
+        target: "self",
+        desc: "Increases your crit chance by 50% and your crit damage by 200%. Costs 100 mana. Lasts 5 turns.",
+        costs: 100,
+        onCast: function(opt){
+            logger.message(this.getFullName() + " drinks aimwater! critical chance increased!");
+            opt.target.addBuff(buffData.load("aimwater_buff"));
+        },
+        icon: "assets/ace.png"
+    },
+
+    //["mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"]
+    mortal_strike: {
+        name: "Mortal Strike",
+        id: "mortal_strike",
+        basePower: 80,
+        target: "enemy",
+        desc: "Causes enormous damage and reduces all incoming healing on target by 50%.",
+        costs: 100,
+        onCast: function(opt){
+            logger.message(opt.target.getFullName() + " suffers great pain! Received healing is reduced by 50%.");
+            opt.target.addDebuff(buffData.load("mortal_strike_debuff"));
+        },
+        icon: "assets/battered-axe.png"
     },
     rend: {
-        name: "rend (dot)(debuff)",
+        name: "Rend (Aoe)",
+        desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%.",
         basePower: 20,
         id: "rend",
         isAoe: true,
         onCast: function(opt){
             logger.message(this.getFullName() + " rend his target!");
-            opt.target.addDebuff(buffData.load("test_dot"));
-        }
-
+            opt.target.addDebuff(buffData.load("rend_debuff"));
+        },
+        icon: "assets/ragged-wound.png"
     },
-    aimwater: {
-        name: "Aimwater(buff)",
-        id: "aimwater",
-        target: "friendly",
-        costs: 100,
+    bloodthirst: {
+        name: "Bloodthirst",
+        desc: "Instantly attack the target and restoring 1% of your health. Bloodthirst has double the normal chance to be a critical strike.",
+        basePower: 50,
+        id: "bloodthirst",
+        target: "enemy",
+        costs: 50,
         onCast: function(opt){
-            logger.message(this.getFullName() + " drinks aimwater! critical chance increased!");
-            opt.target.addBuff(buffData.load("aimwater_buff"));
-        }
+            var val = this.getMaxHp() / 100;
+            this.changeHpBy(val);
+
+            opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
+        },
+        icon: "assets/swallow.png"
+    },
+    bladestorm: {
+        name: "Bladestorm (Aoe)",
+        desc: "You become a whirling storm of destructive force, hitting all targets 5 times.",
+        basePower: 30,
+        id: "bladestorm",
+        target: "enemy",
+        isAoe: true,
+        costs: 50,
+        multiple: 5,
+        onCast: function(opt){
+
+        },
+        icon: "assets/spinning-sword.png"
+    },
+    battle_shout: {
+        name: "Battle Shout",
+        desc: "",
+        id: "battle_shout",
+        target: "friendly",
+        isAoe: true,
+        costs: 50,
+        onCast: function(opt){
+            opt.target.addBuff(buffData.load("battle_shout"));
+        },
+        icon: "assets/sonic-shout.png"
     }
 }

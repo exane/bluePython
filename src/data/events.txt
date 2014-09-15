@@ -1,15 +1,17 @@
 
-
+// moves
  - id required
  - name required
+ - desc required
  - basePower null | number
  - isCrit false | true
- - priority 0
- - target "enemy" | "friendly"
+ - priority 0 | number
+ - target "enemy" | "friendly" | "self"
  - accuracy 100
  - isAoe false | true
- - noTarget false | true
  - costs false | number | function
+ - multiple 1 | number
+ // - noTarget false | true //deprecated!
 
  - possible events: (context: user | params: opt.target, opt.yourSide, opt.otherSide)
  - onTurnBegin
@@ -21,6 +23,7 @@
  - onGetHit
  - onHit
  - onInit
+ - onReceiveHeal
 
  also:
  - id muss und sollte extakt gleich heißen wie

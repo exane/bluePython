@@ -16,45 +16,18 @@ var data = {
             lck: 100
         },
         img: "assets/gajeel_150.jpg",
-        skills: ["aimwater","rend", "hot_test","fumeboost", "heal", "quick_attack", "assassination", "burnslash"],
+        skills: ["aimwater", "rend", "hot_test", "fumeboost", "heal", "quick_attack", "assassination", "burnslash"],
         ai: function(){
             var moves = [
-                {chance: 100/5 + 100/5/2 + 100/5/2, id: "rend"},
-                {chance: 100/5, id: "hot_test"},
-                {chance: 100/5, id: "heal"},
-                {chance: 100/5/2, id: "quick_attack"},
-                {chance: 100/5/2, id: "burnslash"}
+                {chance: 100 / 5 + 100 / 5 / 2 + 100 / 5 / 2, id: "rend"},
+                {chance: 100 / 5, id: "hot_test"},
+                {chance: 100 / 5, id: "heal"},
+                {chance: 100 / 5 / 2, id: "quick_attack"},
+                {chance: 100 / 5 / 2, id: "burnslash"}
             ];
 
             this.turnAction.do = util.random(moves);
         }
-    },
-    boss: {
-        name: "Boss",
-        id: "boss",
-        stats: {
-            str: 100,
-            def: 100,
-            agi: 100,
-            tec: 10,
-            vit: 150,
-            lck: 100
-        },
-        img: "assets/Serpant.png"
-    },
-    boss2: {
-        name: "Big Boss",
-        id: "boss2",
-        stats: {
-            str: 100,
-            def: 100,
-            agi: 100,
-            tec: 10,
-            vit: 500,
-            lck: 100
-        },
-        img: "assets/Serpant.png",
-        skills: ["sacrifice"]
     },
     gnomemage: {
         name: "Gnome Mage",
@@ -69,6 +42,11 @@ var data = {
         },
         img: "assets/GnomeMage.png",
         ai: function(){
+            //var member = this.getYourside().getRandomMember(false);
+            //this.turnAction.do = "aimwater";
+            //this.turnAction.target = member;
+
+            //return 0;
 
             if(this.getYourside().hasDeadMember() && this.getMana() >= moveData["revive"].costs){
                 var member = this.getYourside().getRandomMember(false);
@@ -76,7 +54,6 @@ var data = {
                 this.turnAction.target = member;
                 return 0;
             }
-
 
 
             var m = this.getYourside().getRandomMember(true);
@@ -90,7 +67,7 @@ var data = {
             this.turnAction.do = "default_attack";
 
         },
-        skills: ["quick_attack","revive", "heal"],
+        skills: ["aimwater", "quick_attack", "revive", "heal"],
         abilities: ["prayer"]
 
     },
@@ -110,7 +87,10 @@ var data = {
         skills: ["burnslash"],
         ai: function(){
 
-            var moves = [{chance: 25, id: "burnslash"}, {chance: 75, id: "default_attack"}];
+            var moves = [
+                {chance: 25, id: "burnslash"},
+                {chance: 75, id: "default_attack"}
+            ];
             this.turnAction.do = util.random(moves);
 
             if(this.getMana() < moveData["burnslash"].costs){
@@ -120,6 +100,24 @@ var data = {
 
         }
 
+    },
+    warrior: {
+        name: "Warrior",
+        id: "warrior",
+        stats: {
+            str: 100,
+            def: 100,
+            agi: 100,
+            tec: 100,
+            vit: 100,
+            lck: 100
+        },
+        img: "assets/warrior_11.png",
+        skills: ["hot_test", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"], //, "bladestorm", "battle_shout"],
+        ai: function(){
+
+        },
+        abilities: ["endless_rage"]
     }
 }
 
