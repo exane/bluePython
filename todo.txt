@@ -1,12 +1,12 @@
 
-- tooltips
+- buffs abändern. keine bufftable mehr sondern statische boosts.
+- mergeBuff function überarbeiten
 - accuracy einbauen
-- bufftable erweitern (von -6 bis +6)
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
+- PERFORMANCE!!!
+- mehr als einen char steuern können
 
 
-
-//- dmg & crit dmg überarbeiten! (berechnung) (vorerst erledigt)
 
 
 
