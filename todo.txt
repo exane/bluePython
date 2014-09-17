@@ -1,6 +1,5 @@
 
-- buffs abändern. keine bufftable mehr sondern statische boosts.
-- mergeBuff function überarbeiten
+
 - accuracy einbauen
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 - PERFORMANCE!!!

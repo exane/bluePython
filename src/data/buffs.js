@@ -10,6 +10,7 @@ module.exports = self = {
         name: "Fume boost",
         id: "fumeboost",
         desc: "Increasing each stat by 300%.",
+        /*
         stats: {
             def: 6,
             str: 6,
@@ -18,24 +19,25 @@ module.exports = self = {
             tec: 6,
             lck: 6
         },
+        */
         duration: 20,
         icon: "assets/devfake.jpg"
     },
     defenseboost: {
         name: "Defense boost",
         id: "defenseboost",
-        stats: {
+        /*stats: {
             def: 2
-        },
+        },*/
         duration: 5,
         icon: "assets/aura.png"
     },
     attackboost: {
         name: "Attack boost",
         id: "attackboost",
-        stats: {
+        /*stats: {
             str: 2
-        },
+        },*/
         duration: 5,
         icon: "assets/muscle-up.png"
     },
@@ -43,14 +45,14 @@ module.exports = self = {
         name: "Fire Armor",
         id: "firearmor",
         desc: "Target inflames his body. All stats are increased by 50% for each ally.",
-        stats: {
+        /*stats: {
             def: 0,
             str: 0,
             agi: 0,
             vit: 0,
             tec: 0,
             lck: 0
-        },
+        },*/
         duration: -1,
         icon: "assets/burning-passion.png",
         effects: {
@@ -71,14 +73,14 @@ module.exports = self = {
 
                 var firearmor = self.load("firearmor");
 
-                firearmor.stats = {
+               /* firearmor.stats = {
                     def: length,
                     str: length,
                     agi: length,
                     vit: length,
                     tec: length,
                     lck: length
-                }
+                }*/
 
 
                 this.setBuffTo(firearmor);
@@ -104,8 +106,8 @@ module.exports = self = {
         name: "HoT (Heal over Time)",
         id: "hot_test",
         desc: "Healing of the target at end of each turn.",
-        icon: "assets/lotus-flower.png",
-        stats: {},
+        icon: "assets/lotus-flower.png",/*
+        stats: {},*/
         duration: 5,
         effects: {
             onTurnEnd: function(opt){ //opt = buff properties
@@ -119,7 +121,7 @@ module.exports = self = {
         id: "onHit_test",
         desc: "If target got hit, then he immediately regenerates some hp.",
         icon: "assets/aura.png",
-        stats: {},
+        /*stats: {},*/
         duration: 5,
         effects: {
             onGetHit: function(opt){
@@ -135,7 +137,9 @@ module.exports = self = {
         id: "aimwater_buff",
         desc: "Increase crit chances by 50% and crit dmg by 200%",
         icon: "assets/beer-stein.png",
+/*
         stats: {},
+*/
         duration: 5,
         effects: {
             onInit: function(opt){
@@ -154,7 +158,9 @@ module.exports = self = {
         id: "mortal_strike_debuff",
         desc: "Reduce received healing by 50%.",
         icon: "assets/battered-axe.png",
+/*
         stats: {},
+*/
         duration: 5,
         effects: {
             onInit: function(opt){
@@ -170,7 +176,9 @@ module.exports = self = {
         id: "rend_debuff",
         desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%.",
         icon: "assets/ragged-wound.png",
+/*
         stats: {},
+*/
         duration: 5,
         effects: {
             onTurnEnd: function(opt){
@@ -188,20 +196,36 @@ module.exports = self = {
     battle_shout: {
         name: "Battle Shout",
         id: "battle_shout",
-        desc: "Increase strength and vitality.",
+        desc: "Increase strength and vitality by 10%.",
         icon: "assets/sonic-shout.png",
-        stats: {
+       /* stats: {
             str: 1,
             vit: 1
-        },
-        duration: 5
+        },*/
+        duration: 5,
+        effects: {
+            onInit: function(opt){
+                this.changeBoost({
+                    "str": 10,
+                    "vit": 10
+                });
+            },
+            onEnd: function(opt){
+                this.changeBoost({
+                    "str": -10,
+                    "vit": -10
+                });
+            }
+        }
     },
     endless_rage: {
         name: "Endless Rage",
         id: "endless_rage",
         desc: "With each hit, you get mana depends on damage you deal. You also get mana for each hit which you get.",
         icon: "assets/muscle-up.png",
+/*
         stats: {},
+*/
         duration: -1,
         effects: {
             onHit: function(opt, dmg){
