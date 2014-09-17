@@ -165,21 +165,33 @@ var Entity = (function(){
     r.getImg = function(){
         return this._img;
     }
-    r.getBuff = function(name){
+    r.getBuff = function(name, from){
         var n = this._buffs.length;
 
         for(var i = 0; i < n; i++) {
-            if(this._buffs[i].name === name)
-                return this._buffs[i];
+            if(this._buffs[i].name === name){
+                if(from && from === this._buffs[i].from.getId()){
+                    return this._buffs[i];
+                }/*
+                else
+                    return this._buffs[i];*/
+            }
         }
         return null;
     }
-    r.getDebuff = function(name){
+
+    r.getDebuff = function(name, from){
         var n = this._debuffs.length;
+        from = from || null;
 
         for(var i = 0; i < n; i++) {
-            if(this._debuffs[i].name === name)
-                return this._debuffs[i];
+            if(this._debuffs[i].name === name){
+                if(from && from === this._debuffs[i].from.getId()){
+                    return this._debuffs[i];
+                }/*
+                else
+                    return this._debuffs[i];*/
+            }
         }
         return null;
     }
@@ -333,19 +345,14 @@ var Entity = (function(){
         if(!name){
             throw new Error("Missing name property! @skill")
         }
-        /*
-         if(!stats){
-         throw new Error("Missing stats property! @skill")
-         }*/
         if(!duration){
             throw new Error("Missing duration property! @skill")
         }
 
         buff.from = from;
 
-
         if(!this.hasBuff(name)){
-            new Display({buffName: name, /*buffStats: stats, */buffDuration: duration, target: this});
+            new Display({buffName: name, buffDuration: duration, target: this});
         }
 
         this._buffEvents(buff);
@@ -360,29 +367,29 @@ var Entity = (function(){
         //pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + buff.id);
         pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + buff.id);
     }
-    r.addDebuff = function(debuff){
+    r.addDebuff = function(debuff, from){
         //var stats = debuff.stats;
         var duration = debuff.duration;
         var name = debuff.name;
         if(this.isFainted()) return 0;
 
+        from = from || this;
+
+
         if(!name){
             throw new Error("Missing name property! @skill")
         }
-        /*
-         if(!stats){
-         throw new Error("Missing stats property! @skill")
-         }
-         */
         if(!duration){
             throw new Error("Missing duration property! @skill")
         }
 
-        this._buffEvents(debuff);
+        debuff.from = from;
+
 
         if(!this.hasDebuff(name))
-            new Display({buffName: name/*, buffStats: stats*/, buffDuration: duration, target: this});
+            new Display({buffName: name, buffDuration: duration, target: this});
 
+        this._buffEvents(debuff);
         var t = this._debuffs.push(debuff);
 
         //merge buff & extend duration
@@ -674,61 +681,18 @@ var Entity = (function(){
     }
     r._mergeBuffs = function(buffs){
         var n = buffs.length;
-        /*
-         for(var i = 0; i < n; i++) {
-         var buff = buffs[i];
 
-         for(var j = i + 1; j < n; j++) {
-         if(buff.name === buffs[j].name){
-         var buff2 = buffs[j];
-
-         var tmp = {};
-
-         for(var obj in buff) {
-         tmp[obj] = buff[obj];
-         }
-         tmp.duration = buff.duration > buff2.duration ? buff.duration : buff2.duration;
-
-
-         //stats
-         for(var stat in buff.stats) {
-         if((buff.stats[stat] + buff2.stats[stat]) < this._buffTable.length){
-         tmp.stats[stat] = buff.stats[stat] + buff2.stats[stat];
-         }
-         else {
-         tmp.stats[stat] = this._buffTable.length - 1;
-         }
-         }
-
-
-         this._removeHandlers(buff2);
-         //this._removeHandlers(buff);
-         //this._removeHandlers(buff);
-         //this._removeHandlers(tmp);
-         //
-         //this._buffEvents(tmp);
-
-
-         buffs.splice(j, 1);
-         buffs.splice(i, 1);
-
-         buffs.push(tmp);
-         pubsub.publish("/bp/battle/onEnd/" + this.getId() + "/" + tmp.id);
-
-
-         return this._mergeBuffs(buffs);
-         }
-         }
-
-
-         }*/
         for(var i = 0; i < n; i++) {
             var buff = buffs[i];
             for(var j = i + 1; j < n; j++) {
-                if(buff.name === buffs[j].name){
+                if(((buff.name === buffs[j].name)
+                    && (buff.from.getId() === buffs[j].from.getId()))
+                    || (buff.isLimited) ){
                     var buff2 = buffs[j];
+                    //console.log("buff", buff.from, buff2.from);
 
                     buff.duration = buff.duration > buff2.duration ? buff.duration : buff2.duration;
+                    buff.from = buff2.from;
 
                     this._removeHandlers(buff2);
 
@@ -782,23 +746,13 @@ var Entity = (function(){
             stats2string = "";
             tmp = $("<img>");
 
-            for(stat in b.stats) {
-                stats2string += stat + ": " + b.stats[stat] + "; ";
-            }
-
-            /*
-             //$(buff).html(b.name + "<br>" + stats2string + "<br>" + b.duration);
-             tmp += b.name + "<br>" + stats2string + "<br>" + b.duration + "<br>";
-
-
-             */
-
             if(!this._buffs[i].icon) continue;
 
             $(tmp).attr("src", b.icon)
             $(tmp).attr("data-id", this.getId());
             $(tmp).attr("data-value", b.name);
             $(tmp).attr("data-type", "buff");
+            $(tmp).attr("data-from", b.from.getId());
 
             $(this.uiBuffs).append(tmp);
         }
@@ -808,23 +762,16 @@ var Entity = (function(){
             stats2string = "";
             tmp = $("<img>");
 
-            for(stat in b.stats) {
-                stats2string += stat + ": " + b.stats[stat] + "; ";
-            }
-
-
             if(!this._debuffs[i].icon) continue;
 
             $(tmp).attr("src", b.icon)
             $(tmp).attr("data-id", this.getId());
             $(tmp).attr("data-value", b.name);
             $(tmp).attr("data-type", "debuff");
+            $(tmp).attr("data-from", b.from.getId());
 
             $(this.uiDebuffs).append(tmp);
         }
-
-
-        //$(buff).html(tmp);
 
     }
     r._nextTurnListener = function(){
@@ -930,8 +877,8 @@ var Entity = (function(){
                     if(buff.__initFlag){
                         return self;
                     }
-                    buff.effects.onInit.call(self, buff);
                     buff.__initFlag = true;
+                    buff.effects.onInit.call(self, buff);
                 }));
             }
             if(buff.effects.onEnd){/*

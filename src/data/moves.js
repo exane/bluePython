@@ -115,7 +115,7 @@ module.exports = self = {
         id: "attackboost",
         costs: 100,
         onCast: function(opt){
-            this.addBuff(buffData.load("attackboost"));
+            this.addBuff(buffData.load("attackboost"), this);
 
             logger.message("str boosted by 2. total str boosts: " + this.getBoostLevel("str"));
         },
@@ -126,7 +126,7 @@ module.exports = self = {
         id: "defboost",
         costs: 100,
         onCast: function(opt){
-            this.addBuff(buffData.load("defenseboost"));
+            this.addBuff(buffData.load("defenseboost"), this);
 
             logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
         },
@@ -138,7 +138,7 @@ module.exports = self = {
         id: "fumeboost",
         costs: 500,
         onCast: function(opt){
-            opt.target.addBuff(buffData.load("fumeboost"));
+            opt.target.addBuff(buffData.load("fumeboost"), this);
 
             logger.message("each stat increased by 300%! ");
         },
@@ -166,12 +166,11 @@ module.exports = self = {
         costs: 100,
         onCast: function(opt){
             logger.message(this.getFullName() + " drinks aimwater! critical chance increased!");
-            opt.target.addBuff(buffData.load("aimwater_buff"));
+            opt.target.addBuff(buffData.load("aimwater_buff"), this);
         },
         icon: "assets/ace.png"
     },
 
-    //["mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"]
     mortal_strike: {
         name: "Mortal Strike",
         id: "mortal_strike",
@@ -181,7 +180,7 @@ module.exports = self = {
         costs: 50,
         onCast: function(opt){
             logger.message(opt.target.getFullName() + " suffers great pain! Received healing is reduced by 50%.");
-            opt.target.addDebuff(buffData.load("mortal_strike_debuff"));
+            opt.target.addDebuff(buffData.load("mortal_strike_debuff"), this);
         },
         icon: "assets/battered-axe.png"
     },
@@ -194,7 +193,7 @@ module.exports = self = {
         costs: 20,
         onCast: function(opt){
             logger.message(this.getFullName() + " rend his target!");
-            opt.target.addDebuff(buffData.load("rend_debuff"));
+            opt.target.addDebuff(buffData.load("rend_debuff"), this);
         },
         icon: "assets/ragged-wound.png"
     },
@@ -238,7 +237,7 @@ module.exports = self = {
         isAoe: true,
         //costs: 50,
         onCast: function(opt){
-            opt.target.addBuff(buffData.load("battle_shout"));
+            opt.target.addBuff(buffData.load("battle_shout"), this);
             if(opt.target.getId() === this.getId())
                 this.changeManaBy(30);
         },

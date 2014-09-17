@@ -1,5 +1,6 @@
 var Entity = require("./Entity.js");
 var logger = require("./log.js");
+var moveData = require("../data/moves.js");
 
 "use strict";
 var Player = (function(){
@@ -12,11 +13,14 @@ var Player = (function(){
         this.uiMenuSkill = $("#menu-skill");
         this.uiMenu = uiMenu;
 
-
+        this._isOpen = false;
         //this.events = events;
 
 
         //this.otherSide = otherSide || null;
+
+        //this.listSkills();
+        //this.listTargets(otherSide, yourSide);
 
         this.initEvents();
     }
@@ -28,9 +32,12 @@ var Player = (function(){
     r.uiMenuSkill = null;
     r.uiMenu = null;
 
+    r.isActive = false;
+    r.isPlayer = true;
+
     //r.otherSide = null;
     //r.events = {};
-    r._isOpen = false;
+    r._isOpen = null;
 
     r.setOpen = function(bool){
         this._isOpen = bool;
@@ -42,22 +49,29 @@ var Player = (function(){
 
     r.initEvents = function(){
         var self = this;
+        //debugger;
         this.uiMenuAttack.click(function(){
-            self.clickAttack.call(self);
+            if(self.isActive)
+                self.clickAttack.call(self);
         });
 
         this.uiMenuDefense.click(function(){
-            self.clickDefense.call(self);
+            if(self.isActive)
+                self.clickDefense.call(self);
         });
 
         this.uiMenuSkill.click(function(){
-            self.clickSkills.call(self);
+            if(self.isActive)
+                self.clickSkills.call(self);
         });
 
-        $(".view").click(this.onBack.bind(this));
+        $(".view").on("click", this.onBack.bind(this));
+        //this.resetMenu();
+
     }
 
     r.clickSkills = function(){
+        this.listSkills();
         this.uiMenu.children(".menu-main").hide();
         this.uiMenu.children(".menu-skills").show();
         this.expandMenu();
@@ -65,18 +79,22 @@ var Player = (function(){
     }
 
     r.clickDefense = function(){
+        var self = this;
         if(this.hasChosen()) return 0;
         this.turnAction.do = "default_defense";
         this.turnAction.from = this;
         //this.hasChosen = true;
-        this.expandMenu();
-        this.setChosen(true);
-        this.ready(this.turnAction);
+        //this.expandMenu();
+        setTimeout(function(){
+            self.setChosen(true);
+            self.ready(self.turnAction);
+        },1);
         //console.log(this);
     }
 
     r.clickAttack = function(){
         this.turnAction.do = "default_attack";
+        this.listTargets(this.getOtherside(), this.getYourside());
 
 
         //logger.message("-> Choose a target to attack");
@@ -90,6 +108,7 @@ var Player = (function(){
     r.expandMenu = function(){
         var maxHeight = $(".view").css("height");
         this.setOpen(true);
+        //return;
         this.uiMenu.animate({
             "margin-top": "-=" + maxHeight,
             "height": "+=" + maxHeight
@@ -99,6 +118,7 @@ var Player = (function(){
     }
 
     r.reduceMenu = function(){
+        //return;
         var maxHeight = $(".view").css("height");
         /*
          this.uiMenu.animate({
@@ -106,6 +126,7 @@ var Player = (function(){
          "height": "-="+maxHeight
          });
          */
+        if(!this.isOpen()) return;
         this.uiMenu.css({
             "margin-top": 0,
             "height": "-=" + maxHeight
@@ -134,6 +155,7 @@ var Player = (function(){
     r.onSkillClick = function(skill){
         //console.log(skill);
         if(this.hasChosen()) return 0;
+        this.listTargets(this.getOtherside(), this.getYourside());
 
 
         //this.listTargets();
@@ -161,7 +183,10 @@ var Player = (function(){
 
     r.setChosen = function(value){
         if(value){
-            $(".controller").hide();
+            this.reduceMenu();
+            //$(".controller").hide();
+            this.uiToggleActive();
+            this.isActive = false;
         }
         this.setOpen(false);
         this._hasChosen = value;
@@ -178,6 +203,71 @@ var Player = (function(){
         this.setChosen(true);
         this.ready(this.turnAction);
     }
+
+    r.listTargets = function(otherSide, yourSide){
+        //if(!this.player) return 0;
+        var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
+        //console.log(ulEnemy, otherSide);
+        var ulAlly = this.uiMenu.children(".menu-target-ally").find("ul");
+        var npc, pointer, i;
+        var n = otherSide.length();
+        var m = yourSide.length();
+
+        ulEnemy.text("");
+        ulAlly.text("");
+        for(i = 0; i < n; i++) {
+            npc = otherSide.getMemberByIndex(i);
+            pointer = $("<li>" + npc.getName() + "</li>");
+
+
+            otherSide.addDomPointerReferenceTo(npc.getId(), pointer);
+
+            $(pointer).appendTo(ulEnemy);
+
+            $(pointer).on("click", this.onTargetClick.bind(this, npc));
+            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
+            //console.log(pointer, npc);
+        }
+        for(i = 0; i < m; i++) {
+
+            npc = yourSide.getMemberByIndex(i);
+            pointer = $("<li>" + npc.getName() + "</li>");
+
+            //console.log("npc", npc);
+
+            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
+            yourSide.addDomPointerReferenceTo(npc.getId(), pointer);
+
+            $(pointer).appendTo(ulAlly);
+
+            $(pointer).on("click", this.onTargetClick.bind(this, npc));
+            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
+        }
+    }
+
+    r.listSkills = function(){
+        //if(!this.player) return 0;
+        var ul = $(".menu-skills ul");
+        var n = this.getSkillList().length;
+
+        ul.empty("");
+
+        for(var i = 0; i < n; i++) {
+            //moves.push(moveData[this.player.skillList[i]].name);
+            var data = moveData[this.getSkillList(i)];
+            var li = $("<li data-type='skill' value='" + data.id + "'></li>");
+            $(li).append("<img src='" + data.icon + "'>");
+            $(li).append("<p>" + data.name + "</p>");
+            ul.append(li);
+
+            //console.log("yolo", );
+            $("li[value=" + data.id + "]").on("click", this.onSkillClick.bind(this, data));
+        }
+
+    }
+
 
 
     return Player;

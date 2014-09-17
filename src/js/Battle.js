@@ -24,17 +24,19 @@ var Battle = (function(){
 
     r.allies = null;
     r.enemies = null;
-    //r.turnorderIndex = 0;
     r.turn = 1;
     r.uiMenu = null;
+/*
     r.player = null;
-    //r.events = {};
+*/
+    r.player = [];
+    r.playerOrder = 0;
     r.tooltip = null;
 
     r.speed = 1000;
 
     r.debug = false;
-    r.debugSkipGameover = false; //doesnt work yet / buggy
+    //r.debugSkipGameover = false; //doesnt work yet / buggy
 
 
     r.init = function(){
@@ -42,8 +44,10 @@ var Battle = (function(){
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewPlayer(data.exane, this.side1, this.side2);
         this.addNewPlayer(data.warrior, this.side1, this.side2);
-        this.addNewNpc(data.gnomemage, this.side1, this.side2);
-        this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        this.addNewPlayer(data.warrior, this.side1, this.side2);
+        this.addNewPlayer(data.warrior, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
+        //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
@@ -51,13 +55,13 @@ var Battle = (function(){
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
-        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
-
+/*
         if(this.player){
             this.listTargets(this.player.getOtherside(), this.player.getYourside());
             this.listSkills();
-        }
+        }*/
 
         var self = this;
         this.tooltip = new Tooltip(this);
@@ -129,8 +133,10 @@ var Battle = (function(){
     }
 
     r.addNewPlayer = function(options, yourSide, otherSide){
-        var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
+        //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
+        var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
+        this.player.push(ally);
         yourSide.add(ally);
     }
 
@@ -217,79 +223,17 @@ var Battle = (function(){
         }
     }
 
-    r.listTargets = function(otherSide, yourSide){
-        if(!this.player) return 0;
-        var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
-        var ulAlly = this.uiMenu.children(".menu-target-ally").find("ul");
-        var npc, pointer, i;
-        //var n = this.side2.length();
-        var n = otherSide.length();
-        var m = yourSide.length();
-
-        ulEnemy.text("");
-        ulAlly.text("");
-        for(i = 0; i < n; i++) {
-            //var npc = this.side2.getMemberByIndex(i);
-            npc = otherSide.getMemberByIndex(i);
-            pointer = $("<li>" + npc.getName() + "</li>");
-
-            //console.log("npc", npc);
-
-            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
-            otherSide.addDomPointerReferenceTo(npc.getId(), pointer);
-
-            $(pointer).appendTo(ulEnemy);
-
-            $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
-            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
-            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
-            //console.log(pointer, npc);
-        }
-        for(i = 0; i < m; i++) {
-
-            npc = yourSide.getMemberByIndex(i);
-            pointer = $("<li>" + npc.getName() + "</li>");
-
-            //console.log("npc", npc);
-
-            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
-            yourSide.addDomPointerReferenceTo(npc.getId(), pointer);
-
-            $(pointer).appendTo(ulAlly);
-
-            $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
-            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
-            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
-        }
-    }
-
-    r.listSkills = function(){
-        if(!this.player) return 0;
-        var ul = $(".menu-skills ul");
-        var n = this.player.getSkillList().length;
-
-        for(var i = 0; i < n; i++) {
-            //moves.push(moveData[this.player.skillList[i]].name);
-            var data = moveData[this.player.getSkillList(i)];
-            var li = $("<li data-type='skill' value='" + data.id + "'></li>");
-            $(li).append("<img src='" + data.icon + "'>");
-            $(li).append("<p>" + data.name + "</p>");
-            ul.append(li);
-
-            //console.log("yolo", );
-            $("li[value=" + data.id + "]").on("click", this.player.onSkillClick.bind(this.player, data));
-        }
-
-    }
-
     r.observe = function(){
         var n = this.side1.length(true);
         var m = this.side2.length(true);
-        var k = 0;
+        var k = 0, i=0;
         var self = this;
 
         var collectData = [];
         var observeList = this.getObserveList();
+
+        //this.player[0].initEvents();
+        this.handlePlayerEvents(i++);
 
 
         /*
@@ -311,12 +255,23 @@ var Battle = (function(){
             self.removeFromObserveList(observeList, data.from.getId());
             collectData.push(data);
 
+            if(data.from.isPlayer && i < self.player.length){
+                self.handlePlayerEvents(i++)
+            }
+
             if(!observeList.length){
                 //$(document).unbind("bp-battle-chosen");
                 pubsub.unsubscribe(handle);
                 self.runStartEvent(collectData);
             }
         })
+    }
+
+    r.handlePlayerEvents = function(playerIndex){
+        //this.player[playerIndex].initEvents();
+        this.player[playerIndex].isActive = true;
+        this.player[playerIndex].uiToggleActive();// = true;
+        this.player[playerIndex].resetMenu();
     }
 
     r.removeFromObserveList = function(list, id){
@@ -573,8 +528,11 @@ var Battle = (function(){
         this.turn++;
         //$.event.trigger("bp-battle-nextTurn");
         pubsub.publish("/bp/battle/nextTurn/");
-        if(this.player){
-            this.player.resetMenu();
+        //if(this.player){
+        //    this.player.resetMenu();
+        //}
+        for(var i=0; i<this.player.length; i++){
+            this.player[i].resetMenu();
         }
         this.startNewTurn();
 

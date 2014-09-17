@@ -203,6 +203,7 @@ module.exports = self = {
             vit: 1
         },*/
         duration: 5,
+        isLimited: true,
         effects: {
             onInit: function(opt){
                 this.changeBoost({

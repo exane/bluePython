@@ -14,6 +14,7 @@ var Tooltip = (function(){
     r.entity = null;
     r.type = null;
     r.buff = null;
+    r.buffFrom = null;
 
     r.start = function(){
         this.uiTooltip = $(".tooltip");
@@ -24,7 +25,7 @@ var Tooltip = (function(){
         var self = this;
         //$(".view .sprite .sprite-img-container").hover(this.onMouseover.bind(this), this.onMouseout.bind(this));
         $(".view .sprite .sprite-img-container").on("mouseover", self.onMouseover.bind(self));
-        $(".menu-skills li").on("mouseover", self.onMouseoverSkills.bind(self));
+        $(".menu-skills").on("mouseover", "li", self.onMouseoverSkills.bind(self));
         //$(document).on("bp-tooltip-update", this.render.bind(this));
         pubsub.subscribe("/bp/tooltip/update/", this.render.bind(this));
     }
@@ -51,6 +52,7 @@ var Tooltip = (function(){
         if(type === "buff" || type === "debuff"){
             //data =
             this.buff = $(e.target).attr("data-value");
+            this.buffFrom = $(e.target).attr("data-from");
             //console.log(entity.getBuff($(e.target).attr("data-value")));
         }
         if(type === "entity"){
@@ -67,7 +69,7 @@ var Tooltip = (function(){
         if(this.type === "buff" || this.type === "debuff"){
             this.renderBuff();
         }
-        else if(this.type === "entity") {
+        else if(this.type === "entity"){
             this.renderEntity();
         }
     }
@@ -84,17 +86,17 @@ var Tooltip = (function(){
             uiSelf.find(".tooltip-hp").text(entity.getHp() + " / " + entity.getMaxHp() + " | " + entity.getHp(true) + "%");
             uiSelf.find(".tooltip-mana").text(entity.getMana() + " / " + entity.getMaxMana() + " | " + entity.getMana(true) + "%");
 
-            for(var stat in stats){
-                uiSelf.find(".tooltip-stats ul").append("<li>"+stat+ ": "+ entity.getAttr(stat)+"</li>");
+            for(var stat in stats) {
+                uiSelf.find(".tooltip-stats ul").append("<li>" + stat + ": " + entity.getAttr(stat) + "</li>");
             }
 
-            uiSelf.find(".tooltip-stats ul").append("<li>Crit chance: "+entity.getCritRate()+"%</li>");
-            uiSelf.find(".tooltip-stats ul").append("<li>Crit dmg: "+entity.getCritDmgMultiplicator()*100+"%</li>");
+            uiSelf.find(".tooltip-stats ul").append("<li>Crit chance: " + entity.getCritRate() + "%</li>");
+            uiSelf.find(".tooltip-stats ul").append("<li>Crit dmg: " + entity.getCritDmgMultiplicator() * 100 + "%</li>");
 
-            for(var i=0; i<entity.getAbilities().length; i++){
+            for(var i = 0; i < entity.getAbilities().length; i++) {
                 uiSelf.find(".tooltip-abilities").append(entity.getAbilities(i) + "; ");
             }
-            for(var i=0; i<entity.getSkillList().length; i++){
+            for(var i = 0; i < entity.getSkillList().length; i++) {
                 uiSelf.find(".tooltip-skills").append(entity.getSkillList(i) + "; ");
             }
 
@@ -108,7 +110,6 @@ var Tooltip = (function(){
         var move = moveData[id];
 
 
-
         this.uiTooltip.load("./tpl/skill-tpl.html", function(){
             var self = $(this);
             self.find(".tooltip-icon img").attr("src", move.icon);
@@ -117,16 +118,16 @@ var Tooltip = (function(){
         });
     }
 
-
     r.renderBuff = function(){
         var buff;
         var self = this;
 
+
         if(this.type === "buff"){
-            buff = this.entity.getBuff(this.buff);
+            buff = this.entity.getBuff(this.buff, self.buffFrom);
         }
         if(this.type === "debuff"){
-            buff = this.entity.getDebuff(this.buff);
+            buff = this.entity.getDebuff(this.buff, self.buffFrom);
         }
 
         this.uiTooltip.load("./tpl/buff-tpl.html", function(){
@@ -137,27 +138,11 @@ var Tooltip = (function(){
             uiSelf.find(".tooltip-desc").text(buff.desc);
             uiSelf.find(".tooltip-name").text(buff.name);
             uiSelf.find(".tooltip-type").text(self.type);
+            uiSelf.find(".tooltip-from").text("source: " + buff.from.getId());
             if(duration){
                 uiSelf.find(".tooltip-duration").text(buff.duration + " turns left.");
             }
-            /*
-            if(buff.costs){
-                uiSelf.find(".tooltip-costs").text(buff.costs + " Mana");
-            }
-            */
         });
-        /*
-        $(name).text(buff.name);
-
-        console.log(buff);
-
-        var duration = $("<div></div>");
-        duration.text(buff.duration);
-
-
-        this.uiTooltip.append(name);
-        this.uiTooltip.append(duration);
-        */
     }
 
 
