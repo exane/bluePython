@@ -200,7 +200,7 @@ module.exports = self = {
     },
     bloodthirst: {
         name: "Bloodthirst",
-        desc: "Instantly attack the target and restoring 1% of your health. Bloodthirst has double the normal chance to be a critical strike. Costs 30 Mana.",
+        desc: "Instantly attack the target and heals you by 30% of damage you have dealt. Bloodthirst has double the normal chance to be a critical strike. Costs 30 Mana.",
         basePower: 50,
         id: "bloodthirst",
         target: "enemy",
@@ -209,7 +209,7 @@ module.exports = self = {
             opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
         },
         onAfterAttack: function(opt, dmg){
-            var val = dmg *30 / 100;
+            var val = dmg * 30 / 100;
             this.changeHpBy(val);
 
             //opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
@@ -232,14 +232,15 @@ module.exports = self = {
     },
     battle_shout: {
         name: "Battle Shout",
-        desc: "Increase strength and vitality by 1 level. Additionally you gain 20 mana.",
+        desc: "Increase strength and vitality by 10%. Additionally you gain 30 mana.",
         id: "battle_shout",
         target: "friendly",
         isAoe: true,
         //costs: 50,
         onCast: function(opt){
             opt.target.addBuff(buffData.load("battle_shout"));
-            this.changeManaBy(5);
+            if(opt.target.getId() === this.getId())
+                this.changeManaBy(30);
         },
         icon: "assets/sonic-shout.png"
     }

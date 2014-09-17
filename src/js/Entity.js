@@ -653,6 +653,14 @@ var Entity = (function(){
         }
         this.updateUi();
     }
+    r.uiToggleActive = function(){
+        if(this.uiSprite.hasClass("entity-active")){
+            this.uiSprite.removeClass("entity-active");
+            return;
+        }
+
+        this.uiSprite.addClass("entity-active");
+    }
 
     /**
      * Private Methods

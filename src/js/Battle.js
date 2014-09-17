@@ -241,6 +241,9 @@ var Battle = (function(){
             $(pointer).appendTo(ulEnemy);
 
             $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
+            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
+            //console.log(pointer, npc);
         }
         for(i = 0; i < m; i++) {
 
@@ -255,6 +258,8 @@ var Battle = (function(){
             $(pointer).appendTo(ulAlly);
 
             $(pointer).on("click", this.player.onTargetClick.bind(this.player, npc));
+            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
         }
     }
 
@@ -267,7 +272,7 @@ var Battle = (function(){
             //moves.push(moveData[this.player.skillList[i]].name);
             var data = moveData[this.player.getSkillList(i)];
             var li = $("<li data-type='skill' value='" + data.id + "'></li>");
-            $(li).append("<img src='"+data.icon+"'>");
+            $(li).append("<img src='" + data.icon + "'>");
             $(li).append("<p>" + data.name + "</p>");
             ul.append(li);
 
@@ -288,18 +293,18 @@ var Battle = (function(){
 
 
         /*
-        $(document).on("bp-battle-chosen", function(e, data){
-            k++;
+         $(document).on("bp-battle-chosen", function(e, data){
+         k++;
 
-            self.removeFromObserveList(observeList, data.data.from.getId());
-            collectData.push(data.data);
+         self.removeFromObserveList(observeList, data.data.from.getId());
+         collectData.push(data.data);
 
-            if(!observeList.length){
-                $(document).unbind("bp-battle-chosen");
-                self.runStartEvent(collectData);
-            }
-        })
-        */
+         if(!observeList.length){
+         $(document).unbind("bp-battle-chosen");
+         self.runStartEvent(collectData);
+         }
+         })
+         */
         var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
 
@@ -412,7 +417,7 @@ var Battle = (function(){
             return;
         }
 
-        if(move.isAoe  && move.target === "enemy" && k < user.getOtherside().length()){
+        if(move.isAoe && move.target === "enemy" && k < user.getOtherside().length()){
             setTimeout(function(){
                 self.calculateTurnOf(user, user.getOtherside().member[k], move);
                 k++;
@@ -425,7 +430,7 @@ var Battle = (function(){
             target = user;
         }
 
-        if(!move.isAoe) {
+        if(!move.isAoe){
             this.calculateTurnOf(user, target, move);
         }
 
@@ -434,7 +439,7 @@ var Battle = (function(){
                 $(user.uiSprite).removeClass("entity-active");
                 multiple++;
                 self.runEvent(i, n, data, 0, multiple);
-            }, this.speed/6);
+            }, this.speed / 6);
 
             return;
         }
@@ -514,7 +519,7 @@ var Battle = (function(){
             }
             dmg = this.calculateDmg(user, target, move, opt);
             target.changeHpBy(-dmg, opt.isCrit);
-            pubsub.publish("/bp/battle/onGetHit/" + target.getId(),[dmg]);
+            pubsub.publish("/bp/battle/onGetHit/" + target.getId(), [dmg]);
             pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]);
         }
 
