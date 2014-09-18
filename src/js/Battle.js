@@ -26,9 +26,9 @@ var Battle = (function(){
     r.enemies = null;
     r.turn = 1;
     r.uiMenu = null;
-/*
-    r.player = null;
-*/
+    /*
+     r.player = null;
+     */
     r.player = [];
     r.playerOrder = 0;
     r.tooltip = null;
@@ -44,7 +44,7 @@ var Battle = (function(){
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewPlayer(data.exane, this.side1, this.side2);
         this.addNewPlayer(data.warrior, this.side1, this.side2);
-        this.addNewPlayer(data.warrior, this.side1, this.side2);
+        this.addNewPlayer(data.priest, this.side1, this.side2);
         this.addNewPlayer(data.warrior, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
@@ -53,15 +53,15 @@ var Battle = (function(){
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
-        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        this.addNewNpc(data.serpant_boss, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
-/*
-        if(this.player){
-            this.listTargets(this.player.getOtherside(), this.player.getYourside());
-            this.listSkills();
-        }*/
+        /*
+         if(this.player){
+         this.listTargets(this.player.getOtherside(), this.player.getYourside());
+         this.listSkills();
+         }*/
 
         var self = this;
         this.tooltip = new Tooltip(this);
@@ -226,7 +226,7 @@ var Battle = (function(){
     r.observe = function(){
         var n = this.side1.length(true);
         var m = this.side2.length(true);
-        var k = 0, i=0;
+        var k = 0, i = 0;
         var self = this;
 
         var collectData = [];
@@ -236,19 +236,6 @@ var Battle = (function(){
         this.handlePlayerEvents(i++);
 
 
-        /*
-         $(document).on("bp-battle-chosen", function(e, data){
-         k++;
-
-         self.removeFromObserveList(observeList, data.data.from.getId());
-         collectData.push(data.data);
-
-         if(!observeList.length){
-         $(document).unbind("bp-battle-chosen");
-         self.runStartEvent(collectData);
-         }
-         })
-         */
         var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
 
@@ -260,7 +247,6 @@ var Battle = (function(){
             }
 
             if(!observeList.length){
-                //$(document).unbind("bp-battle-chosen");
                 pubsub.unsubscribe(handle);
                 self.runStartEvent(collectData);
             }
@@ -268,7 +254,10 @@ var Battle = (function(){
     }
 
     r.handlePlayerEvents = function(playerIndex){
-        //this.player[playerIndex].initEvents();
+        if(this.player[playerIndex].isFainted()) {
+            this.player[playerIndex].ready();
+            return;
+        }
         this.player[playerIndex].isActive = true;
         this.player[playerIndex].uiToggleActive();// = true;
         this.player[playerIndex].resetMenu();
@@ -429,7 +418,7 @@ var Battle = (function(){
 
 
         for(var i = 0; i < n; i++) {
-            var move = moveData[data[i].do];
+            var move = moveData[data[i].do] || {};
             var self = data[i].from;
 
             //skills
@@ -467,32 +456,38 @@ var Battle = (function(){
             move.onCast.call(user, opt);
         }
 
-        if(move.basePower){
-            //dmg = this.calculateDmg(user, target, move, opt);
-            if(move.onAttack){
-                move.onAttack.call(user, opt);
-            }
-            dmg = this.calculateDmg(user, target, move, opt);
-            target.changeHpBy(-dmg, opt.isCrit);
-            pubsub.publish("/bp/battle/onGetHit/" + target.getId(), [dmg]);
-            pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]);
-        }
+        $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
+            .done((function(){
+                if(move.basePower){
+                    //dmg = this.calculateDmg(user, target, move, opt);
+                    if(move.onAttack){
+                        move.onAttack.call(user, opt);
+                    }
+                    dmg = this.calculateDmg(user, opt.target, move, opt);
+                    opt.target.changeHpBy(-dmg, opt.isCrit);
+                    pubsub.publish("/bp/battle/onGetHit/" + opt.target.getId(), [dmg]);
+                    pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]);
 
-        //if(move.boost){ //deprecated!
-        //    move.boost.call(user, opt);
-        //}
+                    $.when(pubsub.publish("/bp/battle/onAfterGetAttack/" + opt.target.getId(), [opt]))
+                        .done((function(){
 
-        if(move.onAfterAttack){
-            move.onAfterAttack.call(user, opt, [dmg]);
-        }
+                        }).bind(this));
+                }
 
 
-        //console.log(target);
-        if(target && target.isFainted() && !wasFainted){
-            //$.event.trigger("bp-ability-onFaint", opt);
-            pubsub.publish("/bp/battle/onFaint/", [opt]);
-            logger.message(target.getFullName() + " fainted...");
-        }
+                if(move.onAfterAttack){
+                    move.onAfterAttack.call(user, opt, [dmg]);
+                }
+
+                //console.log(target);
+                if(opt.target && opt.target.isFainted() && !wasFainted){
+                    //$.event.trigger("bp-ability-onFaint", opt);
+                    pubsub.publish("/bp/battle/onFaint/", [opt]);
+                    logger.message(opt.target.getFullName() + " fainted...");
+                }
+
+            }).bind(this));
+
     }
 
     r.calculateDmg = function(user, target, move, opt){
@@ -531,7 +526,7 @@ var Battle = (function(){
         //if(this.player){
         //    this.player.resetMenu();
         //}
-        for(var i=0; i<this.player.length; i++){
+        for(var i = 0; i < this.player.length; i++) {
             this.player[i].resetMenu();
         }
         this.startNewTurn();

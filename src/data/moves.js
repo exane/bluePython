@@ -28,24 +28,6 @@ module.exports = self = {
         id: "default_defense",
         icon: "assets/ace.png"
     },
-    heal: {
-        name: "Heal",
-        id: "heal",
-        costs: 100,
-        onCast: function(opt){
-            var val;
-            if(opt.target.isFainted()){
-                logger.message(this.getFullName() + " uses Heal on " + opt.target.getFullName());
-                logger.message(opt.target.getFullName() + " is not alive...");
-                return 0;
-            }
-            opt.target.changeHpBy(val = 200 + this.getSpecialAttackPower());
-            logger.message(this.getFullName() + " heals " + opt.target.getFullName()
-                + " by " + val + " hp!");
-        },
-        target: "friendly",
-        icon: "assets/ace.png"
-    },
     assassination: {
         id: "assassination",
         name: "Assassination (instant kill)",
@@ -242,5 +224,82 @@ module.exports = self = {
                 this.changeManaBy(30);
         },
         icon: "assets/sonic-shout.png"
+    },
+    taunt: {
+        name: "Taunt",
+        desc: "Increases chance of enemies attacking you  by 80% for 5 turns. Costs 5 mana.",
+        id: "taunt",
+        target: "enemy",
+        isAoe: true,
+        costs: 5,
+        onCast: function(opt){
+            logger.message(this.getFullName() + " taunts " + opt.target.getFullName() + "!");
+            opt.target.addDebuff(buffData.load("taunt_debuff"), this);
+        },
+        icon: "assets/sonic-shout.png"
+    },
+    renew: {
+        name: "Renew",
+        desc: "",
+        id: "renew",
+        target: "friendly",
+        //isAoe: true,
+        costs: 50,
+        onCast: function(opt){
+            logger.message(this.getFullName() + " casts renew on " + opt.target.getFullName());
+            opt.target.addBuff(buffData.load("renew_buff"), this);
+
+        },
+        icon: "assets/lotus-flower.png"
+    },
+    absorb_shield: {
+        name: "Magic Shield Absorb",
+        desc: "Absorbs 1000 damage. Costs 250 mana.",
+        id: "absorb_shield",
+        target: "friendly",
+        costs: 250,
+        onCast: function(opt){
+            logger.message(this.getFullName() + " casts Magic Shield Absorb on " + opt.target.getFullName());
+            opt.target.addBuff(buffData.load("absorb_shield_buff"), this);
+
+        },
+        icon: "assets/aura.png"
+    },
+    heal: {
+        name: "Heal",
+        id: "heal",
+        costs: 100,
+        onCast: function(opt){
+            var val;
+            if(opt.target.isFainted()){
+                logger.message(this.getFullName() + " uses Heal on " + opt.target.getFullName());
+                logger.message(opt.target.getFullName() + " is not alive...");
+                return 0;
+            }
+            opt.target.changeHpBy(val = 600 + this.getSpecialAttackPower());
+            logger.message(this.getFullName() + " heals " + opt.target.getFullName()
+                + " by " + val + " hp!");
+        },
+        target: "friendly",
+        icon: "assets/ace.png"
+    },
+    aoe_heal: {
+        name: "Heal(Aoe)",
+        id: "aoe_heal",
+        costs: 200,
+        isAoe: true,
+        onCast: function(opt){
+            var val;
+            if(opt.target.isFainted()){
+                logger.message(this.getFullName() + " uses Heal(Aoe) on " + opt.target.getFullName());
+                logger.message(opt.target.getFullName() + " is not alive...");
+                return 0;
+            }
+            opt.target.changeHpBy(val = 200 + this.getSpecialAttackPower());
+            logger.message(this.getFullName() + " heals " + opt.target.getFullName()
+                + " by " + val + " hp!");
+        },
+        target: "friendly",
+        icon: "assets/ace.png"
     }
 }

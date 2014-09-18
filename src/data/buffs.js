@@ -1,4 +1,5 @@
 var logger = require("../js/log.js");
+var util = require("../js/Util.js");
 
 var self;
 module.exports = self = {
@@ -10,36 +11,9 @@ module.exports = self = {
         name: "Fume boost",
         id: "fumeboost",
         desc: "Increasing each stat by 300%.",
-        /*
-        stats: {
-            def: 6,
-            str: 6,
-            agi: 6,
-            vit: 6,
-            tec: 6,
-            lck: 6
-        },
-        */
+
         duration: 20,
         icon: "assets/devfake.jpg"
-    },
-    defenseboost: {
-        name: "Defense boost",
-        id: "defenseboost",
-        /*stats: {
-            def: 2
-        },*/
-        duration: 5,
-        icon: "assets/aura.png"
-    },
-    attackboost: {
-        name: "Attack boost",
-        id: "attackboost",
-        /*stats: {
-            str: 2
-        },*/
-        duration: 5,
-        icon: "assets/muscle-up.png"
     },
     firearmor: {
         name: "Fire Armor",
@@ -106,13 +80,12 @@ module.exports = self = {
         name: "HoT (Heal over Time)",
         id: "hot_test",
         desc: "Healing of the target at end of each turn.",
-        icon: "assets/lotus-flower.png",/*
-        stats: {},*/
+        icon: "assets/lotus-flower.png",
         duration: 5,
         effects: {
-            onTurnEnd: function(opt){ //opt = buff properties
+            onTurnEnd: function(buff){ //opt = buff properties
                 //debugger;
-                this.changeHpBy(opt.from.getAttr("tec"));
+                this.changeHpBy(buff.from.getAttr("tec"));
             }
         }
     },
@@ -121,13 +94,12 @@ module.exports = self = {
         id: "onHit_test",
         desc: "If target got hit, then he immediately regenerates some hp.",
         icon: "assets/aura.png",
-        /*stats: {},*/
         duration: 5,
         effects: {
-            onGetHit: function(opt){
-                this.changeHpBy(opt.from.getAttr("tec")/3);
+            onGetHit: function(buff){
+                this.changeHpBy(buff.from.getAttr("tec")/3);
             },
-            onHit: function(opt){
+            onHit: function(buff){
                 //this.changeHpBy(this.getAttr("tec"));
             }
         }
@@ -137,16 +109,13 @@ module.exports = self = {
         id: "aimwater_buff",
         desc: "Increase crit chances by 50% and crit dmg by 200%",
         icon: "assets/beer-stein.png",
-/*
-        stats: {},
-*/
         duration: 5,
         effects: {
-            onInit: function(opt){
+            onInit: function(buff){
                 this.increaseCritChancesBy(50);
                 this.increaseCritDmgBy(200);
             },
-            onEnd: function(opt){
+            onEnd: function(buff){
                 this.decreaseCritChancesBy(50);
                 this.decreaseCritDmgBy(200);
             }
@@ -158,15 +127,13 @@ module.exports = self = {
         id: "mortal_strike_debuff",
         desc: "Reduce received healing by 50%.",
         icon: "assets/battered-axe.png",
-/*
-        stats: {},
-*/
         duration: 5,
+        isLimited: true,
         effects: {
-            onInit: function(opt){
+            onInit: function(buff){
                 this.decreaseHealMultiplierBy(50);
             },
-            onEnd: function(opt){
+            onEnd: function(buff){
                 this.increaseHealMultiplierBy(50);
             }
         }
@@ -176,19 +143,16 @@ module.exports = self = {
         id: "rend_debuff",
         desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%.",
         icon: "assets/ragged-wound.png",
-/*
-        stats: {},
-*/
         duration: 5,
         effects: {
-            onTurnEnd: function(opt){
+            onTurnEnd: function(buff){
                 //var dmg = this.calculateDmg()
-                this.changeHpBy(-500);
+                this.changeHpBy(-(100 + buff.from.getPhysicalAttackPower()));
             },
-            onInit: function(opt){
+            onInit: function(buff){
                 this.changeIncomingDmgMultiplierBy(0.2);
             },
-            onEnd: function(opt){
+            onEnd: function(buff){
                 this.changeIncomingDmgMultiplierBy(-0.2);
             }
         }
@@ -198,20 +162,16 @@ module.exports = self = {
         id: "battle_shout",
         desc: "Increase strength and vitality by 10%.",
         icon: "assets/sonic-shout.png",
-       /* stats: {
-            str: 1,
-            vit: 1
-        },*/
         duration: 5,
         isLimited: true,
         effects: {
-            onInit: function(opt){
+            onInit: function(buff){
                 this.changeBoost({
                     "str": 10,
                     "vit": 10
                 });
             },
-            onEnd: function(opt){
+            onEnd: function(buff){
                 this.changeBoost({
                     "str": -10,
                     "vit": -10
@@ -224,16 +184,61 @@ module.exports = self = {
         id: "endless_rage",
         desc: "With each hit, you get mana depends on damage you deal. You also get mana for each hit which you get.",
         icon: "assets/muscle-up.png",
-/*
-        stats: {},
-*/
         duration: -1,
         effects: {
-            onHit: function(opt, dmg){
-                this.changeManaBy(dmg/100);
+            onHit: function(buff, dmg){
+                this.changeManaBy(dmg*2/100);
             },
             onGetHit: function(opt, dmg){
-                this.changeManaBy(dmg*10/100);
+                this.changeManaBy(dmg*20/100);
+            }
+        }
+    },
+    taunt_debuff: {
+        name: "Taunt (debuff)",
+        id: "taunt_debuff",
+        desc: "Increases chance of enemies attacking you  by 80% for 5 turns.",
+        icon: "assets/sonic-shout.png",
+        duration: 5,
+        isLimited: true,
+        effects: {
+            onBeforeAttack: function(buff, turnOptions){
+                var rnd = Math.random()*100 | 0;
+                if(rnd <= 80){
+                    turnOptions.target = buff.from;
+                }
+            }
+        }
+    },
+    renew_buff: {
+        name: "Renew",
+        id: "renew_buff",
+        desc: "",
+        icon: "assets/lotus-flower.png",
+        duration: 5,
+        effects: {
+            onTurnEnd: function(buff){
+                this.changeHpBy(100 + buff.from.getSpecialAttackPower());
+            }
+        }
+    },
+    absorb_shield_buff: {
+        name: "Magic Shield Absorb",
+        id: "absorb_shield_buff",
+        desc: "Absorbs 1000 damage.",
+        icon: "assets/aura.png",
+        duration: 3,
+        effects: {
+            onInit: function(buff){
+                this.changeShieldAbsorbBy(1000);
+            },
+            onEnd: function(buff){
+                this.changeShieldAbsorbBy(-1000);
+            },
+            onAfterGetAttack: function(buff){
+                if(this.getShieldAbsorb() === 0){
+                    this.removeBuff(buff);
+                }
             }
         }
     }

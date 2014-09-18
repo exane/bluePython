@@ -37,7 +37,7 @@ var data = {
             def: 40,
             agi: 80,
             tec: 200,
-            vit: 750,
+            vit: 1750,
             lck: 100
         },
         img: "assets/GnomeMage.png",
@@ -71,56 +71,61 @@ var data = {
         abilities: ["prayer"]
 
     },
-    chernabog: {
-        name: "Chernabog",
-        id: "chernabog",
-        stats: {
-            str: 200,
-            def: 50,
-            agi: 50,
-            tec: 100,
-            vit: 1000,
-            lck: 100
-        },
-        img: "assets/Chernabog.png",
-        abilities: ["firearmor"],
-        skills: ["burnslash"],
-        ai: function(){
-
-            var moves = [
-                {chance: 25, id: "burnslash"},
-                {chance: 75, id: "default_attack"}
-            ];
-            this.turnAction.do = util.random(moves);
-
-            if(this.getMana() < moveData["burnslash"].costs){
-                this.turnAction.do = "default_attack";
-
-            }
-
-        }
-
-    },
     warrior: {
         name: "Warrior",
         id: "warrior",
         stats: {
             str: 100,
-            def: 100,
+            def: 200,
             agi: 100,
             tec: 10,
-            vit: 100,
+            vit: 1000,
             lck: 1000
         },
         img: "assets/warrior_11.png",
-        skills: ["mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"], //, "bladestorm", "battle_shout"],
-        ai: function(){
-
-        },
+        skills: ["taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
         abilities: ["endless_rage"],
         onBattleStart: function(){
             this.changeManaBy(-this.getMaxMana());
         }
+    },
+    priest: {
+        name: "Priest",
+        id: "priest",
+        stats: {
+            str: 40,
+            def: 75,
+            agi: 100,
+            tec: 750,
+            vit: 800,
+            lck: 150
+        },
+        img: "assets/priest_12.png",
+        skills: ["absorb_shield", "renew", "heal", "aoe_heal", "revive"],
+        abilities: []
+    },
+    serpant_boss: {
+        name: "Serpant King",
+        id: "serpant_boss",
+        stats: {
+            str: 450,
+            def: 100,
+            agi: 100,
+            tec: 10000,
+            vit: 10000,
+            lck: 2000
+        },
+        img: "assets/Serpant.png",
+        skills: ["rend", "mortal_strike"],
+        ai: function(){
+            var moves = [
+                {chance: 20, id: "rend"},
+                {chance: 80, id: "mortal_strike"}
+            ];
+
+            this.turnAction.do = util.random(moves);
+        },
+        abilities: []
     }
 }
 

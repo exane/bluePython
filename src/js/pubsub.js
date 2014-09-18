@@ -29,9 +29,12 @@
 
         //can change loop or reverse array if the order matters
         while(len--) {
-            if(subs[len])
+            if(subs[len]){
                 subs[len].apply(context, args || []);
+            }
         }
+
+        return {};
     };
 
     MinPubSub.subscribe = function(/* String */ topic, /* Function */ callback){

@@ -71,7 +71,6 @@ var Entity = (function(){
     r._buffs = [];
     r._debuffs = [];
     r._boosts = {};
-    //r._buffTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
     r._mana = 1;
     r._maxMana = 1;
     r._incomingDmgMultiplier = 1;
@@ -79,6 +78,7 @@ var Entity = (function(){
     r._critDmgMultiplicator = 2;
     r._additionalCritChances = 0;
     r._healMultiplier = 1;
+    r._shieldAbsorb = 0;
 
     /**
      * UI Properties
@@ -165,32 +165,37 @@ var Entity = (function(){
     r.getImg = function(){
         return this._img;
     }
-    r.getBuff = function(name, from){
+    r.getBuff = function(name, from, getIndex){
         var n = this._buffs.length;
 
         for(var i = 0; i < n; i++) {
             if(this._buffs[i].name === name){
                 if(from && from === this._buffs[i].from.getId()){
+                    if(getIndex) {
+                        return i;
+                    }
                     return this._buffs[i];
-                }/*
-                else
-                    return this._buffs[i];*/
+                }
             }
         }
         return null;
     }
+    r.getShieldAbsorb = function(){
+        return this._shieldAbsorb;
+    }
 
-    r.getDebuff = function(name, from){
+    r.getDebuff = function(name, from, getIndex){
         var n = this._debuffs.length;
         from = from || null;
 
         for(var i = 0; i < n; i++) {
             if(this._debuffs[i].name === name){
                 if(from && from === this._debuffs[i].from.getId()){
+                    if(getIndex) {
+                        return i;
+                    }
                     return this._debuffs[i];
-                }/*
-                else
-                    return this._debuffs[i];*/
+                }
             }
         }
         return null;
@@ -409,6 +414,9 @@ var Entity = (function(){
                 pubsub.unsubscribe(buff.__handler[i]);
             }
         }
+        if(typeof index == "undefined"){
+            index = this.getBuff(buff.name, buff.from.getId(), true);
+        }
 
         this._buffs.splice(index, 1);
         logger.message(buff.name + " wears off.");
@@ -430,6 +438,11 @@ var Entity = (function(){
                 pubsub.unsubscribe(debuff.__handler[i]);
             }
         }
+
+        if(typeof index == "undefined"){
+            index = this.getDebuff(debuff.name, debuff.from.getId(), true);
+        }
+
 
         this._debuffs.splice(index, 1);
         logger.message(debuff.name + " wears off.");
@@ -532,6 +545,13 @@ var Entity = (function(){
 
         return def;
     }
+    r.changeShieldAbsorbBy = function(value){
+        this._shieldAbsorb += value;
+
+        if(this._shieldAbsorb < 0){
+            this._shieldAbsorb = 0;
+        }
+    }
     r.changeHpBy = function(value, crit){
         if(this.isFainted()) return 0;
         value = value | 0;
@@ -543,7 +563,18 @@ var Entity = (function(){
             pubsub.publish("/bp/battle/onReceiveHeal/" + this.getId())
         }
 
-        //console.log("entity", this);
+        if(value < 0){
+            var absorb = this.getShieldAbsorb();
+
+            this.changeShieldAbsorbBy(value);
+
+            value += absorb;
+
+            if(value > 0){
+                value = 0;
+            }
+        }
+
         new Display({target: this, amount: value, isCrit: crit});
 
         this._currHp = this.getHp() + value;
@@ -593,6 +624,7 @@ var Entity = (function(){
         if(this.isFainted()){
             data.fainted = true;
             data.from = this;
+            data.do = "default_attack"; //just... prevents getting errors
         }
         //$.event.trigger("bp-battle-chosen", {data: data});
         pubsub.publish("/bp/battle/chosen/", [data]);
@@ -652,11 +684,6 @@ var Entity = (function(){
         for(var stat in stats) {
             this._boosts[stat] += stats[stat];
 
-
-            /*if(this._boosts[stat] >= this._buffTable.length){
-             this._boosts[stat] = this._buffTable.length - 1;
-             logger.message(stat + " can't be boosted more!");
-             }*/
         }
         this.updateUi();
     }
@@ -685,9 +712,8 @@ var Entity = (function(){
         for(var i = 0; i < n; i++) {
             var buff = buffs[i];
             for(var j = i + 1; j < n; j++) {
-                if(((buff.name === buffs[j].name)
-                    && (buff.from.getId() === buffs[j].from.getId()))
-                    || (buff.isLimited) ){
+                if(((buff.name === buffs[j].name) && (buff.from.getId() === buffs[j].from.getId()))
+                    || (buff.isLimited && buff.name === buffs[j].name)){
                     var buff2 = buffs[j];
                     //console.log("buff", buff.from, buff2.from);
 
@@ -870,9 +896,15 @@ var Entity = (function(){
                 __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId(), // + "/"+ buff.id,
                     buff.effects.onHit.bind(this, buff)));
             }
-            if(buff.effects.onInit){/*
-             __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId() + "/"+ buff.id,
-             buff.effects.onInit.bind(this, buff)));*/
+            if(buff.effects.onBeforeAttack){
+                __h.push(pubsub.subscribe("/bp/battle/onBeforeAttack/" + this.getId(),
+                    buff.effects.onBeforeAttack.bind(this, buff)));
+            }
+            if(buff.effects.onAfterGetAttack){
+                __h.push(pubsub.subscribe("/bp/battle/onAfterGetAttack/" + this.getId(),
+                    buff.effects.onAfterGetAttack.bind(this, buff)));
+            }
+            if(buff.effects.onInit){
                 __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId() + "/" + buff.id, function(){
                     if(buff.__initFlag){
                         return self;
@@ -881,9 +913,7 @@ var Entity = (function(){
                     buff.effects.onInit.call(self, buff);
                 }));
             }
-            if(buff.effects.onEnd){/*
-             __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id,
-             buff.effects.onEnd.bind(this, buff)));*/
+            if(buff.effects.onEnd){
                 __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, function(){
                         if(buff.__endFlag){
                             return self;

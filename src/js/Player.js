@@ -141,7 +141,7 @@ var Player = (function(){
 
     r.resetMenu = function(){
         if(this.isFainted()) return 0;
-        this.turnAction = null;
+        //this.turnAction = null;
         this.turnAction = {};
         this.reduceMenu();
         this.setOpen(false);
