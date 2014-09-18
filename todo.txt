@@ -2,8 +2,6 @@
 
 - accuracy einbauen
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
-- PERFORMANCE!!!
-- mehr als einen char steuern können
 
 
 
