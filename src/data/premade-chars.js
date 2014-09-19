@@ -36,7 +36,7 @@ var data = {
             str: 40,
             def: 40,
             agi: 80,
-            tec: 200,
+            tec: 800,
             vit: 1750,
             lck: 100
         },
@@ -75,9 +75,9 @@ var data = {
         name: "Warrior",
         id: "warrior",
         stats: {
-            str: 100,
+            str: 200,
             def: 200,
-            agi: 100,
+            agi: 110,
             tec: 10,
             vit: 1000,
             lck: 1000
@@ -95,22 +95,22 @@ var data = {
         stats: {
             str: 40,
             def: 75,
-            agi: 100,
+            agi: 120,
             tec: 750,
             vit: 800,
             lck: 150
         },
         img: "assets/priest_12.png",
         skills: ["absorb_shield", "renew", "heal", "aoe_heal", "revive"],
-        abilities: []
+        abilities: ["prayer"]
     },
     serpant_boss: {
         name: "Serpant King",
         id: "serpant_boss",
         stats: {
-            str: 450,
+            str: 400,
             def: 100,
-            agi: 100,
+            agi: 200,
             tec: 10000,
             vit: 10000,
             lck: 2000

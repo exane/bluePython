@@ -119,12 +119,12 @@ var Entity = (function(){
         return this.getAttr("tec") * 10;
     }
     r.getSpecialAttackPower = function(){
-        var tec = this.getAttr("tec") * 2;
+        var tec = this.getAttr("tec") * 3;
 
         return tec;
     }
     r.getPhysicalAttackPower = function(){
-        var str = this.getAttr("str") * 2;
+        var str = this.getAttr("str") * 3;
 
         return str;
     }
@@ -648,6 +648,11 @@ var Entity = (function(){
             cb.call(this, this._buffs[i]);
         }
     }
+    r.eachDebuff = function(cb){
+        for(var i = 0; i < this._debuffs.length; i++) {
+            cb.call(this, this._debuffs[i]);
+        }
+    }
     r.increaseCritChancesBy = function(prozent){
         //50 = 50%, 20 = 20%
         this._additionalCritChances += prozent;
@@ -688,6 +693,9 @@ var Entity = (function(){
         this.updateUi();
     }
     r.uiToggleActive = function(){
+        if(this.isFainted()){
+            return 0;
+        }
         if(this.uiSprite.hasClass("entity-active")){
             this.uiSprite.removeClass("entity-active");
             return;

@@ -218,22 +218,22 @@ module.exports = self = {
         duration: 5,
         effects: {
             onTurnEnd: function(buff){
-                this.changeHpBy(100 + buff.from.getSpecialAttackPower());
+                this.changeHpBy(400 + buff.from.getSpecialAttackPower());
             }
         }
     },
     absorb_shield_buff: {
         name: "Magic Shield Absorb",
         id: "absorb_shield_buff",
-        desc: "Absorbs 1000 damage.",
+        desc: "Absorbs 3000 damage.",
         icon: "assets/aura.png",
         duration: 3,
         effects: {
             onInit: function(buff){
-                this.changeShieldAbsorbBy(1000);
+                this.changeShieldAbsorbBy(3000);
             },
             onEnd: function(buff){
-                this.changeShieldAbsorbBy(-1000);
+                this.changeShieldAbsorbBy(-3000);
             },
             onAfterGetAttack: function(buff){
                 if(this.getShieldAbsorb() === 0){

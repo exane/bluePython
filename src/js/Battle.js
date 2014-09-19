@@ -233,6 +233,9 @@ var Battle = (function(){
         var observeList = this.getObserveList();
 
         //this.player[0].initEvents();
+        while(self.player[i] && self.player[i].isFainted()){
+            i++;
+        }
         this.handlePlayerEvents(i++);
 
 
@@ -243,6 +246,9 @@ var Battle = (function(){
             collectData.push(data);
 
             if(data.from.isPlayer && i < self.player.length){
+                while(self.player[i] && self.player[i].isFainted()){
+                    i++;
+                }
                 self.handlePlayerEvents(i++)
             }
 
@@ -254,13 +260,14 @@ var Battle = (function(){
     }
 
     r.handlePlayerEvents = function(playerIndex){
-        if(this.player[playerIndex].isFainted()) {
-            this.player[playerIndex].ready();
-            return;
-        }
-        this.player[playerIndex].isActive = true;
+        if(!this.player[playerIndex]) return 0;
+        this.player[playerIndex].setActive(true);
         this.player[playerIndex].uiToggleActive();// = true;
         this.player[playerIndex].resetMenu();
+        if(this.player[playerIndex].isFainted()){
+            this.player[playerIndex].setChosen(true);
+            this.player[playerIndex].ready();
+        }
     }
 
     r.removeFromObserveList = function(list, id){

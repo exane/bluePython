@@ -32,12 +32,26 @@ var Player = (function(){
     r.uiMenuSkill = null;
     r.uiMenu = null;
 
-    r.isActive = false;
+    r._isActive = false;
     r.isPlayer = true;
 
     //r.otherSide = null;
     //r.events = {};
     r._isOpen = null;
+
+    r.setActive = function(bool){
+        if(bool){
+            this.addHighlightBuffs();
+        }
+        if(!bool){
+            this.removeHighlightBuffs();
+        }
+        this._isActive = bool;
+    }
+
+    r.isActive = function(){
+        return this._isActive;
+    }
 
     r.setOpen = function(bool){
         this._isOpen = bool;
@@ -51,17 +65,17 @@ var Player = (function(){
         var self = this;
         //debugger;
         this.uiMenuAttack.click(function(){
-            if(self.isActive)
+            if(self.isActive())
                 self.clickAttack.call(self);
         });
 
         this.uiMenuDefense.click(function(){
-            if(self.isActive)
+            if(self.isActive())
                 self.clickDefense.call(self);
         });
 
         this.uiMenuSkill.click(function(){
-            if(self.isActive)
+            if(self.isActive())
                 self.clickSkills.call(self);
         });
 
@@ -83,12 +97,11 @@ var Player = (function(){
         if(this.hasChosen()) return 0;
         this.turnAction.do = "default_defense";
         this.turnAction.from = this;
-        //this.hasChosen = true;
-        //this.expandMenu();
+
         setTimeout(function(){
             self.setChosen(true);
             self.ready(self.turnAction);
-        },1);
+        }, 1);
         //console.log(this);
     }
 
@@ -118,14 +131,8 @@ var Player = (function(){
     }
 
     r.reduceMenu = function(){
-        //return;
+
         var maxHeight = $(".view").css("height");
-        /*
-         this.uiMenu.animate({
-         "top": "+="+maxHeight,
-         "height": "-="+maxHeight
-         });
-         */
         if(!this.isOpen()) return;
         this.uiMenu.css({
             "margin-top": 0,
@@ -186,7 +193,7 @@ var Player = (function(){
             this.reduceMenu();
             //$(".controller").hide();
             this.uiToggleActive();
-            this.isActive = false;
+            this.setActive(false);
         }
         this.setOpen(false);
         this._hasChosen = value;
@@ -266,6 +273,28 @@ var Player = (function(){
             $("li[value=" + data.id + "]").on("click", this.onSkillClick.bind(this, data));
         }
 
+    }
+
+
+    r.addHighlightBuffs = function(){
+        var n = this.getYourside().length(), m = this.getOtherside().length();
+        var i;
+        var entity;
+        var self = this;
+/*
+        for(i = 0; i < n; i++) {
+            entity = this.getYourside().getMemberByIndex(i);
+         *//*   entity.eachBuff(function(buff){
+                if(buff.from.getId() === self.getId()){
+
+                }
+            })*//*
+
+        }*/
+        $("[data-from=" + this.getId() + "]").addClass("buff-highlight");
+    }
+    r.removeHighlightBuffs = function(){
+        $("[data-from=" + this.getId() + "]").removeClass("buff-highlight");
     }
 
 

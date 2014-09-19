@@ -36,6 +36,11 @@ $height: 600px;
 
 }
 
+.buff-highlight {
+  height: 25px !important;
+  width: 25px !important;
+}
+
 .battle {
   float: left;
   height: $height/2;
@@ -78,14 +83,16 @@ $height: 600px;
 }
 
 .battle-buffs, .battle-debuffs {
-  width: ($width - $height/2)/4/2;
+  min-width: ($width - $height/2)/4/2;
+  min-height: 30px;
   height: auto;
   //border: 1px solid red;
   //line-height: 12px;
-  display: inline-block;
+  display: block;
+  float: left;
 
   img {
-    height: 20px;
+    height: 18px;
     float: left;
     display: block;
     border-radius: 3px;

@@ -22,7 +22,7 @@ module.exports = self = {
     },
     prayer: {
         onTurnEnd: function(){
-            this.changeManaBy(20);
+            this.changeManaBy(30);
         }
     },
     endless_rage: {

@@ -156,7 +156,7 @@ module.exports = self = {
     mortal_strike: {
         name: "Mortal Strike",
         id: "mortal_strike",
-        basePower: 90,
+        basePower: 100,
         target: "enemy",
         desc: "Causes enormous damage and reduces all incoming healing on target by 50%. Costs 50 Mana.",
         costs: 50,
@@ -181,8 +181,8 @@ module.exports = self = {
     },
     bloodthirst: {
         name: "Bloodthirst",
-        desc: "Instantly attack the target and heals you by 30% of damage you have dealt. Bloodthirst has double the normal chance to be a critical strike. Costs 30 Mana.",
-        basePower: 50,
+        desc: "Instantly attack the target and heals you by 50% of damage you have dealt. Bloodthirst has double the normal chance to be a critical strike. Costs 30 Mana.",
+        basePower: 80,
         id: "bloodthirst",
         target: "enemy",
         costs: 30,
@@ -190,7 +190,7 @@ module.exports = self = {
             opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
         },
         onAfterAttack: function(opt, dmg){
-            var val = dmg * 30 / 100;
+            var val = dmg * 50 / 100;
             this.changeHpBy(val);
 
             //opt.isCrit = this.calculateCrit(this.calculateCritChance() * 2);
@@ -254,10 +254,10 @@ module.exports = self = {
     },
     absorb_shield: {
         name: "Magic Shield Absorb",
-        desc: "Absorbs 1000 damage. Costs 250 mana.",
+        desc: "Absorbs 3000 damage. Costs 350 mana.",
         id: "absorb_shield",
         target: "friendly",
-        costs: 250,
+        costs: 350,
         onCast: function(opt){
             logger.message(this.getFullName() + " casts Magic Shield Absorb on " + opt.target.getFullName());
             opt.target.addBuff(buffData.load("absorb_shield_buff"), this);
@@ -276,7 +276,7 @@ module.exports = self = {
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
             }
-            opt.target.changeHpBy(val = 600 + this.getSpecialAttackPower());
+            opt.target.changeHpBy(val = 800 + this.getSpecialAttackPower());
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
                 + " by " + val + " hp!");
         },
@@ -295,7 +295,7 @@ module.exports = self = {
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
             }
-            opt.target.changeHpBy(val = 200 + this.getSpecialAttackPower());
+            opt.target.changeHpBy(val = 100 + this.getSpecialAttackPower());
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
                 + " by " + val + " hp!");
         },
