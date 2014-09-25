@@ -464,7 +464,7 @@ var Battle = (function(){
         }
 
         $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
-            .done((function(){
+            .then((function(){
                 if(move.basePower){
                     //dmg = this.calculateDmg(user, target, move, opt);
                     if(move.onAttack){
@@ -481,19 +481,19 @@ var Battle = (function(){
                         }).bind(this));
                 }
 
+            }).bind(this))
+            .then(function(){
 
                 if(move.onAfterAttack){
                     move.onAfterAttack.call(user, opt, [dmg]);
                 }
 
-                //console.log(target);
                 if(opt.target && opt.target.isFainted() && !wasFainted){
                     //$.event.trigger("bp-ability-onFaint", opt);
                     pubsub.publish("/bp/battle/onFaint/", [opt]);
                     logger.message(opt.target.getFullName() + " fainted...");
                 }
-
-            }).bind(this));
+            }.bind(this));
 
     }
 

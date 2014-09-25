@@ -44,6 +44,10 @@ var Entity = (function(){
 
         this._nextTurnListener();
 
+        if(options.multipleAttacks){
+            this._multipleAttacks = options.multipleAttacks;
+        }
+
         if(options.onBattleStart){
             //options.onBattleStart.call(this);
             pubsub.subscribe("/bp/battle/onBattleStart/", options.onBattleStart.bind(this));
@@ -79,6 +83,7 @@ var Entity = (function(){
     r._additionalCritChances = 0;
     r._healMultiplier = 1;
     r._shieldAbsorb = 0;
+    r._multipleAttacks = null;
 
     /**
      * UI Properties
@@ -119,12 +124,12 @@ var Entity = (function(){
         return this.getAttr("tec") * 10;
     }
     r.getSpecialAttackPower = function(){
-        var tec = this.getAttr("tec") * 3;
+        var tec = this.getAttr("tec") * 4;
 
         return tec;
     }
     r.getPhysicalAttackPower = function(){
-        var str = this.getAttr("str") * 3;
+        var str = this.getAttr("str") * 2;
 
         return str;
     }
@@ -183,7 +188,6 @@ var Entity = (function(){
     r.getShieldAbsorb = function(){
         return this._shieldAbsorb;
     }
-
     r.getDebuff = function(name, from, getIndex){
         var n = this._debuffs.length;
         from = from || null;
@@ -223,6 +227,24 @@ var Entity = (function(){
     }
     r.getHealMultiplier = function(){
         return this._healMultiplier;
+    }
+    r.getRawDamage = function(move, opt){
+        var dmg = this.calculatePower(move);
+        var rnd;
+
+        dmg = (((((200 / 5) + 2) * dmg * 8 /100) / 50) + 2) * this.getOutgoingDmgMultiplier() | 0;
+        rnd = Math.random() * (dmg * 10 / 100) - (dmg * 20 / 100);
+
+        dmg += rnd | 0;
+
+        if(opt.isCrit){
+            dmg *= this.getCritDmgMultiplicator();
+        }
+
+        return dmg;
+    }
+    r.getMultipleAttacks = function(){
+        return this._multipleAttacks || false;
     }
 
     /**
@@ -370,7 +392,7 @@ var Entity = (function(){
         //this._boost(stats);
         this._renderBuffs();
         //pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + buff.id);
-        pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + buff.id);
+        pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + buff.id, [buff.from]);
     }
     r.addDebuff = function(debuff, from){
         //var stats = debuff.stats;
@@ -403,11 +425,11 @@ var Entity = (function(){
         //this._boost(stats);
         this._renderBuffs();
 
-        pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + debuff.id);
+        pubsub.publish("/bp/battle/onInit/" + this.getId() + "/" + debuff.id, [debuff.from]);
 
     }
     r.removeBuff = function(buff, index){
-        pubsub.publish("/bp/battle/onEnd/" + this.getId() + "/" + buff.id);
+        pubsub.publish("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, [buff.from]);
 
         if(buff.__handler){
             for(var i = 0; i < buff.__handler.length; i++) {
@@ -431,7 +453,7 @@ var Entity = (function(){
     }
     r.removeDebuff = function(debuff, index){
         //console.log(debuff, index);
-        pubsub.publish("/bp/battle/onEnd/" + this.getId() + "/" + debuff.id);
+        pubsub.publish("/bp/battle/onEnd/" + this.getId() + "/" + debuff.id, [debuff.from]);
 
         if(debuff.__handler){
             for(var i = 0; i < debuff.__handler.length; i++) {
@@ -502,24 +524,11 @@ var Entity = (function(){
         return false;
     }
     r.calculateDmgTo = function(move, target, opt){
-        //var dmg = this.calculatePower(move) * this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
-        var dmg = this.calculatePower(move); //* this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
-        var def = (target && target.calculateDef(move)) || 1;
-        var rnd = 0;
-        dmg = (((((200 / 5) + 2) * dmg * 8 / def) / 50) + 2) * this.getOutgoingDmgMultiplier() * target.getIncomingDmgMultiplier() | 0;
-        rnd = Math.random() * (dmg * 10 / 100) - (dmg * 20 / 100);
 
-        dmg += rnd | 0;
-
-        if(opt.isCrit){
-            dmg *= this._critDmgMultiplicator;
-        }
-
-        //var diff = dmg - def;
-
-        //diff = diff >= 0 ? diff : 0;
-
-        return dmg;
+        var dmg = this.getRawDamage(move, opt);
+        var def = (target && target.calculateDef()) || 0; //1;
+        def = target.getIncomingDmgMultiplier() - def;
+        return dmg*def | 0;
     }
     r.calculateCritChance = function(target, move){
 
@@ -541,9 +550,13 @@ var Entity = (function(){
     r.calculateDef = function(){
         var def = this.getAttr("Def");
 
-        //console.log(this._name, def);
+        //if(def > 1000) def = 1000;
+        if(def < 0) def = 0;
 
-        return def;
+        var plott = Math.pow(0.45*def, (1/1.7));
+
+        return plott/100;
+        //return def / 1000; //damage reduce in percent
     }
     r.changeShieldAbsorbBy = function(value){
         this._shieldAbsorb += value;
@@ -913,8 +926,8 @@ var Entity = (function(){
                     buff.effects.onAfterGetAttack.bind(this, buff)));
             }
             if(buff.effects.onInit){
-                __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId() + "/" + buff.id, function(){
-                    if(buff.__initFlag){
+                __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId() + "/" + buff.id, function(from){
+                    if(buff.__initFlag || buff.from.getId() != from.getId()){
                         return self;
                     }
                     buff.__initFlag = true;
@@ -922,8 +935,9 @@ var Entity = (function(){
                 }));
             }
             if(buff.effects.onEnd){
-                __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, function(){
-                        if(buff.__endFlag){
+                __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, function(from){
+                        debugger;
+                        if(buff.__endFlag || buff.from.getId() != from.getId()){
                             return self;
                         }
                         buff.effects.onEnd.call(self, buff);

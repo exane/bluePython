@@ -115,6 +115,7 @@ var data = {
             vit: 10000,
             lck: 2000
         },
+        multipleAttacks: 3,
         img: "assets/Serpant.png",
         skills: ["rend", "mortal_strike"],
         ai: function(){
