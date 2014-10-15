@@ -9,7 +9,7 @@ var Player = (function(){
         Entity.call(this, options, yourSide, otherSide);
 
         this.uiMenuAttack = $("#menu-attack");
-        this.uiMenuDefense = $("#menu-defense");
+        //this.uiMenuDefense = $("#menu-defense");
         this.uiMenuSkill = $("#menu-skill");
         this.uiMenu = uiMenu;
 
@@ -68,11 +68,11 @@ var Player = (function(){
             if(self.isActive())
                 self.clickAttack.call(self);
         });
-
+/*
         this.uiMenuDefense.click(function(){
             if(self.isActive())
                 self.clickDefense.call(self);
-        });
+        });*/
 
         this.uiMenuSkill.click(function(){
             if(self.isActive())
@@ -91,6 +91,7 @@ var Player = (function(){
         this.expandMenu();
 
     }
+/*
 
     r.clickDefense = function(){
         var self = this;
@@ -104,6 +105,7 @@ var Player = (function(){
         }, 1);
         //console.log(this);
     }
+*/
 
     r.clickAttack = function(){
         this.turnAction.do = "default_attack";
