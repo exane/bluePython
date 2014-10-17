@@ -53,7 +53,7 @@ var Battle = (function(){
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
-        this.addNewNpc(data.serpant_boss, this.side2, this.side1);
+        this.addNewPlayer(data.serpant_boss, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 

@@ -83,7 +83,7 @@ var data = {
             lck: 1000
         },
         img: "assets/warrior_11.png",
-        skills: ["taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
+        skills: ["shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
         abilities: ["endless_rage"],
         onBattleStart: function(){
             this.changeManaBy(-this.getMaxMana());

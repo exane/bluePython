@@ -166,6 +166,20 @@ module.exports = self = {
         },
         icon: "assets/battered-axe.png"
     },
+    shieldwall: {
+        name: "Shieldwall",
+        id: "shieldwall",
+        target: "self",
+        desc: "Causes enormous damage and reduces all incoming healing on target by 50%. Costs 50 Mana.",
+        costs: 0,
+        priority: 1,
+        onCast: function(opt){
+            //logger.message(opt.target.getFullName() + " suffers great pain! Received healing is reduced by 50%.");
+            //opt.target.addDebuff(buffData.load("mortal_strike_debuff"), this);
+            opt.target.addBuff(buffData.load("shieldwall_buff"));
+        },
+        icon: "assets/battered-axe.png"
+    },
     rend: {
         name: "Rend (Aoe)",
         desc: "Target bleeds each turn. Each Dmg on this target is also increased by 20%. Costs 20 Mana.",

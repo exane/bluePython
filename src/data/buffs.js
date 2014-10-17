@@ -121,6 +121,21 @@ module.exports = self = {
             }
         }
     },
+    shieldwall_buff: {
+        name: "Shieldwall",
+        id: "shieldwall_buff",
+        desc: "Reduces damage by 65% for 1 turn.",
+        icon: "assets/beer-stein.png",
+        duration: 1,
+        effects: {
+            onInit: function(buff){
+                this.changeIncomingDmgMultiplierBy(-0.65)
+            },
+            onEnd: function(buff){
+                this.changeIncomingDmgMultiplierBy(0.65)
+            }
+        }
+    },
 
     mortal_strike_debuff: {
         name: "Mortal Strike",

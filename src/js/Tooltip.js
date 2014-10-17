@@ -100,8 +100,8 @@ var Tooltip = (function(){
                 uiSelf.find(".tooltip-skills").append(entity.getSkillList(i) + "; ");
             }
 
-            uiSelf.find(".tooltip-damage-multiplier")
-                .text("damage-reduce: "+Math.round((1-(entity.getIncomingDmgMultiplier() - entity.calculateDef()))*100) + "%");
+            //uiSelf.find(".tooltip-damage-multiplier")
+            //    .text("damage-reduce: "+Math.round((1-(entity.getIncomingDmgMultiplier() - entity.calculateDef()))*100) + "%");
 
         });
     }

@@ -527,8 +527,17 @@ var Entity = (function(){
 
         var dmg = this.getRawDamage(move, opt);
         var def = (target && target.calculateDef()) || 0; //1;
-        def = target.getIncomingDmgMultiplier() - def;
-        return dmg*def | 0;
+
+        //def = target.getIncomingDmgMultiplier() - def;
+        def = 1 - (def/100);
+
+        dmg *= def;
+
+        //def = target.getIncomingDmgMultiplier() - def;
+        dmg *= target.getIncomingDmgMultiplier();
+
+        //return dmg*def | 0;
+        return dmg | 0;
     }
     r.calculateCritChance = function(target, move){
 
