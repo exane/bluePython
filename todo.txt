@@ -4,6 +4,7 @@
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 - bosse mehrfach angreifen lassen pro runde
 - ändern der skillstärke (basePower) in prozentualen "waffenschaden". "equip" ausrüstbar bei premade-chars (bzw einstellbar)
+- tec stat aufteilen in int und tec. int zutzen für die menge an mana und tec nutzen für "spezielle" skill attacken skalieren zu können (heilung oder ähnliches)
 
 
 
