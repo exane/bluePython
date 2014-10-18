@@ -92,7 +92,8 @@ var Battle = (function(){
 
         this.observe();
 
-        this.startAi();
+        this.startAi(this.side1);
+        this.startAi(this.side2);
 
         //console.log(this.turnorder);
 
@@ -109,20 +110,13 @@ var Battle = (function(){
         }
     }
 
-    r.startAi = function(){
-        var n = this.side2.length();
-        var m = this.side1.length();
+    r.startAi = function(side){
+        var n = side.length();
         var npc;
 
 
         for(var i = 0; i < n; i++) {
-            npc = this.side2.getMemberByIndex(i);
-            if(npc.ai){
-                npc.startAi();
-            }
-        }
-        for(var j = 0; j < m; j++) {
-            npc = this.side1.getMemberByIndex(j);
+            npc = side.getMemberByIndex(i);
             if(npc.ai){
                 npc.startAi();
             }
