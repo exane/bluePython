@@ -244,11 +244,11 @@ module.exports = self = {
     },
     taunt: {
         name: "Taunt",
-        desc: "Increases chance of enemies attacking you  by 80% for 5 turns. Costs 5 mana. Cooldown for 4 turns.",
+        desc: "Increases chance of enemies attacking you  by 80% for 5 turns. Costs 0 mana. Cooldown for 5 turns.",
         id: "taunt",
         target: "enemy",
         isAoe: true,
-        costs: 5,
+        costs: 0,
         cooldown: 5,
         onCast: function(opt){
             logger.message(this.getFullName() + " taunts " + opt.target.getFullName() + "!");
