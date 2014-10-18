@@ -53,7 +53,7 @@ var Battle = (function(){
 
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
-        this.addNewPlayer(data.serpant_boss, this.side2, this.side1);
+        this.addNewNpc(data.serpant_boss, this.side2, this.side1);
         this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
@@ -84,7 +84,8 @@ var Battle = (function(){
     r.startNewTurn = function(){
         $(".controller").show();
 
-        this.decrementDurationTimer();
+        this.decrementDurationTimer(this.side1);
+        this.decrementDurationTimer(this.side2);
 
         logger.line();
 
@@ -97,18 +98,14 @@ var Battle = (function(){
 
     }
 
-    r.decrementDurationTimer = function(){
-        var n = this.side1.length();
-        var m = this.side2.length();
+    r.decrementDurationTimer = function(side){
+        var n = side.length();
         var i, member;
 
         for(i = 0; i < n; i++) {
-            member = this.side1.member[i];
+            member = side.member[i];
             member.decreaseDurationTime();
-        }
-        for(i = 0; i < m; i++) {
-            member = this.side2.member[i];
-            member.decreaseDurationTime();
+            member.reduceCooldownTimerBy(1);
         }
     }
 
@@ -403,23 +400,6 @@ var Battle = (function(){
 
     }
 
-    r.checkEventOnTurnEnd = function(data){
-        var n = data.length;
-
-        for(var i = 0; i < n; i++) {
-            var move = moveData[data[i].do];
-            var self = data[i].from;
-
-            //skills
-            if(move.onTurnEnd){
-                move.onTurnEnd.call(self);
-            }
-
-        }
-        //$.event.trigger("bp-ability-onTurnEnd");
-        pubsub.publish("/bp/battle/onTurnEnd/");
-    }
-
     r.checkEventOnTurnBegin = function(data){
         var n = data.length;
 
@@ -437,6 +417,23 @@ var Battle = (function(){
         }
         //$.event.trigger("bp-ability-onTurnBegin");
         pubsub.publish("/bp/battle/onTurnBegin/");
+    }
+
+    r.checkEventOnTurnEnd = function(data){
+        var n = data.length;
+
+        for(var i = 0; i < n; i++) {
+            var move = moveData[data[i].do];
+            var self = data[i].from;
+
+            //skills
+            if(move.onTurnEnd){
+                move.onTurnEnd.call(self);
+            }
+
+        }
+        //$.event.trigger("bp-ability-onTurnEnd");
+        pubsub.publish("/bp/battle/onTurnEnd/");
     }
 
     r.calculateTurnOf = function(user, target, move){

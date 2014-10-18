@@ -89,8 +89,8 @@ var Player = (function(){
         this.uiMenu.children(".menu-main").hide();
         this.uiMenu.children(".menu-skills").show();
         this.expandMenu();
-
     }
+
 /*
 
     r.clickDefense = function(){
@@ -164,9 +164,13 @@ var Player = (function(){
     r.onSkillClick = function(skill){
         //console.log(skill);
         if(this.hasChosen()) return 0;
+        if(this.hasCooldown(skill.id)) return 0;
+
         this.listTargets(this.getOtherside(), this.getYourside());
 
-
+        if(skill.cooldown){
+            this.addCooldown(skill.id);
+        }
         //this.listTargets();
 
         this.turnAction.do = skill.id;
@@ -269,6 +273,12 @@ var Player = (function(){
             var li = $("<li data-type='skill' value='" + data.id + "'></li>");
             $(li).append("<img src='" + data.icon + "'>");
             $(li).append("<p>" + data.name + "</p>");
+
+            $(li).removeClass("onCooldown");
+            if(this.hasCooldown(data.id)) {
+                $(li).addClass("onCooldown");
+            }
+
             ul.append(li);
 
             //console.log("yolo", );
@@ -295,6 +305,7 @@ var Player = (function(){
         }*/
         $("[data-from=" + this.getId() + "]").addClass("buff-highlight");
     }
+
     r.removeHighlightBuffs = function(){
         $("[data-from=" + this.getId() + "]").removeClass("buff-highlight");
     }

@@ -3,6 +3,7 @@
 var logger = require("./log.js");
 var abilityData = require("../data/abilities.js");
 var buffData = require("../data/buffs.js");
+var moveData = require("../data/moves.js");
 
 var Entity = (function(){
     var Display = require("./Display.js");
@@ -35,6 +36,7 @@ var Entity = (function(){
 
         this._buffs = [];
         this._debuffs = [];
+        this._cooldowns = [];
 
         this.turnAction = {};
 
@@ -84,6 +86,7 @@ var Entity = (function(){
     r._healMultiplier = 1;
     r._shieldAbsorb = 0;
     r._multipleAttacks = null;
+    r._cooldowns = null; // i.e.: [{id: "shieldwall", duration: 3}]
 
     /**
      * UI Properties
@@ -96,6 +99,8 @@ var Entity = (function(){
     r.uiDebuffs = null;
 
     r.turnAction = null;
+
+
 
 
     /**
@@ -725,6 +730,38 @@ var Entity = (function(){
 
         this.uiSprite.addClass("entity-active");
     }
+    r.addCooldown = function(skillid){
+        var dur  = moveData.load(skillid).cooldown;
+        this._cooldowns.push({id: skillid, duration: dur});
+    }
+    r.removeCooldown = function(skillid){
+        var n = this._cooldowns.length;
+
+        for(var i=0; i< n; i++){
+            if(this._cooldowns[i].id === skillid){
+                this._cooldowns.splice(i, 1);
+                return;
+            }
+        }
+    }
+    r.reduceCooldownTimerBy = function(i){
+        this._cooldowns.forEach(function(element, index, array){
+            array[index].duration -= i;
+            if(array[index].duration <= 0) {
+                this.removeCooldown(array[index].id);
+            }
+        }, this);
+    }
+    r.hasCooldown = function(skillid){
+        var n = this._cooldowns.length;
+
+        for(var i=0; i< n; i++){
+            if(this._cooldowns[i].id === skillid){
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Private Methods
@@ -945,7 +982,6 @@ var Entity = (function(){
             }
             if(buff.effects.onEnd){
                 __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, function(from){
-                        debugger;
                         if(buff.__endFlag || buff.from.getId() != from.getId()){
                             return self;
                         }

@@ -170,6 +170,10 @@ $height: 600px;
       &:hover {
         background: rgba(9, 118, 0, 0.61);
       }
+
+      &.onCooldown {
+        opacity: 0.4;
+      }
     }
 
   }

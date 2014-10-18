@@ -173,6 +173,7 @@ module.exports = self = {
         desc: "Causes enormous damage and reduces all incoming healing on target by 50%. Costs 50 Mana.",
         costs: 0,
         priority: 1,
+        cooldown: 3,
         onCast: function(opt){
             //logger.message(opt.target.getFullName() + " suffers great pain! Received healing is reduced by 50%.");
             //opt.target.addDebuff(buffData.load("mortal_strike_debuff"), this);
@@ -213,13 +214,14 @@ module.exports = self = {
     },
     bladestorm: {
         name: "Bladestorm (Aoe)",
-        desc: "You become a whirling storm of destructive force, hitting all targets 5 times. Costs 20 Mana each spin.",
+        desc: "You become a whirling storm of destructive force, hitting all targets 5 times. Costs 20 Mana each spin. Cooldown for 5 turns.",
         basePower: 15,
         id: "bladestorm",
         target: "enemy",
         isAoe: true,
         costs: 20,
         multiple: 5,
+        cooldown: 5,
         onCast: function(opt){
 
         },
@@ -227,25 +229,27 @@ module.exports = self = {
     },
     battle_shout: {
         name: "Battle Shout",
-        desc: "Increase strength and vitality by 10%. Additionally you gain 30 mana.",
+        desc: "Increase strength and vitality by 10%. Additionally you gain 50 mana. Lasts 5 turns.",
         id: "battle_shout",
         target: "friendly",
         isAoe: true,
         //costs: 50,
+        cooldown: 5,
         onCast: function(opt){
             opt.target.addBuff(buffData.load("battle_shout"), this);
             if(opt.target.getId() === this.getId())
-                this.changeManaBy(30);
+                this.changeManaBy(50);
         },
         icon: "assets/sonic-shout.png"
     },
     taunt: {
         name: "Taunt",
-        desc: "Increases chance of enemies attacking you  by 80% for 5 turns. Costs 5 mana.",
+        desc: "Increases chance of enemies attacking you  by 80% for 5 turns. Costs 5 mana. Cooldown for 4 turns.",
         id: "taunt",
         target: "enemy",
         isAoe: true,
         costs: 5,
+        cooldown: 5,
         onCast: function(opt){
             logger.message(this.getFullName() + " taunts " + opt.target.getFullName() + "!");
             opt.target.addDebuff(buffData.load("taunt_debuff"), this);
