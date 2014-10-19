@@ -45,16 +45,16 @@ var Battle = (function(){
         //this.addNewPlayer(data.exane, this.side1, this.side2);
         this.addNewPlayer(data.warrior, this.side1, this.side2);
         this.addNewPlayer(data.priest, this.side1, this.side2);
-        this.addNewPlayer(data.warrior, this.side1, this.side2);
+        //this.addNewPlayer(data.warrior, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.chernabog, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
 
-        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        //this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
         this.addNewNpc(data.serpant_boss, this.side2, this.side1);
-        this.addNewNpc(data.gnomemage, this.side2, this.side1);
+        //this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
         /*
@@ -132,7 +132,7 @@ var Battle = (function(){
     }
 
     r.addNewNpc = function(options, yourSide, otherSide){
-        var npc = new Npc(options, yourSide, otherSide, this.tooltip);
+        var npc = new Npc(options, yourSide, otherSide/*, this.tooltip*/);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
         yourSide.add(npc);
@@ -160,8 +160,6 @@ var Battle = (function(){
     }
 
     r.createTurnorder = function(data){
-        //var move = moveData[data[i].do];
-
 
         data.sort(function(a, b){
             return b.from.getAttr("agi") - a.from.getAttr("agi");
@@ -169,6 +167,9 @@ var Battle = (function(){
 
         //handle speed tie
         this.handleSpeedTie(data);
+
+        //handle multiple attacks per turn
+        this.handleMultipleAttacksOrder(data);
 
         //priority check
         data.sort(function(a, b){
@@ -179,6 +180,17 @@ var Battle = (function(){
 
 
         return data;
+    }
+
+    r.handleMultipleAttacksOrder = function(turnorder){
+        turnorder.sort(function(a, b){
+            var orderA = 1, orderB = 1;
+
+            orderA += a._attackOrder || 0;
+            orderB += b._attackOrder || 0;
+            return b.from.getAttr("agi")/ orderB - a.from.getAttr("agi")/ orderA;
+        });
+
     }
 
     r.handleSpeedTie = function(turnorder){
@@ -215,15 +227,17 @@ var Battle = (function(){
     }
 
     r.observe = function(){
+        /*
         var n = this.side1.length(true);
         var m = this.side2.length(true);
+        */
         var k = 0, i = 0;
         var self = this;
 
         var collectData = [];
         var observeList = this.getObserveList();
 
-        //this.player[0].initEvents();
+
         while(self.player[i] && self.player[i].isFainted()) {
             i++;
         }
@@ -235,6 +249,10 @@ var Battle = (function(){
 
             self.removeFromObserveList(observeList, data.from.getId());
             collectData.push(data);
+
+            if(data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
+                data.from.startAi();
+            }
 
             if(data.from.isPlayer && i < self.player.length){
                 while(self.player[i] && self.player[i].isFainted()) {
@@ -281,7 +299,15 @@ var Battle = (function(){
         list = a.concat(b);
 
         for(var i = 0; i < list.length; i++) {
-            res.push(list[i].getId());
+            var member = list[i];
+            if(member.hasMultipleAttacks()){
+                member.resetAttacksLeft();
+                for(var k=0; k<member.getMultipleAttacks(); k++){
+                    res.push(member.getId());
+                }
+                continue;
+            }
+            res.push(member.getId());
         }
 
         return res;
@@ -436,6 +462,8 @@ var Battle = (function(){
         var isCrit = (move.isCrit == null || typeof move.isCrit == "undefined")
         ? user.calculateCrit(critChance)
         : move.isCrit;
+        var isTargetLocked = move.isAoe || false;
+        var originalTarget = target;
 
         var opt = {
             target: target,
@@ -456,6 +484,9 @@ var Battle = (function(){
 
         $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
         .then((function(){
+            if(isTargetLocked) {
+                opt.target = originalTarget;
+            }
             if(move.basePower){
 
                 if(move.onAttack){
@@ -478,6 +509,9 @@ var Battle = (function(){
 
         }).bind(this))
         .then(function(){
+            if(isTargetLocked) {
+                opt.target = originalTarget;
+            }
 
             if(move.onAfterAttack){
                 move.onAfterAttack.call(user, opt, [dmg]);

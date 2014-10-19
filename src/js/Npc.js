@@ -20,6 +20,11 @@ var Npc = (function(){
 
         this.turnAction.from = this;
 
+        if(this.hasMultipleAttacks()){
+            this.decreaseAttacksLeftBy(1);
+            this.turnAction._attackOrder = this.getAttacksLeft();
+        }
+
 
         if(typeof this.ai == "function"){
             this.ai.call(this);

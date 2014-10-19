@@ -112,7 +112,7 @@ var data = {
         name: "Serpant King",
         id: "serpant_boss",
         stats: {
-            str: 400,
+            str: 200,
             def: 100,
             agi: 200,
             tec: 200,

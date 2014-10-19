@@ -48,7 +48,8 @@ var Entity = (function(){
         this._nextTurnListener();
 
         if(options.multipleAttacks){
-            this._multipleAttacks = options.multipleAttacks;
+            this._attacksLeft = this._multipleAttacks = options.multipleAttacks;
+
         }
 
         if(options.onBattleStart){
@@ -87,6 +88,7 @@ var Entity = (function(){
     r._healMultiplier = 1;
     r._shieldAbsorb = 0;
     r._multipleAttacks = null;
+    r._attacksLeft = null;
     r._cooldowns = null; // i.e.: [{id: "shieldwall", duration: 3}]
 
     /**
@@ -101,7 +103,29 @@ var Entity = (function(){
 
     r.turnAction = null;
 
+    r.hasMultipleAttacks = function(){
+        return !!this._multipleAttacks;
+    }
 
+    r.getMultipleAttacks = function(){
+        return this._multipleAttacks || false;
+    }
+
+    r.resetAttacksLeft = function(){
+        this._attacksLeft = this.getMultipleAttacks();
+    }
+
+    r.hasAttacksLeft = function(){
+        return !!this._attacksLeft;
+    }
+
+    r.getAttacksLeft = function(){
+        return this._attacksLeft;
+    }
+
+    r.decreaseAttacksLeftBy = function(i){
+        this._attacksLeft -= i;
+    }
 
 
     /**
@@ -251,9 +275,6 @@ var Entity = (function(){
         }
 
         return dmg;
-    }
-    r.getMultipleAttacks = function(){
-        return this._multipleAttacks || false;
     }
 
     /**
@@ -658,7 +679,7 @@ var Entity = (function(){
             data.do = "default_attack"; //just... prevents getting errors
         }
         //$.event.trigger("bp-battle-chosen", {data: data});
-        pubsub.publish("/bp/battle/chosen/", [data]);
+        pubsub.publish("/bp/battle/chosen/", [$.extend(false, {}, data)]);
     }
     r.decreaseDurationTime = function(){
 
