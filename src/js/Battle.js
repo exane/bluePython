@@ -478,14 +478,13 @@ var Battle = (function(){
         }
 
 
-        if(move.onCast){
-            move.onCast.call(user, opt);
-        }
-
         $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
         .then((function(){
             if(isTargetLocked) {
                 opt.target = originalTarget;
+            }
+            if(move.onCast){
+                move.onCast.call(user, opt);
             }
             if(move.basePower){
 
