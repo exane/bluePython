@@ -202,10 +202,12 @@ module.exports = self = {
         duration: -1,
         effects: {
             onHit: function(buff, dmg){
-                this.changeManaBy(dmg*2/100);
+                var mana = (dmg*5/1000 | 0) < 10 ? (dmg*5/1000 | 0) : 10;
+                this.changeManaBy(mana);
             },
             onGetHit: function(opt, dmg){
-                this.changeManaBy(dmg*20/100);
+                var mana = (dmg*10/1000 | 0) < 20 ? (dmg*10/1000 | 0) : 20;
+                this.changeManaBy(mana);
             }
         }
     },
