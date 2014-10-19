@@ -4,7 +4,6 @@ var source = require('vinyl-source-stream');
 var sass = require("gulp-sass");
 var livereload = require("gulp-livereload");
 
-
 gulp.task('browserify', function() {
     browserify('./src/js/app.js', {standalone: "name"})
         .bundle().on("error", function(err){
