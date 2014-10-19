@@ -4,7 +4,7 @@
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 - ändern der skillstärke (basePower) in prozentualen "waffenschaden". "equip" ausrüstbar bei premade-chars (bzw einstellbar)
 - combat log überarbeiten /übersichtlicher machen
-- need fix: premade-chars mit dem attribut .multipleAttacks können nicht gespielt werden
+- need fix: premade-chars mit dem attribut .multipleAttacks können nicht gespielt werden (als player)
 
 
 
