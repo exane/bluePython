@@ -15,12 +15,13 @@ var Entity = (function(){
         this._stats = options.stats || this._stats;
 
         this._boosts = {
-            str: 100,
-            def: 100,
-            agi: 100,
-            tec: 100,
-            vit: 100,
-            lck: 100
+            vit: 100,   //hp = vit*100
+            int: 100,   //mana = int*100
+            str: 100,   //strength
+            tec: 100,   //technique
+            def: 100,   //defense
+            agi: 100,   //agility
+            lck: 100    //luck = crit
         }
 
         this._skillList = options.skills || [];
@@ -126,10 +127,13 @@ var Entity = (function(){
         return this._mana;
     }
     r.getMaxMana = function(){
-        return this.getAttr("tec") * 10;
+        return this.getAttr("int") * 10;
     }
     r.getSpecialAttackPower = function(){
+/*
         var tec = this.getAttr("tec") * 4;
+*/
+        var tec = Math.sqrt(this.getAttr("tec"))*0.4;
 
         return tec;
     }

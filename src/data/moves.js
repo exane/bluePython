@@ -63,7 +63,7 @@ module.exports = self = {
             if(!target.isFainted()){
                 return logger.message(this.getFullName() + "'s revive failed! Target is alive.");
             }
-            target.revive(1 + this.getSpecialAttackPower() * 0.25);
+            target.revive(1 + this.getSpecialAttackPower()*500);
         },
         target: "friendly",
         icon: "assets/ace.png"
@@ -249,7 +249,7 @@ module.exports = self = {
         target: "enemy",
         isAoe: true,
         costs: 0,
-        cooldown: 5,
+        cooldown: 4,
         onCast: function(opt){
             logger.message(this.getFullName() + " taunts " + opt.target.getFullName() + "!");
             opt.target.addDebuff(buffData.load("taunt_debuff"), this);
@@ -294,7 +294,7 @@ module.exports = self = {
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
             }
-            opt.target.changeHpBy(val = 800 + this.getSpecialAttackPower());
+            opt.target.changeHpBy(val = 1100 * this.getSpecialAttackPower() | 0);
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
                 + " by " + val + " hp!");
         },
@@ -304,7 +304,7 @@ module.exports = self = {
     aoe_heal: {
         name: "Heal(Aoe)",
         id: "aoe_heal",
-        costs: 200,
+        costs: 300,
         isAoe: true,
         onCast: function(opt){
             var val;
@@ -313,7 +313,7 @@ module.exports = self = {
                 logger.message(opt.target.getFullName() + " is not alive...");
                 return 0;
             }
-            opt.target.changeHpBy(val = 100 + this.getSpecialAttackPower());
+            opt.target.changeHpBy(val = 600 * this.getSpecialAttackPower() | 0);
             logger.message(this.getFullName() + " heals " + opt.target.getFullName()
                 + " by " + val + " hp!");
         },

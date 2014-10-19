@@ -233,7 +233,7 @@ module.exports = self = {
         duration: 5,
         effects: {
             onTurnEnd: function(buff){
-                this.changeHpBy(400 + buff.from.getSpecialAttackPower());
+                this.changeHpBy(350 * buff.from.getSpecialAttackPower());
             }
         }
     },

@@ -224,7 +224,7 @@ var Battle = (function(){
         var observeList = this.getObserveList();
 
         //this.player[0].initEvents();
-        while(self.player[i] && self.player[i].isFainted()){
+        while(self.player[i] && self.player[i].isFainted()) {
             i++;
         }
         this.handlePlayerEvents(i++);
@@ -237,7 +237,7 @@ var Battle = (function(){
             collectData.push(data);
 
             if(data.from.isPlayer && i < self.player.length){
-                while(self.player[i] && self.player[i].isFainted()){
+                while(self.player[i] && self.player[i].isFainted()) {
                     i++;
                 }
                 self.handlePlayerEvents(i++)
@@ -434,8 +434,8 @@ var Battle = (function(){
         var critChance = user.calculateCritChance(target, move);
         var wasFainted = target ? target.isFainted() : false; //target.isFainted() || null;
         var isCrit = (move.isCrit == null || typeof move.isCrit == "undefined")
-            ? user.calculateCrit(critChance)
-            : move.isCrit;
+        ? user.calculateCrit(critChance)
+        : move.isCrit;
 
         var opt = {
             target: target,
@@ -443,7 +443,7 @@ var Battle = (function(){
             otherSide: user.getOtherside(),
             isCrit: isCrit
         }
-        var dmg;// = this.calculateDmg(user, target, move, opt);
+        var dmg;
 
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);
@@ -455,36 +455,40 @@ var Battle = (function(){
         }
 
         $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
-            .then((function(){
-                if(move.basePower){
-                    //dmg = this.calculateDmg(user, target, move, opt);
-                    if(move.onAttack){
-                        move.onAttack.call(user, opt);
-                    }
-                    dmg = this.calculateDmg(user, opt.target, move, opt);
-                    opt.target.changeHpBy(-dmg, opt.isCrit);
-                    pubsub.publish("/bp/battle/onGetHit/" + opt.target.getId(), [dmg]);
-                    pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]);
+        .then((function(){
+            if(move.basePower){
 
-                    $.when(pubsub.publish("/bp/battle/onAfterGetAttack/" + opt.target.getId(), [opt]))
-                        .done((function(){
-
-                        }).bind(this));
+                if(move.onAttack){
+                    move.onAttack.call(user, opt);
                 }
 
-            }).bind(this))
-            .then(function(){
+                dmg = this.calculateDmg(user, opt.target, move, opt);
+                opt.target.changeHpBy(-dmg, opt.isCrit);
 
-                if(move.onAfterAttack){
-                    move.onAfterAttack.call(user, opt, [dmg]);
-                }
+                $.when(pubsub.publish("/bp/battle/onGetHit/" + opt.target.getId(), [dmg]))
+                .then(pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]))
+                .then(pubsub.publish("/bp/battle/onAfterGetAttack/" + opt.target.getId(), [opt]));
 
-                if(opt.target && opt.target.isFainted() && !wasFainted){
-                    //$.event.trigger("bp-ability-onFaint", opt);
-                    pubsub.publish("/bp/battle/onFaint/", [opt]);
-                    logger.message(opt.target.getFullName() + " fainted...");
-                }
-            }.bind(this));
+                /*
+                 $.when(pubsub.publish("/bp/battle/onAfterGetAttack/" + opt.target.getId(), [opt]))
+                 .done((function(){
+
+                 }).bind(this));*/
+            }
+
+        }).bind(this))
+        .then(function(){
+
+            if(move.onAfterAttack){
+                move.onAfterAttack.call(user, opt, [dmg]);
+            }
+
+            if(opt.target && opt.target.isFainted() && !wasFainted){
+                //$.event.trigger("bp-ability-onFaint", opt);
+                $.when(pubsub.publish("/bp/battle/onFaint/", [opt]))
+                .then(logger.message(opt.target.getFullName() + " fainted..."));
+            }
+        }.bind(this));
 
     }
 
@@ -520,14 +524,21 @@ var Battle = (function(){
 
         this.turn++;
         //$.event.trigger("bp-battle-nextTurn");
-        pubsub.publish("/bp/battle/nextTurn/");
+        $.when(pubsub.publish("/bp/battle/nextTurn/"))
+        .then(function(){
+            for(var i = 0; i < this.player.length; i++) {
+                this.player[i].resetMenu();
+            }
+            this.startNewTurn();
+        }.bind(this));
+
         //if(this.player){
         //    this.player.resetMenu();
         //}
-        for(var i = 0; i < this.player.length; i++) {
+        /*for(var i = 0; i < this.player.length; i++) {
             this.player[i].resetMenu();
         }
-        this.startNewTurn();
+        this.startNewTurn();*/
 
     }
 

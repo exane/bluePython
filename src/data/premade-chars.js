@@ -11,6 +11,7 @@ var data = {
             str: 100,
             def: 100,
             agi: 100,
+            int: 100,
             tec: 1000,
             vit: 2000,
             lck: 100
@@ -36,7 +37,8 @@ var data = {
             str: 40,
             def: 40,
             agi: 80,
-            tec: 800,
+            tec: 100,
+            int: 800,
             vit: 1750,
             lck: 100
         },
@@ -72,13 +74,14 @@ var data = {
 
     },
     warrior: {
-        name: "Warrior",
+        name: "Warrior (tank)",
         id: "warrior",
         stats: {
-            str: 200,
-            def: 200,
+            str: 100,
+            def: 1000,
             agi: 110,
             tec: 10,
+            int: 10,
             vit: 1000,
             lck: 1000
         },
@@ -96,7 +99,8 @@ var data = {
             str: 40,
             def: 75,
             agi: 120,
-            tec: 750,
+            tec: 200,
+            int: 300,
             vit: 800,
             lck: 150
         },
@@ -111,7 +115,8 @@ var data = {
             str: 400,
             def: 100,
             agi: 200,
-            tec: 10000,
+            tec: 200,
+            int: 10000,
             vit: 10000,
             lck: 2000
         },

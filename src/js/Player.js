@@ -279,12 +279,21 @@ var Player = (function(){
                 $(li).addClass("onCooldown");
             }
 
+            $(li).removeClass("noResource");
+            if(!this.hasEnoughResources(data.costs || 0)){
+                $(li).addClass("noResource");
+            }
+
             ul.append(li);
 
             //console.log("yolo", );
             $("li[value=" + data.id + "]").on("click", this.onSkillClick.bind(this, data));
         }
 
+    }
+
+    r.hasEnoughResources = function(costs){
+        return this.getMana() >= costs;
     }
 
 
