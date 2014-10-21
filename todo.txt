@@ -4,6 +4,8 @@
 - komplette überarbeitung der variablen. unterteilung public und private (entity erledigt)
 - ändern der skillstärke (basePower) in prozentualen "waffenschaden". "equip" ausrüstbar bei premade-chars (bzw einstellbar)
 - combat log überarbeiten /übersichtlicher machen
+- npc unterklasse erstellen (oder etwas ähnliches), die nach tod despawnt und nicht wiederbelebar ist (und wärend des kampfes 'erstellbar'/beschwörbar ist)
+- buffs/debuffs die möglichkeit geben nicht sichtbar für den nutzer zu sein
 
 
 
