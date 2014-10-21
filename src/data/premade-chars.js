@@ -88,6 +88,7 @@ var data = {
         img: "assets/warrior_11.png",
         skills: ["shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
         abilities: ["endless_rage"],
+        //multipleAttacks: 3,
         onBattleStart: function(){
             this.changeManaBy(-this.getMaxMana());
         }

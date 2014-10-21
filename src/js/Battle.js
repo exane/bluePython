@@ -241,24 +241,31 @@ var Battle = (function(){
         while(self.player[i] && self.player[i].isFainted()) {
             i++;
         }
-        this.handlePlayerEvents(i++);
+        this.handlePlayerEvents(i);
 
 
         var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
+            if(data.from.isPlayer) i++;
 
             self.removeFromObserveList(observeList, data.from.getId());
             collectData.push(data);
 
-            if(data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
+            if(!data.from.isPlayer && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
                 data.from.startAi();
+            }
+
+            if(data.from.isPlayer && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
+                //data.from.decreaseAttacksLeftBy(1);
+                self.handlePlayerEvents(--i);
+                return;
             }
 
             if(data.from.isPlayer && i < self.player.length){
                 while(self.player[i] && self.player[i].isFainted()) {
                     i++;
                 }
-                self.handlePlayerEvents(i++)
+                self.handlePlayerEvents(i)
             }
 
             if(!observeList.length){
@@ -271,6 +278,7 @@ var Battle = (function(){
     r.handlePlayerEvents = function(playerIndex){
         if(!this.player[playerIndex]) return 0;
         this.player[playerIndex].setActive(true);
+        this.player[playerIndex].setChosen(false);
         this.player[playerIndex].uiToggleActive();// = true;
         this.player[playerIndex].resetMenu();
         if(this.player[playerIndex].isFainted()){

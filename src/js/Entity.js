@@ -106,23 +106,18 @@ var Entity = (function(){
     r.hasMultipleAttacks = function(){
         return !!this._multipleAttacks;
     }
-
     r.getMultipleAttacks = function(){
         return this._multipleAttacks || false;
     }
-
     r.resetAttacksLeft = function(){
         this._attacksLeft = this.getMultipleAttacks();
     }
-
     r.hasAttacksLeft = function(){
         return !!this._attacksLeft;
     }
-
     r.getAttacksLeft = function(){
         return this._attacksLeft;
     }
-
     r.decreaseAttacksLeftBy = function(i){
         this._attacksLeft -= i;
     }
@@ -672,6 +667,11 @@ var Entity = (function(){
     }
     r.ready = function(data){
         data = data || {};
+
+        if(this.hasMultipleAttacks()){
+            this.decreaseAttacksLeftBy(1);
+            data._attackOrder = this.getMultipleAttacks() - this.getAttacksLeft() - 1;
+        }
 
         if(this.isFainted()){
             data.fainted = true;

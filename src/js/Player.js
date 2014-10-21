@@ -91,22 +91,6 @@ var Player = (function(){
         this.expandMenu();
     }
 
-/*
-
-    r.clickDefense = function(){
-        var self = this;
-        if(this.hasChosen()) return 0;
-        this.turnAction.do = "default_defense";
-        this.turnAction.from = this;
-
-        setTimeout(function(){
-            self.setChosen(true);
-            self.ready(self.turnAction);
-        }, 1);
-        //console.log(this);
-    }
-*/
-
     r.clickAttack = function(){
         this.turnAction.do = "default_attack";
         this.listTargets(this.getOtherside(), this.getYourside());
@@ -295,7 +279,6 @@ var Player = (function(){
     r.hasEnoughResources = function(costs){
         return this.getMana() >= costs;
     }
-
 
     r.addHighlightBuffs = function(){
         var n = this.getYourside().length(), m = this.getOtherside().length();

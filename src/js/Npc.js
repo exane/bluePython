@@ -21,8 +21,8 @@ var Npc = (function(){
         this.turnAction.from = this;
 
         if(this.hasMultipleAttacks()){
-            this.decreaseAttacksLeftBy(1);
-            this.turnAction._attackOrder = this.getAttacksLeft();
+            //this.decreaseAttacksLeftBy(1);
+            //this.turnAction._attackOrder = this.getAttacksLeft();
         }
 
 
