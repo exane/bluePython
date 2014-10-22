@@ -23,6 +23,7 @@
         //    with a function signature like: function(a,b,c){ ... }
         //
         //    publish('/some/topic', ['a','b','c']);
+        var promise = new $.Deferred();
 
         var subs = cache[topic],
             len = subs ? subs.length : 0;
@@ -34,7 +35,9 @@
             }
         }
 
-        return {};
+        promise.resolve();
+
+        return promise;
     };
 
     MinPubSub.subscribe = function(/* String */ topic, /* Function */ callback){

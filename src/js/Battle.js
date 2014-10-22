@@ -33,18 +33,33 @@ var Battle = (function(){
     r.playerOrder = 0;
     r.tooltip = null;
 
+    r._speedMultiplicator = 1;
+
     r.speed = 1000;
 
     r.debug = false;
     //r.debugSkipGameover = false; //doesnt work yet / buggy
 
+    r.adjustAnimSpeed = function(percentage){ //
+        this._speedMultiplicator = percentage/100;
+    }
+    r.resetAnimSpeed = function(){
+        this._speedMultiplicator = 1;
+    }
+    r.getAnimSpeedMultiplicator = function(){
+        return this._speedMultiplicator;
+    }
 
     r.init = function(){
 
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewPlayer(data.exane, this.side1, this.side2);
-        this.addNewPlayer(data.warrior, this.side1, this.side2);
-        this.addNewPlayer(data.priest, this.side1, this.side2);
+/*
+        this.addNewPlayer("warrior", "side1", "side2");
+*/
+/*
+        this.addNewPlayer("priest", "side1", "side2");
+*/
         //this.addNewPlayer(data.warrior, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
@@ -53,7 +68,7 @@ var Battle = (function(){
 
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.chernabog, this.side2, this.side1);
-        this.addNewNpc(data.serpant_boss, this.side2, this.side1);
+        //this.addNewNpc("serpant_boss", "side2", "side1");
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
         //this.addNewNpc(data.gnomemage, this.side2, this.side1);
 
@@ -69,7 +84,6 @@ var Battle = (function(){
             self.battleStart();
             pubsub.publish("/bp/battle/onBattleStart/");
         }, 100);
-        //this.battleStart();
     }
 
     r.battleStart = function(){
@@ -124,6 +138,15 @@ var Battle = (function(){
     }
 
     r.addNewPlayer = function(options, yourSide, otherSide){
+        if(typeof options == "string"){
+            options = data[options];
+        }
+        if(typeof yourSide == "string"){
+            yourSide = this[yourSide];
+        }
+        if(typeof otherSide == "string"){
+            otherSide = this[otherSide];
+        }
         //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
@@ -132,6 +155,15 @@ var Battle = (function(){
     }
 
     r.addNewNpc = function(options, yourSide, otherSide){
+        if(typeof options == "string"){
+            options = data[options];
+        }
+        if(typeof yourSide == "string"){
+            yourSide = this[yourSide];
+        }
+        if(typeof otherSide == "string"){
+            otherSide = this[otherSide];
+        }
         var npc = new Npc(options, yourSide, otherSide/*, this.tooltip*/);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
@@ -378,7 +410,7 @@ var Battle = (function(){
                 setTimeout(function(){
                     $(user.uiSprite).removeClass("entity-active");
                     self.runEvent(++i, n, data);
-                }, this.speed);
+                }, this.speed * this.getAnimSpeedMultiplicator());
                 return -1;
             }
         }
@@ -389,7 +421,7 @@ var Battle = (function(){
                 self.calculateTurnOf(user, user.getYourside().member[k], move);
                 k++;
                 self.runEvent(i, n, data, k, multiple);
-            }, 250);
+            }, 250 * this.getAnimSpeedMultiplicator());
             return;
         }
 
@@ -398,7 +430,7 @@ var Battle = (function(){
                 self.calculateTurnOf(user, user.getOtherside().member[k], move);
                 k++;
                 self.runEvent(i, n, data, k, multiple);
-            }, 250);
+            }, 250 * this.getAnimSpeedMultiplicator());
             return;
         }
 
@@ -415,7 +447,7 @@ var Battle = (function(){
                 $(user.uiSprite).removeClass("entity-active");
                 multiple++;
                 self.runEvent(i, n, data, 0, multiple);
-            }, this.speed / 6);
+            }, this.speed / 6 * this.getAnimSpeedMultiplicator());
 
             return;
         }
@@ -423,7 +455,7 @@ var Battle = (function(){
         setTimeout(function(){
             $(user.uiSprite).removeClass("entity-active");
             self.runEvent(++i, n, data);
-        }, this.speed);
+        }, this.speed * this.getAnimSpeedMultiplicator());
 
 
     }
