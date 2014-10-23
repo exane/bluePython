@@ -33,10 +33,8 @@ var Player = (function(){
     r.uiMenu = null;
 
     r._isActive = false;
-    r.isPlayer = true;
+    r._isPlayer = true;
 
-    //r.otherSide = null;
-    //r.events = {};
     r._isOpen = null;
 
     r.setActive = function(bool){

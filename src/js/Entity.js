@@ -90,6 +90,34 @@ var Entity = (function(){
     r._multipleAttacks = null;
     r._attacksLeft = null;
     r._cooldowns = null; // i.e.: [{id: "shieldwall", duration: 3}]
+    r._tmp = false;
+    r._isPlayer = false;
+
+    r.isTemp = function(){
+        return this._tmp;
+    }
+    r.setTmp = function(bool){
+        this._tmp = bool;
+    }
+    r.delete = function(){
+        this.getYourside().remove(this);
+    }
+    r.isPlayer = function(){
+        return !!this._isPlayer;
+    }
+    r.spawnAlly = function(id, isPlayer){
+        if(isPlayer){
+            return this.getYourside().battle.addNewPlayer(id, this.getYourside(), this.getOtherside());
+        }
+        return this.getYourside().battle.addNewNpc(id, this.getYourside(), this.getOtherside());
+
+    }
+    r.spawnEnemy = function(id, isPlayer){
+        if(isPlayer){
+            return this.getOtherside().battle.addNewPlayer(id, this.getOtherside(), this.getYourside());
+        }
+        return this.getOtherside().battle.addNewNpc(id, this.getOtherside(), this.getYourside());
+    }
 
     /**
      * UI Properties
@@ -149,10 +177,10 @@ var Entity = (function(){
         return this.getAttr("int") * 10;
     }
     r.getSpecialAttackPower = function(){
-/*
-        var tec = this.getAttr("tec") * 4;
-*/
-        var tec = Math.sqrt(this.getAttr("tec"))*0.4;
+        /*
+         var tec = this.getAttr("tec") * 4;
+         */
+        var tec = Math.sqrt(this.getAttr("tec")) * 0.4;
 
         return tec;
     }
@@ -204,7 +232,7 @@ var Entity = (function(){
         for(var i = 0; i < n; i++) {
             if(this._buffs[i].name === name){
                 if(from && from === this._buffs[i].from.getId()){
-                    if(getIndex) {
+                    if(getIndex){
                         return i;
                     }
                     return this._buffs[i];
@@ -223,7 +251,7 @@ var Entity = (function(){
         for(var i = 0; i < n; i++) {
             if(this._debuffs[i].name === name){
                 if(from && from === this._debuffs[i].from.getId()){
-                    if(getIndex) {
+                    if(getIndex){
                         return i;
                     }
                     return this._debuffs[i];
@@ -260,7 +288,7 @@ var Entity = (function(){
         var dmg = this.calculatePower(move);
         var rnd;
 
-        dmg = (((((200 / 5) + 2) * dmg * 8 /100) / 50) + 2) * this.getOutgoingDmgMultiplier() | 0;
+        dmg = (((((200 / 5) + 2) * dmg * 8 / 100) / 50) + 2) * this.getOutgoingDmgMultiplier() | 0;
         rnd = Math.random() * (dmg * 10 / 100) - (dmg * 20 / 100);
 
         dmg += rnd | 0;
@@ -283,6 +311,10 @@ var Entity = (function(){
         this._fainted = bool;
         this.removeAllBuffs();
         this.removeAllDebuffs();
+
+        if(this.isTemp()){
+            this.delete();
+        }
     }
     r.setImg = function(img){
         this._img = img;
@@ -554,7 +586,7 @@ var Entity = (function(){
         var def = (target && target.calculateDef()) || 0; //1;
 
         //def = target.getIncomingDmgMultiplier() - def;
-        def = 1 - (def/100);
+        def = 1 - (def / 100);
 
         dmg *= def;
 
@@ -587,9 +619,9 @@ var Entity = (function(){
         //if(def > 1000) def = 1000;
         if(def < 0) def = 0;
 
-        var plott = Math.pow(0.45*def, (1/1.7));
+        var plott = Math.pow(0.45 * def, (1 / 1.7));
 
-        return plott/100;
+        return plott / 100;
         //return def / 1000; //damage reduce in percent
     }
     r.changeShieldAbsorbBy = function(value){
@@ -756,13 +788,13 @@ var Entity = (function(){
         this.uiSprite.addClass("entity-active");
     }
     r.addCooldown = function(skillid){
-        var dur  = moveData.load(skillid).cooldown;
+        var dur = moveData.load(skillid).cooldown;
         this._cooldowns.push({id: skillid, duration: dur});
     }
     r.removeCooldown = function(skillid){
         var n = this._cooldowns.length;
 
-        for(var i=0; i< n; i++){
+        for(var i = 0; i < n; i++) {
             if(this._cooldowns[i].id === skillid){
                 this._cooldowns.splice(i, 1);
                 return;
@@ -772,7 +804,7 @@ var Entity = (function(){
     r.reduceCooldownTimerBy = function(i){
         this._cooldowns.forEach(function(element, index, array){
             array[index].duration -= i;
-            if(array[index].duration <= 0) {
+            if(array[index].duration <= 0){
                 this.removeCooldown(array[index].id);
             }
         }, this);
@@ -780,7 +812,7 @@ var Entity = (function(){
     r.hasCooldown = function(skillid){
         var n = this._cooldowns.length;
 
-        for(var i=0; i< n; i++){
+        for(var i = 0; i < n; i++) {
             if(this._cooldowns[i].id === skillid){
                 return true;
             }
@@ -805,7 +837,7 @@ var Entity = (function(){
             var buff = buffs[i];
             for(var j = i + 1; j < n; j++) {
                 if(((buff.name === buffs[j].name) && (buff.from.getId() === buffs[j].from.getId()))
-                    || (buff.isLimited && buff.name === buffs[j].name)){
+                || (buff.isLimited && buff.name === buffs[j].name)){
                     var buff2 = buffs[j];
                     //console.log("buff", buff.from, buff2.from);
 
@@ -966,35 +998,35 @@ var Entity = (function(){
             var __h = buff.__handler = [];
             if(buff.effects.onTurnEnd){
                 __h.push(pubsub.subscribe("/bp/battle/onTurnEnd/",
-                    buff.effects.onTurnEnd.bind(this, buff)));
+                buff.effects.onTurnEnd.bind(this, buff)));
             }
             if(buff.effects.onTurnBegin){
                 __h.push(pubsub.subscribe("/bp/battle/onTurnBegin/",
-                    buff.effects.onTurnBegin.bind(this, buff)));
+                buff.effects.onTurnBegin.bind(this, buff)));
             }
             if(buff.effects.onFaint){
                 __h.push(pubsub.subscribe("/bp/battle/onFaint/",
-                    buff.effects.onFaint.bind(this, buff)));
+                buff.effects.onFaint.bind(this, buff)));
             }
             if(buff.effects.onRevive){
                 __h.push(pubsub.subscribe("/bp/battle/onRevive/",
-                    buff.effects.onRevive.bind(this, buff)));
+                buff.effects.onRevive.bind(this, buff)));
             }
             if(buff.effects.onGetHit){
                 __h.push(pubsub.subscribe("/bp/battle/onGetHit/" + this.getId(), // + "/"+ buff.id,
-                    buff.effects.onGetHit.bind(this, buff)));
+                buff.effects.onGetHit.bind(this, buff)));
             }
             if(buff.effects.onHit){
                 __h.push(pubsub.subscribe("/bp/battle/onHit/" + this.getId(), // + "/"+ buff.id,
-                    buff.effects.onHit.bind(this, buff)));
+                buff.effects.onHit.bind(this, buff)));
             }
             if(buff.effects.onBeforeAttack){
                 __h.push(pubsub.subscribe("/bp/battle/onBeforeAttack/" + this.getId(),
-                    buff.effects.onBeforeAttack.bind(this, buff)));
+                buff.effects.onBeforeAttack.bind(this, buff)));
             }
             if(buff.effects.onAfterGetAttack){
                 __h.push(pubsub.subscribe("/bp/battle/onAfterGetAttack/" + this.getId(),
-                    buff.effects.onAfterGetAttack.bind(this, buff)));
+                buff.effects.onAfterGetAttack.bind(this, buff)));
             }
             if(buff.effects.onInit){
                 __h.push(pubsub.subscribe("/bp/battle/onInit/" + this.getId() + "/" + buff.id, function(from){
@@ -1007,17 +1039,17 @@ var Entity = (function(){
             }
             if(buff.effects.onEnd){
                 __h.push(pubsub.subscribe("/bp/battle/onEnd/" + this.getId() + "/" + buff.id, function(from){
-                        if(buff.__endFlag || buff.from.getId() != from.getId()){
-                            return self;
-                        }
-                        buff.effects.onEnd.call(self, buff);
-                        buff.__endFlag = true;
+                    if(buff.__endFlag || buff.from.getId() != from.getId()){
+                        return self;
                     }
+                    buff.effects.onEnd.call(self, buff);
+                    buff.__endFlag = true;
+                }
                 ));
             }
             if(buff.effects.onReceiveHeal){
                 __h.push(pubsub.subscribe("/bp/battle/onReceiveHeal/" + this.getId(),
-                    buff.effects.onReceiveHeal.bind(this, buff)));
+                buff.effects.onReceiveHeal.bind(this, buff)));
             }
         }
 

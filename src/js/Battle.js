@@ -15,8 +15,8 @@ var Tooltip = require("./Tooltip.js");
 
 var Battle = (function(){
     var Battle = function(){
-        this.side1 = new BattleSide($(".side-ally"), "s1", "Team Yolo");
-        this.side2 = new BattleSide($(".side-enemy"), "s2", "Team Swag");
+        this.side1 = new BattleSide($(".side-ally"), "s1", "Team Yolo", this);
+        this.side2 = new BattleSide($(".side-enemy"), "s2", "Team Swag", this);
 
         this.uiMenu = $(".controller");
     }
@@ -38,7 +38,8 @@ var Battle = (function(){
     r.speed = 1000;
 
     r.debug = false;
-    //r.debugSkipGameover = false; //doesnt work yet / buggy
+
+
 
     r.adjustAnimSpeed = function(percentage){ //
         this._speedMultiplicator = percentage/100;
@@ -48,6 +49,18 @@ var Battle = (function(){
     }
     r.getAnimSpeedMultiplicator = function(){
         return this._speedMultiplicator;
+    }
+
+    r.getPlayerIndexById = function(id){
+        var n = this.player.length;
+        for(var i=0; i< n; i++){
+            if(id === this.player[i].getId())
+            return i;
+        }
+        return -1;
+    }
+    r.removePlayer = function(id){
+        this.player.splice(this.getPlayerIndexById(id), 1);
     }
 
     r.init = function(){
@@ -150,8 +163,10 @@ var Battle = (function(){
         //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
-        this.player.push(ally);
+        //this.player.push(ally);
         yourSide.add(ally);
+
+        return ally;
     }
 
     r.addNewNpc = function(options, yourSide, otherSide){
@@ -168,6 +183,8 @@ var Battle = (function(){
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
         yourSide.add(npc);
+
+        return npc;
     }
 
     r.checkIfEntityAlreadyExists = function(entity, yourSide){
@@ -278,22 +295,22 @@ var Battle = (function(){
 
         var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
-            if(data.from.isPlayer) i++;
+            if(data.from.isPlayer()) i++;
 
             self.removeFromObserveList(observeList, data.from.getId());
             collectData.push(data);
 
-            if(!data.from.isPlayer && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
+            if(!data.from.isPlayer() && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
                 data.from.startAi();
             }
 
-            if(data.from.isPlayer && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
+            if(data.from.isPlayer() && data.from.hasMultipleAttacks() && data.from.hasAttacksLeft()){
                 //data.from.decreaseAttacksLeftBy(1);
                 self.handlePlayerEvents(--i);
                 return;
             }
 
-            if(data.from.isPlayer && i < self.player.length){
+            if(data.from.isPlayer() && i < self.player.length){
                 while(self.player[i] && self.player[i].isFainted()) {
                     i++;
                 }

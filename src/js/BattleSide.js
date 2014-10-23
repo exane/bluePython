@@ -1,13 +1,15 @@
 "use strict";
 
 var BattleSide = (function(){
-    var BattleSide = function(side, id, name){
+    var BattleSide = function(side, id, name, battle){
         this.member = [];
         this.uiMember = [];
         this.uiSide = side;
 
         this.sideId = id || null;
         this.sideName = name || "unnamed";
+
+        this.battle = battle;
 
         //console.log(side);
     }
@@ -23,13 +25,38 @@ var BattleSide = (function(){
     r.sideId = null;
     r.sideName = null;
 
+    r.battle = null;
+
+    r.maxEntities = 4;
+
     r.add = function(entity){
-        //entity.id = this.sideId + "_" + entity.id;
+        if(this.length() >= this.maxEntities)
+            return;
+
         entity.setId(this.sideId + "_" + entity.getId());
-        //entity.name = this.sideName + " " + entity.name;
         this.member.push(entity);
         this.uiMember.push(null);
         this.createInfoUi(entity);
+        if(entity.isPlayer()){
+            this.battle.player.push(entity);
+        }
+    }
+
+    r.remove = function(entity){
+        var index = this.getMemberIndexById(entity.getId());
+
+        if(entity.isPlayer()){
+            this.battle.removePlayer(entity.getId());
+        }
+
+
+        this.member.splice(index, 1);
+        this.uiMember.splice(index, 1);
+        this._removeUiOf(entity);
+    }
+
+    r._removeUiOf = function(entity){
+        $("#"+this.sideId + "-battle-sprite-" + entity.getId() + "-container").remove();
     }
 
     r._createUiSprite = function(entity){
@@ -123,6 +150,14 @@ var BattleSide = (function(){
         for(var i = 0; i < n; i++) {
             if(this.member[i].getId() !== id) continue;
             return this.member[i];
+        }
+        return null;
+    }
+    r.getMemberIndexById = function(id){
+        var n = this.member.length;
+        for(var i=0; i<n; i++){
+            if(id === this.member[i].getId())
+                return i;
         }
         return null;
     }

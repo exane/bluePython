@@ -39,7 +39,7 @@ var data = {
             agi: 80,
             tec: 100,
             int: 800,
-            vit: 1750,
+            vit: 10,
             lck: 100
         },
         img: "assets/GnomeMage.png",
@@ -78,7 +78,7 @@ var data = {
         id: "warrior",
         stats: {
             str: 100,
-            def: 1000,
+            def: 1100,
             agi: 110,
             tec: 10,
             int: 10,
@@ -86,7 +86,7 @@ var data = {
             lck: 1000
         },
         img: "assets/warrior_11.png",
-        skills: ["shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
+        skills: ["__SPAWN__", "__DELETE__", "shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
         abilities: ["endless_rage"],
         //multipleAttacks: 3,
         onBattleStart: function(){
@@ -100,7 +100,7 @@ var data = {
             str: 40,
             def: 75,
             agi: 120,
-            tec: 200,
+            tec: 250,
             int: 300,
             vit: 800,
             lck: 150
@@ -127,7 +127,8 @@ var data = {
         ai: function(){
             var moves = [
                 {chance: 20, id: "rend"},
-                {chance: 80, id: "mortal_strike"}
+                {chance: 10, id: "spawn_mage"},
+                {chance: 70, id: "mortal_strike"}
             ];
 
             this.turnAction.do = util.random(moves);

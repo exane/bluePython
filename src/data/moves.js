@@ -319,5 +319,38 @@ module.exports = self = {
         },
         target: "friendly",
         icon: "assets/ace.png"
+    },
+    spawn_mage: {
+        name: "(spawn) gnomemage",
+        id: "spawn_mage",
+        costs: 0,
+        onCast: function(opt){
+            this.spawnAlly("gnomemage", false).setTmp(true);
+            this.spawnAlly("gnomemage", false).setTmp(true);
+            logger.message(this.getFullName() + " is summoning his minions!");
+        },
+        target: "self",
+        icon: "assets/ace.png"
+    },
+    __DELETE__: {
+        name: "__DELETE__",
+        id: "__DELETE__",
+        costs: 0,
+        onCast: function(opt){
+            this.delete();
+        },
+        target: "self",
+        icon: "assets/ace.png"
+    },
+    __SPAWN__: {
+        name: "__SPAWN__",
+        id: "__SPAWN__",
+        costs: 0,
+        onCast: function(opt){
+            this.spawnAlly("gnomemage", true).setTmp(true);
+        },
+        target: "self",
+        icon: "assets/ace.png"
     }
+
 }
