@@ -136,6 +136,7 @@ $height: 600px;
     margin: 0 auto;
     //float: left;
     display: block;
+    border: 3px solid rgba(0, 0, 0, 0);
 
   }
 }
@@ -333,7 +334,7 @@ $height: 600px;
 }
 
 .entity-active {
-  border: 3px solid red;
+  border: 3px solid red !important;
 
 }
 
