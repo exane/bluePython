@@ -348,6 +348,8 @@ module.exports = self = {
         costs: 0,
         onCast: function(opt){
             this.spawnAlly("gnomemage", true).setTmp(true);
+            this.spawnAlly("gnomemage", true).setTmp(true);
+            this.spawnAlly("gnomemage", true).setTmp(true);
         },
         target: "self",
         icon: "assets/ace.png"

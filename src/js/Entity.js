@@ -14,6 +14,8 @@ var Entity = (function(){
         this._img = (options && options.img) || null;
         this._stats = options.stats || this._stats;
 
+        if(yourSide.length() >= yourSide.maxEntities) return 0;
+
         this._boosts = {
             vit: 100,   //hp = vit*100
             int: 100,   //mana = int*100
