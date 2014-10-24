@@ -97,6 +97,7 @@ var BattleSide = (function(){
         //entity.uiBuffs = $(uiBuffs);
         entity.uiBuffs = $(uiBuffs);
     }
+
     r._createUiDebuffs = function(entity, uiInfo){
         var uiDebuffs = $("<div></div>").attr("id", this.sideId + "-battle-debuffs-" + entity.getId());
         //$(uiBuffs).appendTo(uiInfo);
@@ -108,28 +109,47 @@ var BattleSide = (function(){
 
     r._createUiHp = function(entity, uiInfo){
         var uiHp = $("<div class='bar bar-hp'></div>");
+        var uiHpBackground = $("<div class='bar-hp-background'></div>");
+        var uiHpContainer = $("<div class='bar-hp-container'></div>");
+        var uiHpText = $("<div class='bar-hp-text'></div>");
 
+        $(uiHpBackground).attr("id", this.sideId + "-battle-hp-background-" + entity.getId());
+        $(uiHpText).attr("id", this.sideId + "-battle-hp-text-" + entity.getId());
         $(uiHp).attr("id", this.sideId + "-battle-hp-" + entity.getId());
-        $(uiHp).text(entity.getHp() + " / " + entity.getMaxHp());
+        //$(uiHp).text(entity.getHp() + " / " + entity.getMaxHp());
+        $(uiHpText).text(entity.getHp() + " / " + entity.getMaxHp());
 
-        //uiSprite
-        //console.log(entity.uiSprite.parent());
-        //$(uiHp).appendTo(uiInfo);
-        $(uiHp).appendTo(entity.uiSprite.parent());
+
+        $(uiHpContainer).appendTo(entity.uiSprite.parent());
+
+        $(uiHp).appendTo(uiHpContainer);
+        $(uiHpText).appendTo(uiHpContainer);
+        $(uiHpBackground).appendTo(uiHpContainer);
         entity.uiHp = $(uiHp);
+        entity.uiHpText = $(uiHpText);
 
     }
 
     r._createUiMana = function(entity, uiInfo){
         var uiMana = $("<div class='bar bar-mana'></div>");
+        var uiManaContainer = $("<div class='bar-mana-container'></div>");
+        var uiManaBackground = $("<div class='bar-mana-background'></div>");
+        var uiManaText = $("<div class='bar-mana-text'></div>");
 
         $(uiMana).attr("id", this.sideId + "-battle-mana-" + entity.getId());
-        $(uiMana).text(entity.getMana() + " / " + entity.getMaxMana());
+        $(uiManaText).text(entity.getMana() + " / " + entity.getMaxMana());
 
 
         //$(uiMana).appendTo(uiInfo);
-        $(uiMana).appendTo(entity.uiSprite.parent());
+        $(uiManaContainer).appendTo(entity.uiSprite.parent());
+
+        $(uiManaBackground).appendTo(uiManaContainer);
+        $(uiMana).appendTo(uiManaContainer);
+        $(uiManaText).appendTo(uiManaContainer);
+
+        //$(uiMana).appendTo(entity.uiSprite.parent());
         entity.uiMana = $(uiMana);
+        entity.uiManaText = $(uiManaText);
 
     }
 

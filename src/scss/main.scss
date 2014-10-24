@@ -1,6 +1,7 @@
 //globals
 
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro);
+@import url(http://fonts.googleapis.com/css?family=Inconsolata:400,700);
 
 $width: 1200px;
 $height: 600px;
@@ -22,6 +23,9 @@ $height: 600px;
   height: $height;
   position: relative;
   cursor: default;
+  background: url("../assets/bg.png");
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 .side {
@@ -51,28 +55,115 @@ $height: 600px;
   }
 
   .bar {
-    font-size: 12px;
     width: $height/2 - $height/8;
     height: 12px;
-    margin: 0 auto;
+    //margin: 0 auto;
 
     border: 1px solid black;
-    border-radius: 7px;
-    line-height: 12px;
-    text-align: center;
+    //border-radius: 7px;
 
     margin-top: 0px;
     //position: absolute;
-    max-width: $width/4;
+    //max-width: $width/4;
+    max-width: ($width - $height/2)/5;
   }
 
   .bar-hp {
     //background: #00b900;
-    background: linear-gradient(to right, #00b900 100%, rgba(0, 0, 0, 0) 0%);
+    height: 23px;
+    margin: 1px 0;
+    line-height: 25px;
+    background: linear-gradient(to right, #0cff00 100%, rgba(0, 0, 0, 0) 0%);
+    position: absolute;
+    background: #08ab00;
+    background: -moz-linear-gradient(top,  #08ab00 0%, #0bf300 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#08ab00), color-stop(100%,#0bf300));
+    background: -webkit-linear-gradient(top,  #08ab00 0%,#0bf300 100%);
+    background: -o-linear-gradient(top,  #08ab00 0%,#0bf300 100%);
+    background: -ms-linear-gradient(top,  #08ab00 0%,#0bf300 100%);
+    background: linear-gradient(to bottom,  #08ab00 0%,#0bf300 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#08ab00', endColorstr='#0bf300',GradientType=0 );
+    border-top: 1px solid rgba(0, 0, 0, 0);
+    border-bottom: 1px solid rgba(0, 0, 0, 0);
+    border-right: 0 solid rgba(0, 0, 0, 0);
+    border-left: 1 solid rgba(0, 0, 0, 0);
+
   }
+
+  .bar-hp-text, .bar-mana-text {
+
+    position: absolute;
+    font-size: 15px;
+    font-family: "Inconsolata";
+    line-height: 12px;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    height: 25px;
+    line-height: 25px;
+    width: ($width - $height/2)/5;
+    max-width: ($width - $height/2)/5;
+  }
+
+  .bar-hp-background {
+    height: 25px;
+    width: ($width - $height/2)/5;
+    max-width: ($width - $height/2)/5;
+    border: 1px solid rgb(0, 0, 0);
+    background: #005602;
+    background: -moz-linear-gradient(top,  #005602 0%, #007a03 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#005602), color-stop(100%,#007a03));
+    background: -webkit-linear-gradient(top,  #005602 0%,#007a03 100%);
+    background: -o-linear-gradient(top,  #005602 0%,#007a03 100%);
+    background: -ms-linear-gradient(top,  #005602 0%,#007a03 100%);
+    background: linear-gradient(to bottom,  #005602 0%,#007a03 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#005602', endColorstr='#007a03',GradientType=0 );
+    border-bottom: 2px solid black;
+  }
+
+  .bar-hp-container, .bar-mana-container {
+    position: relative;
+    margin-top: 5px;
+  }
+
+  .bar-mana, .bar-mana-background {
+    top: 20px;
+    position: absolute;
+  }
+
   .bar-mana {
     //background: #297eff;
-    background: linear-gradient(to right, #297eff 100%, rgba(0, 0, 0, 0) 0%);
+    //background: linear-gradient(to right, #297eff 100%, rgba(0, 0, 0, 0) 0%);
+    background: #a69fff;
+    background: -moz-linear-gradient(top,  #a69fff 0%, #1200ff 69%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a69fff), color-stop(69%,#1200ff));
+    background: -webkit-linear-gradient(top,  #a69fff 0%,#1200ff 69%);
+    background: -o-linear-gradient(top,  #a69fff 0%,#1200ff 69%);
+    background: -ms-linear-gradient(top,  #a69fff 0%,#1200ff 69%);
+    background: linear-gradient(to bottom,  #a69fff 0%,#1200ff 69%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a69fff', endColorstr='#1200ff',GradientType=0 );
+    position: absolute;
+
+
+
+
+
+    height: 4px;
+    border-radius: 5px;
+  }
+
+  .bar-mana-background {
+    background: black;
+    height: 4px;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: ($width - $height/2)/5;
+    max-width: ($width - $height/2)/5;
+  }
+
+  .bar-mana-text {
+    text-align: right;
+    font-size: 12px;
   }
 
 }
@@ -83,13 +174,14 @@ $height: 600px;
 }
 
 .battle-buffs, .battle-debuffs {
-  min-width: ($width - $height/2)/4/2;
+  min-width: ($width - $height/2)/5/2;
   min-height: 30px;
   height: auto;
   //border: 1px solid red;
   //line-height: 12px;
   display: block;
   float: left;
+  margin-top: 35px;
 
   img {
     height: 18px;
@@ -98,7 +190,9 @@ $height: 600px;
     border-radius: 3px;
     //padding: 1px;
     //background: green;
-    border: 2px solid green;
+  }
+  &.battle-buffs img {
+    border: 1px solid green;
   }
   &.battle-debuffs img {
     border: 1px solid red;
@@ -124,15 +218,18 @@ $height: 600px;
   vertical-align: middle;
 
   .sprite-img-container {
-    height: auto;
-    width: ($width - $height/2)/4;
+    height: 300px;
+    width: ($width - $height/2)/5;
     //auto;
     display: inline-block;
+    background: rgba(30, 30, 30, 0.4);
+    padding: 10px;
+    margin: 5px;
   }
 
   img {
     //max-height: $height/3;
-    max-width: ($width - $height/2)/4;
+    max-width: ($width - $height/2)/5 - 3px;
     margin: 0 auto;
     //float: left;
     display: block;

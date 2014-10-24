@@ -4,6 +4,7 @@ var logger = require("./log.js");
 var abilityData = require("../data/abilities.js");
 var buffData = require("../data/buffs.js");
 var moveData = require("../data/moves.js");
+var Util = require("./Util.js");
 
 var Entity = (function(){
     var Display = require("./Display.js");
@@ -127,7 +128,9 @@ var Entity = (function(){
     r.uiSprite = null;
     r.uiName = null;
     r.uiHp = null;
+    r.uiHpText = null;
     r.uiMana = null;
+    r.uiManaText = null;
     r.uiBuffs = null;
     r.uiDebuffs = null;
 
@@ -164,18 +167,26 @@ var Entity = (function(){
         attr = attr.toLowerCase();
         return this._stats[attr];
     }
-    r.getHp = function(inPercentage){
+    r.getHp = function(inPercentage, formated){
         if(inPercentage) return 100 * this._currHp / this.getMaxHp() | 0;
+        if(formated)
+            return Util.formatNumber(this._currHp);
         return this._currHp;
     }
-    r.getMaxHp = function(){
+    r.getMaxHp = function(formated){
+        if(formated)
+            return Util.formatNumber(this.getAttr("Vit") * 10);
         return this.getAttr("Vit") * 10;
     }
-    r.getMana = function(inPercentage){
+    r.getMana = function(inPercentage, formated){
         if(inPercentage) return 100 * this._mana / this.getMaxMana() | 0;
+        if(formated)
+            return Util.formatNumber(this._mana);
         return this._mana;
     }
-    r.getMaxMana = function(){
+    r.getMaxMana = function(formated){
+        if(formated)
+            return Util.formatNumber(this.getAttr("int") * 10);
         return this.getAttr("int") * 10;
     }
     r.getSpecialAttackPower = function(){
@@ -539,15 +550,19 @@ var Entity = (function(){
 
         if(this.getHp() > this.getMaxHp()){
             this._currHp = this.getMaxHp();
-        }
-        this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
-        this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
-        this.uiHp.css({
-            "background": "linear-gradient(to right, #00b900 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
-        });
-        this.uiMana.css({
+        }/*
+        this.uiHp.text(this.getHp(false, true) + " / " + this.getMaxHp(true));*/
+        this.setHpText(this.getHp(false, true) + " / " + this.getMaxHp(true));/*
+        this.uiMana.text(this.getMana(false, true) + " / " + this.getMaxMana(true));*/
+        this.setManaText(this.getMana(false, true) + " / " + this.getMaxMana(true));
+        /*this.uiHp.css({
+            "background": "linear-gradient(to right, #0cff00 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
+        });*/
+        this.uiHp.css("width", this.getHp(true, false) + "%");
+        this.uiMana.css("width", this.getMana(true, false) + "%");
+       /* this.uiMana.css({
             "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
-        });
+        });*/
         this._renderBuffs();
         //$.event.trigger("bp-tooltip-update");
         pubsub.publish("/bp/tooltip/update");
@@ -669,12 +684,19 @@ var Entity = (function(){
 
             this.uiSprite.addClass("fainted");
         }
+/*
+         this.uiHp.css({
+         "background": "linear-gradient(to right, #00b900 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
+         });*/
+        this.uiHp.css("width", this.getHp(true, false) + "%");
 
-        this.uiHp.css({
-            "background": "linear-gradient(to right, #00b900 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
-        });
-
-        this.uiHp.text(this.getHp() + " / " + this.getMaxHp());
+        this.setHpText(this.getHp(false, true) + " / " + this.getMaxHp(true));
+    }
+    r.setHpText = function(text){
+        this.uiHpText.text(text);
+    }
+    r.setManaText = function(text){
+        this.uiManaText.text(text);
     }
     r.changeManaBy = function(value){
         if(this.isFainted()) return 0;
@@ -690,12 +712,15 @@ var Entity = (function(){
         }
 
         new Display({target: this, amount: value, isMana: true});
+/*
 
         this.uiMana.css({
             "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
         });
+*/
+        this.uiMana.css("width", this.getMana(true, false) + "%");
 
-        this.uiMana.text(this.getMana() + " / " + this.getMaxMana());
+        this.setManaText(this.getMana(false, true) + " / " + this.getMaxMana(true));
 
         return true;
     }

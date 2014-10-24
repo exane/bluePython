@@ -1,22 +1,23 @@
 {
-  "name": "bluePython",
-  "version": "0.0.1",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "exane",
-  "license": "BSD-2-Clause",
-  "devDependencies": {
-    "browserify": "~5.11.0",
-    "gulp": "~3.8.7",
-    "gulp-livereload": "^2.1.1",
-    "gulp-sass": "~0.7.3",
-    "vinyl-source-stream": "~0.1.1"
-  },
-  "dependencies": {
-    "jquery": "~2.1.1",
-    "jquery-ui": "~1.10.5"
-  }
+    "name": "bluePython",
+    "version": "0.0.1",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "exane",
+    "license": "BSD-2-Clause",
+    "devDependencies": {
+        "browserify": "~5.11.0",
+        "gulp": "~3.8.7",
+        "gulp-livereload": "^2.1.1",
+        "gulp-sass": "~0.7.3",
+        "gulp-imagemin": "^1.2.1",
+        "vinyl-source-stream": "~0.1.1"
+    },
+    "dependencies": {
+        "jquery": "~2.1.1",
+        "jquery-ui": "~1.10.5"
+    }
 }
