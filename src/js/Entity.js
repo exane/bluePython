@@ -47,6 +47,10 @@ var Entity = (function(){
         this._abilityListener();
         this._buffListener();
 
+        if(options.defaultAttack){
+            this.setDefaultAttack(options.defaultAttack);
+        }
+
 
         this._nextTurnListener();
 
@@ -95,6 +99,7 @@ var Entity = (function(){
     r._cooldowns = null; // i.e.: [{id: "shieldwall", duration: 3}]
     r._tmp = false;
     r._isPlayer = false;
+    r._defaultAttack = "default_attack";
 
     r.isTemp = function(){
         return this._tmp;
@@ -135,6 +140,13 @@ var Entity = (function(){
     r.uiDebuffs = null;
 
     r.turnAction = null;
+
+    r.setDefaultAttack = function(id){
+        this._defaultAttack = id;
+    }
+    r.getDefaultAttack = function(){
+        return this._defaultAttack;
+    }
 
     r.hasMultipleAttacks = function(){
         return !!this._multipleAttacks;

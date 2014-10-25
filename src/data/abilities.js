@@ -41,5 +41,11 @@ module.exports = self = {
 
 
         }
+    },
+    calm_mind: {
+        onTurnEnd: function(){
+            this.changeManaBy(20);
+        }
     }
+
 }

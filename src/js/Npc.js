@@ -52,7 +52,7 @@ var Npc = (function(){
         var target = this.chooseTarget();
 
         this.ready({
-            "do": "default_attack",
+            "do": this.getDefaultAttack(),
             "target": target,
             "from": this
         })

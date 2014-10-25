@@ -258,5 +258,35 @@ module.exports = self = {
                 }
             }
         }
+    },
+    poison_weapon_buff: {
+        name: "Poisonweapon",
+        id: "poison_weapon_buff",
+        desc: "50% chance to poison on attack",
+        icon: "assets/dripping-knife.png",
+        duration: 5,
+        effects: {
+            onHit: function(buff, dmg, opt){
+                var getPoison = (Math.random()*100 | 0) > 50;
+                var target = opt.target;
+
+                if(!getPoison) return;
+                target.addDebuff(self.load("poison_weapon_dot_debuff"), this);
+
+            }
+        }
+    },
+    poison_weapon_dot_debuff: {
+        name: "Poison",
+        id: "poison_weapon_dot_debuff",
+        desc: "",
+        icon: "assets/poison-gas.png",
+        duration: 5,
+        effects: {
+            onTurnEnd: function(buff){
+                var source = buff.from;
+                this.changeHpBy(-1.23 * source.getPhysicalAttackPower());
+            }
+        }
     }
 }

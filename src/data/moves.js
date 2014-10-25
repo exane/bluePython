@@ -353,6 +353,31 @@ module.exports = self = {
         },
         target: "self",
         icon: "assets/ace.png"
+    },
+    backstab: {
+        name: "Backstep",
+        id: "backstab",
+        basePower: 120,
+        target: "enemy",
+        desc: "backstab, if crit then mana +20",
+        costs: 60,
+        onCast: function(opt){
+            if(opt.isCrit) {
+                this.changeManaBy(20);
+            }
+        },
+        icon: "assets/backstab.png"
+    },
+    poison_weapon: {
+        name: "Poisonweapon",
+        id: "poison_weapon",
+        target: "self",
+        desc: "Poisonweapon",
+        costs: 20,
+        onCast: function(opt){
+            this.addBuff(buffData.load("poison_weapon_buff"), this);
+        },
+        icon: "assets/dripping-knife.png"
     }
 
 }

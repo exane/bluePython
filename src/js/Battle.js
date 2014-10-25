@@ -573,7 +573,7 @@ var Battle = (function(){
                 opt.target.changeHpBy(-dmg, opt.isCrit);
 
                 $.when(pubsub.publish("/bp/battle/onGetHit/" + opt.target.getId(), [dmg]))
-                .then(pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg]))
+                .then(pubsub.publish("/bp/battle/onHit/" + user.getId(), [dmg, opt]))
                 .then(pubsub.publish("/bp/battle/onAfterGetAttack/" + opt.target.getId(), [opt]));
 
                 /*

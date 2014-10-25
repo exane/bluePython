@@ -95,7 +95,8 @@ var Player = (function(){
     }
 
     r.clickAttack = function(){
-        this.turnAction.do = "default_attack";
+
+        this.turnAction.do = this.getDefaultAttack();
         this.listTargets(this.getOtherside(), this.getYourside());
 
 

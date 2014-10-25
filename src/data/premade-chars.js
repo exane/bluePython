@@ -109,6 +109,24 @@ var data = {
         skills: ["absorb_shield", "renew", "heal", "aoe_heal", "revive"],
         abilities: ["prayer"]
     },
+    rogue: {
+        name: "Rogue",
+        id: "rogue",
+        defaultAttack: "",
+        stats: {
+            str: 200,
+            def: 90,
+            agi: 160,
+            tec: 100,
+            int: 12,
+            vit: 500000,//500
+            lck: 2500
+        },
+        img: "assets/rogue.png",
+        multipleAttacks: 2,
+        skills: ["backstab", "poison_weapon"],
+        abilities: ["calm_mind"]
+    },
     serpant_boss: {
         name: "Serpant King",
         id: "serpant_boss",
