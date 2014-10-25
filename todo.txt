@@ -5,7 +5,6 @@
 - ändern der skillstärke (basePower) in prozentualen "waffenschaden". "equip" ausrüstbar bei premade-chars (bzw einstellbar)
 - combat log überarbeiten /übersichtlicher machen
 - buffs/debuffs die möglichkeit geben nicht sichtbar für den nutzer zu sein
-- back button bug: char mit multiple attacks buggen rum
 - heals sollen critten können
 - stun möglichkeiten erweitern(mit historie wer wann gestunt hat, um festzustellen bis wann das ziel mindest noch gestunt sein müsste)
 

@@ -300,6 +300,7 @@ var Battle = (function(){
 
                 if(i > 0) i--;
                 self.removeFromCollectList(self.player[i].getId(), collectData);
+                self.player[i].resetAttacksLeft();
                 self.handlePlayerEvents(i);
                 return;
             }
