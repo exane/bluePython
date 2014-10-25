@@ -123,7 +123,7 @@ var data = {
         },
         img: "assets/rogue.png",
         multipleAttacks: 2,
-        skills: ["backstab", "poison_weapon", "rupture", "kidney_shot"],
+        skills: ["backstab", "poison_weapon"],
         abilities: ["calm_mind"]
     },
     serpant_boss: {
