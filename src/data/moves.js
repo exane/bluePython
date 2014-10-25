@@ -378,30 +378,6 @@ module.exports = self = {
             this.addBuff(buffData.load("poison_weapon_buff"), this);
         },
         icon: "assets/dripping-knife.png"
-    },
-    rupture: {
-        name: "Rupture(dot)",
-        id: "rupture",
-        basePower: 10,
-        target: "enemy",
-        desc: "dot",
-        costs: 40,
-        onCast: function(opt){
-            opt.target.addDebuff(buffData.load("rupture_debuff"), this);
-        },
-        icon: "assets/ragged-wound.png"
-    },
-    kidney_shot: {
-        name: "Kidney Shot",
-        id: "kidney_shot",
-        target: "enemy",
-        desc: "stun",
-        costs: 25,
-        cooldown: 5,
-        onCast: function(opt){
-            opt.target.addDebuff(buffData.load("kidney_shot_debuff"), this);
-        },
-        icon: "assets/ragged-wound.png"
     }
 
 }
