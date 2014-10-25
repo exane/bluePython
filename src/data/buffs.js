@@ -274,7 +274,6 @@ module.exports = self = {
           this.changeIncomingDmgMultiplierBy(-.3);
           this.changeOutgoingDmgMultiplierBy(.3);
         }
-      }
     },
     beacon_light_buff: {
       name: "Beacon of Light (Buff)",
@@ -286,6 +285,33 @@ module.exports = self = {
         onInit: function (buff) {
           this.increaseHealMultiplierBy(20);
         }
-      }
+    },
+    rupture_debuff: {
+        name: "Rupture",
+        id: "rupture_debuff",
+        desc: "",
+        icon: "assets/ragged-wound.png",
+        duration: 8,
+        effects: {
+            onTurnEnd: function(buff){
+                var source = buff.from;
+                this.changeHpBy(-2.67 * source.getPhysicalAttackPower());
+            }
+        }
+    },
+    kidney_shot_debuff: {
+        name: "Stun",
+        id: "kidney_shot_debuff",
+        desc: "stun",
+        icon: "assets/ragged-wound.png",
+        duration: 1,
+        effects: {
+            onInit: function(buff){
+                this.setFrozen(true);
+            },
+            onEnd: function(buff){
+                this.setFrozen(false);
+            }
+        }
     }
 }

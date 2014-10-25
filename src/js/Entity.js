@@ -100,6 +100,14 @@ var Entity = (function(){
     r._tmp = false;
     r._isPlayer = false;
     r._defaultAttack = "default_attack";
+    r._frozen = false;
+
+    r.isFrozen = function(){
+        return this._frozen;
+    }
+    r.setFrozen = function(bool){
+        this._frozen = bool;
+    }
 
     r.isTemp = function(){
         return this._tmp;
@@ -775,6 +783,16 @@ var Entity = (function(){
         for(var i = 0; i < this._debuffs.length; i++) {
             cb.call(this, this._debuffs[i]);
         }
+    }
+    r.getRandomDebuff = function(){
+        var i = Math.random()*this._debuffs.length | 0;
+
+        return this._debuffs[i] || null;
+    }
+    r.getRandomBuff = function(){
+        var i = Math.random()*this._buffs.length | 0;
+
+        return this._buffs[i] || null;
     }
     r.increaseCritChancesBy = function(prozent){
         //50 = 50%, 20 = 20%
