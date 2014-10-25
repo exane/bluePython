@@ -133,6 +133,7 @@ var Player = (function(){
     r.onReset = function(){
         if(this.isOpen()){
             this.resetMenu();
+            this.removeFreshCooldown();
         }
     }
 

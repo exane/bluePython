@@ -297,6 +297,7 @@ var Battle = (function(){
 
                 data.from.setActive(false);
                 self.removeFromCollectList(data.from.getId(), collectData);
+                data.from.resetAttacksLeft();
 
                 if(i > 0) i--;
                 self.removeFromCollectList(self.player[i].getId(), collectData);
