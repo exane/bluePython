@@ -112,7 +112,6 @@ var data = {
     rogue: {
         name: "Rogue",
         id: "rogue",
-        defaultAttack: "",
         stats: {
             str: 200,
             def: 90,
@@ -124,7 +123,7 @@ var data = {
         },
         img: "assets/rogue.png",
         multipleAttacks: 2,
-        skills: ["backstab", "poison_weapon"],
+        skills: ["backstab", "poison_weapon", "rupture", "kidney_shot"],
         abilities: ["calm_mind"]
     },
     serpant_boss: {

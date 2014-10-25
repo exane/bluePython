@@ -288,5 +288,33 @@ module.exports = self = {
                 this.changeHpBy(-1.23 * source.getPhysicalAttackPower());
             }
         }
+    },
+    rupture_debuff: {
+        name: "Rupture",
+        id: "rupture_debuff",
+        desc: "",
+        icon: "assets/ragged-wound.png",
+        duration: 8,
+        effects: {
+            onTurnEnd: function(buff){
+                var source = buff.from;
+                this.changeHpBy(-2.67 * source.getPhysicalAttackPower());
+            }
+        }
+    },
+    kidney_shot_debuff: {
+        name: "Stun",
+        id: "kidney_shot_debuff",
+        desc: "stun",
+        icon: "assets/ragged-wound.png",
+        duration: 1,
+        effects: {
+            onInit: function(buff){
+                this.setFrozen(true);
+            },
+            onEnd: function(buff){
+                this.setFrozen(false);
+            }
+        }
     }
 }

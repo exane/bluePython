@@ -550,6 +550,10 @@ var Battle = (function(){
         }
         var dmg;
 
+        if(user.isFrozen()){ //stun
+            return;
+        }
+
         if(move.onBeforeAttack){
             move.onBeforeAttack.call(user, opt);
         }
