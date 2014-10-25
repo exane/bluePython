@@ -814,6 +814,28 @@ var Entity = (function(){
 
         this.uiSprite.addClass("entity-active");
     }
+    r.uiSetActive = function(bool){
+        if(this.isFainted()){
+            return 0;
+        }
+        if(bool){
+            this.uiSprite.addClass("entity-active");
+            return;
+        }
+
+        this.uiSprite.removeClass("entity-active");
+    }
+    r.uiSetTarget = function(bool){
+        if(this.isFainted()){
+            return 0;
+        }
+        if(bool){
+            this.uiSprite.addClass("entity-target");
+            return;
+        }
+
+        this.uiSprite.removeClass("entity-target");
+    }
     r.addCooldown = function(skillid){
         var dur = moveData.load(skillid).cooldown;
         this._cooldowns.push({id: skillid, duration: dur});
@@ -845,6 +867,19 @@ var Entity = (function(){
             }
         }
         return false;
+    }
+    r.removeFreshCooldown = function(){ //fix for 'back' button
+        var n = this._cooldowns.length;
+
+        for(var i = 0; i < n; i++) {
+            var origDur, cdDur;
+            cdDur = this._cooldowns[i].duration;
+            origDur = moveData.load(this._cooldowns[i].id).cooldown;
+
+            if(cdDur == origDur) {
+                this.removeCooldown(this._cooldowns[i].id);
+            }
+        }
     }
 
     /**

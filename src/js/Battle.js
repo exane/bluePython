@@ -26,9 +26,6 @@ var Battle = (function(){
     r.enemies = null;
     r.turn = 1;
     r.uiMenu = null;
-    /*
-     r.player = null;
-     */
     r.player = [];
     r.playerOrder = 0;
     r.tooltip = null;
@@ -295,6 +292,18 @@ var Battle = (function(){
 
         var handle = pubsub.subscribe("/bp/battle/chosen/", function(data){
             k++;
+
+            if(data._back){
+
+                data.from.setActive(false);
+                self.removeFromCollectList(data.from.getId(), collectData);
+
+                if(i > 0) i--;
+                self.removeFromCollectList(self.player[i].getId(), collectData);
+                self.handlePlayerEvents(i);
+                return;
+            }
+
             if(data.from.isPlayer()) i++;
 
             self.removeFromObserveList(observeList, data.from.getId());
@@ -324,11 +333,22 @@ var Battle = (function(){
         })
     }
 
+    r.removeFromCollectList = function(id, list){
+        var n = list.length;
+        for(var i=0; i<n; i++){
+            if(list[i].from.getId() === id){
+                list[i].from.removeFreshCooldown();
+                list.splice(i, 1);
+                return this.removeFromCollectList(id, list);
+            }
+        }
+    }
+
     r.handlePlayerEvents = function(playerIndex){
         if(!this.player[playerIndex]) return 0;
         this.player[playerIndex].setActive(true);
         this.player[playerIndex].setChosen(false);
-        this.player[playerIndex].uiToggleActive();// = true;
+        this.player[playerIndex].uiSetActive(true);// = true;
         this.player[playerIndex].resetMenu();
         if(this.player[playerIndex].isFainted()){
             this.player[playerIndex].setChosen(true);

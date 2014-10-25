@@ -11,6 +11,7 @@ var Player = (function(){
         this.uiMenuAttack = $("#menu-attack");
         //this.uiMenuDefense = $("#menu-defense");
         this.uiMenuSkill = $("#menu-skill");
+        this.uiMenuBack = $("#menu-back");
         this.uiMenu = uiMenu;
 
         this._isOpen = false;
@@ -30,6 +31,7 @@ var Player = (function(){
     r.uiMenuAttack = null;
     r.uiMenuDefense = null;
     r.uiMenuSkill = null;
+    r.uiMenuBack = null;
     r.uiMenu = null;
 
     r._isActive = false;
@@ -39,9 +41,11 @@ var Player = (function(){
 
     r.setActive = function(bool){
         if(bool){
+            this.uiSetActive(true);
             this.addHighlightBuffs();
         }
         if(!bool){
+            this.uiSetActive(false);
             this.removeHighlightBuffs();
         }
         this._isActive = bool;
@@ -66,18 +70,19 @@ var Player = (function(){
             if(self.isActive())
                 self.clickAttack.call(self);
         });
-/*
-        this.uiMenuDefense.click(function(){
-            if(self.isActive())
-                self.clickDefense.call(self);
-        });*/
 
         this.uiMenuSkill.click(function(){
             if(self.isActive())
                 self.clickSkills.call(self);
         });
 
-        $(".view").on("click", this.onBack.bind(this));
+        this.uiMenuBack.click(function(){
+            if(self.isActive()){
+                self.onBack.call(self);
+            }
+        });
+
+        $(".view").on("click", this.onReset.bind(this));
         //this.resetMenu();
 
     }
@@ -124,10 +129,16 @@ var Player = (function(){
         });
     }
 
-    r.onBack = function(){
+    r.onReset = function(){
         if(this.isOpen()){
             this.resetMenu();
         }
+    }
+
+    r.onBack = function(){
+        this.turnAction._back = true;
+        this.turnAction.from = this;
+        this.ready(this.turnAction);
     }
 
     r.resetMenu = function(){
@@ -180,7 +191,7 @@ var Player = (function(){
         if(value){
             this.reduceMenu();
             //$(".controller").hide();
-            this.uiToggleActive();
+            this.uiSetActive(false);
             this.setActive(false);
         }
         this.setOpen(false);
@@ -193,8 +204,6 @@ var Player = (function(){
         this.turnAction.target = target;
         this.turnAction.from = this;
 
-        //console.log("yolo", this, target);
-        //this.hasChosen = true;
         this.setChosen(true);
         this.ready(this.turnAction);
     }
@@ -220,8 +229,8 @@ var Player = (function(){
             $(pointer).appendTo(ulEnemy);
 
             $(pointer).on("click", this.onTargetClick.bind(this, npc));
-            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
-            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseover", npc.uiSetTarget.bind(npc, true));
+            pointer.on("mouseout", npc.uiSetTarget.bind(npc, false));
             //console.log(pointer, npc);
         }
         for(i = 0; i < m; i++) {
@@ -237,8 +246,8 @@ var Player = (function(){
             $(pointer).appendTo(ulAlly);
 
             $(pointer).on("click", this.onTargetClick.bind(this, npc));
-            pointer.on("mouseover", npc.uiToggleActive.bind(npc));
-            pointer.on("mouseout", npc.uiToggleActive.bind(npc));
+            pointer.on("mouseover", npc.uiSetTarget.bind(npc, true));
+            pointer.on("mouseout", npc.uiSetTarget.bind(npc, false));
         }
     }
 

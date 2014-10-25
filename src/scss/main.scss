@@ -431,8 +431,11 @@ $height: 600px;
 }
 
 .entity-active {
-  border: 3px solid red !important;
+  border: 3px solid #46ff15 !important;
+}
 
+.entity-target {
+  border: 3px solid red !important;
 }
 
 .test-buff {
