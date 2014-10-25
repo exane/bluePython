@@ -259,34 +259,33 @@ module.exports = self = {
             }
         }
     },
-    poison_weapon_buff: {
-        name: "Poisonweapon",
-        id: "poison_weapon_buff",
-        desc: "50% chance to poison on attack",
-        icon: "assets/dripping-knife.png",
-        duration: 5,
-        effects: {
-            onHit: function(buff, dmg, opt){
-                var getPoison = (Math.random()*100 | 0) > 50;
-                var target = opt.target;
-
-                if(!getPoison) return;
-                target.addDebuff(self.load("poison_weapon_dot_debuff"), this);
-
-            }
+    righteous_debuff: {
+      name: "Hammer of the Righteous (Debuff)",
+      id: "righteous_debuff",
+      desc: "",
+      icon: "assets/hammer-drop.png",
+      duration: 3,
+      effects: {
+        onInit: function(debuff) {
+          this.changeIncomingDmgMultiplierBy(.3);
+          this.changeOutgoingDmgMultiplierBy(-.3);
+        },
+        onEnd: function(debuff) {
+          this.changeIncomingDmgMultiplierBy(-.3);
+          this.changeOutgoingDmgMultiplierBy(.3);
         }
+      }
     },
-    poison_weapon_dot_debuff: {
-        name: "Poison",
-        id: "poison_weapon_dot_debuff",
-        desc: "",
-        icon: "assets/poison-gas.png",
-        duration: 5,
-        effects: {
-            onTurnEnd: function(buff){
-                var source = buff.from;
-                this.changeHpBy(-1.23 * source.getPhysicalAttackPower());
-            }
+    beacon_light_buff: {
+      name: "Beacon of Light (Buff)",
+      id: "beacon_light_buff",
+      desc: "",
+      icon: "assets/gooey-eyed-sun.png",
+      duration: -1,
+      effects: {
+        onInit: function (buff) {
+          this.increaseHealMultiplierBy(20);
         }
+      }
     }
 }

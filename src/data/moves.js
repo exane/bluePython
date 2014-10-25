@@ -332,6 +332,58 @@ module.exports = self = {
         target: "self",
         icon: "assets/ace.png"
     },
+    righteous: {
+      name: "Hammer of the Righteous",
+      id: "righteous",
+      costs: 700,
+      basePower: 160,
+      target: "enemy",
+      onCast: function(opt) {
+        logger.message(this.getFullName() + " casts Hammer of the Righteous on " + opt.target.getFullName());
+        opt.target.addDebuff(buffData.load("righteous_debuff"), this);
+      },
+      onAfterAttack: function(opt, dmg) {
+        this.changeManaBy((dmg / 3));
+      },
+      icon: "assets/hammer-drop.png"
+    },
+    beacon_light: {
+      name: "Beacon of Light",
+      id: "beacon_light",
+      costs: 600,
+      target: "friendly",
+      isAoe: true,
+      onCast: function(opt) {
+        logger.message(this.getFullName() + " casts " + this.name + " on " + opt.target.getFullName());
+        opt.target.addBuff(buffData.load("beacon_light_buff"), this);
+      },
+      icon: "assets/gooey-eyed-sun.png"
+    },
+    purify: {
+      name: "purify",
+      id: "purify",
+      costs: 400,
+      target: "friendly",
+      isAoe: true,
+      onCast: function(opt) {
+        logger.message(this.getFullName() + " casts " + this.name + " on " + opt.target.getFullName());
+        opt.target.changeManaBy(opt.target.getMaxMana() * .2);
+        opt.target.eachDebuff(function(debuff) {
+          opt.target.removeDebuff(debuff);
+        })
+      },
+      icon: "assets/embrassed-energy.png"
+    },
+    genMan: { // test
+      basePower: 40,
+      accuracy: 100,
+      name: "Default Attack",
+      id: "genMana",
+      onCast: function(opt) {
+        this.changeManaBy(200);
+      },
+      icon: "assets/ace.png"
+    },
     __DELETE__: {
         name: "__DELETE__",
         id: "__DELETE__",
