@@ -2,8 +2,8 @@ var Entity = require("./Entity.js");
 var logger = require("./log.js");
 var moveData = require("../data/moves.js");
 
-"use strict";
 var Player = (function(){
+    "use strict";
 
     var Player = function(options, yourSide, otherSide, uiMenu){
         Entity.call(this, options, yourSide, otherSide);
@@ -140,6 +140,7 @@ var Player = (function(){
             this.resetMenu();
             this.removeFreshCooldown();
         }
+
     }
 
     r.onBack = function(){
@@ -289,7 +290,7 @@ var Player = (function(){
             $(li).append("<p>" + data.name + "</p>");
 
             $(li).removeClass("onCooldown");
-            if(this.hasCooldown(data.id)) {
+            if(this.hasCooldown(data.id)){
                 $(li).addClass("onCooldown");
             }
 
@@ -315,23 +316,24 @@ var Player = (function(){
         var i;
         var entity;
         var self = this;
-/*
-        for(i = 0; i < n; i++) {
-            entity = this.getYourside().getMemberByIndex(i);
-         *//*   entity.eachBuff(function(buff){
-                if(buff.from.getId() === self.getId()){
+        /*
+         for(i = 0; i < n; i++) {
+         entity = this.getYourside().getMemberByIndex(i);
+         */
+        /*   entity.eachBuff(function(buff){
+         if(buff.from.getId() === self.getId()){
 
-                }
-            })*//*
+         }
+         })*/
+        /*
 
-        }*/
+         }*/
         $("[data-from=" + this.getId() + "]").addClass("buff-highlight");
     }
 
     r.removeHighlightBuffs = function(){
         $("[data-from=" + this.getId() + "]").removeClass("buff-highlight");
     }
-
 
 
     return Player;

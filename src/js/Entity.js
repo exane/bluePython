@@ -881,7 +881,7 @@ var Entity = (function(){
     }
     r.addCooldown = function(skillid){
         var dur = moveData.load(skillid).cooldown;
-        this._cooldowns.push({id: skillid, duration: dur});
+        this._cooldowns.push({id: skillid, duration: dur, attackNr: this.getAttacksLeft()});
     }
     r.removeCooldown = function(skillid){
         var n = this._cooldowns.length;
@@ -911,15 +911,15 @@ var Entity = (function(){
         }
         return false;
     }
-    r.removeFreshCooldown = function(){ //fix for 'back' button
+    r.removeFreshCooldown = function(removeAll){ //fix for 'back' button
         var n = this._cooldowns.length;
 
         for(var i = 0; i < n; i++) {
-            var origDur, cdDur;
+            var origDur, cdDur, cd = this._cooldowns[i];
             cdDur = this._cooldowns[i].duration;
             origDur = moveData.load(this._cooldowns[i].id).cooldown;
 
-            if(cdDur == origDur) {
+            if(cdDur === origDur && (cd.attackNr === this.getAttacksLeft() || removeAll)) {
                 this.removeCooldown(this._cooldowns[i].id);
             }
         }

@@ -358,7 +358,7 @@ var Battle = (function(){
         var n = list.length;
         for(var i = 0; i < n; i++) {
             if(list[i].from.getId() === id){
-                list[i].from.removeFreshCooldown();
+                list[i].from.removeFreshCooldown(true);
                 list.splice(i, 1);
                 return this.removeFromCollectList(id, list);
             }
