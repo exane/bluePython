@@ -144,6 +144,35 @@ module.exports = self = {
             }
         }
     },
+    righteous_debuff: {
+      name: "Hammer of the Righteous (Debuff)",
+      id: "righteous_debuff",
+      desc: "",
+      icon: "assets/hammer-drop.png",
+      duration: 3,
+      effects: {
+        onInit: function(debuff) {
+          this.changeIncomingDmgMultiplierBy(.3);
+          this.changeOutgoingDmgMultiplierBy(-.3);
+        },
+        onEnd: function(debuff) {
+          this.changeIncomingDmgMultiplierBy(-.3);
+          this.changeOutgoingDmgMultiplierBy(.3);
+        }
+      }
+    },
+    beacon_light_buff: {
+      name: "Beacon of Light (Buff)",
+      id: "beacon_light_buff",
+      desc: "",
+      icon: "assets/gooey-eyed-sun.png",
+      duration: -1,
+      effects: {
+        onInit: function (buff) {
+          this.increaseHealMultiplierBy(20);
+        }
+      }
+    },
     poison_weapon_buff: {
         name: "Poisonweapon",
         id: "poison_weapon_buff",
