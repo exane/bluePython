@@ -37,9 +37,8 @@ var Battle = (function(){
     r.debug = false;
 
 
-
     r.adjustAnimSpeed = function(percentage){ //
-        this._speedMultiplicator = percentage/100;
+        this._speedMultiplicator = percentage / 100;
     }
     r.resetAnimSpeed = function(){
         this._speedMultiplicator = 1;
@@ -50,9 +49,9 @@ var Battle = (function(){
 
     r.getPlayerIndexById = function(id){
         var n = this.player.length;
-        for(var i=0; i< n; i++){
+        for(var i = 0; i < n; i++) {
             if(id === this.player[i].getId())
-            return i;
+                return i;
         }
         return -1;
     }
@@ -64,12 +63,12 @@ var Battle = (function(){
 
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewPlayer(data.exane, this.side1, this.side2);
-/*
-        this.addNewPlayer("warrior", "side1", "side2");
-*/
-/*
-        this.addNewPlayer("priest", "side1", "side2");
-*/
+        /*
+         this.addNewPlayer("warrior", "side1", "side2");
+         */
+        /*
+         this.addNewPlayer("priest", "side1", "side2");
+         */
         //this.addNewPlayer(data.warrior, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
         //this.addNewNpc(data.gnomemage, this.side1, this.side2);
@@ -147,16 +146,27 @@ var Battle = (function(){
         }
     }
 
-    r.addNewPlayer = function(options, yourSide, otherSide){
+    r.addNewPlayer = function(options, yourSide/*, otherSide*/){
+        var otherSide;
         if(typeof options == "string"){
             options = data[options];
         }
         if(typeof yourSide == "string"){
-            yourSide = this[yourSide];
+            switch(yourSide) {
+                case "top":
+                    yourSide = this.side2;
+                    otherSide = this.side1;
+                    break;
+                case "down":
+                    yourSide = this.side1;
+                    otherSide = this.side2;
+                    break;
+            }
+            //yourSide = this[yourSide];
         }
-        if(typeof otherSide == "string"){
-            otherSide = this[otherSide];
-        }
+        /*if(typeof otherSide == "string"){
+         otherSide = this[otherSide];
+         }*/
         //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
@@ -166,16 +176,27 @@ var Battle = (function(){
         return ally;
     }
 
-    r.addNewNpc = function(options, yourSide, otherSide){
+    r.addNewNpc = function(options, yourSide/*, otherSide*/){
+        var otherSide;
         if(typeof options == "string"){
             options = data[options];
         }
         if(typeof yourSide == "string"){
-            yourSide = this[yourSide];
-        }
+            /*yourSide = this[yourSide];*/
+            switch(yourSide) {
+                case "top":
+                    yourSide = this.side2;
+                    otherSide = this.side1;
+                    break;
+                case "down":
+                    yourSide = this.side1;
+                    otherSide = this.side2;
+                    break;
+            }
+        }/*
         if(typeof otherSide == "string"){
-            otherSide = this[otherSide];
-        }
+            //otherSide = this[otherSide];
+        }*/
         var npc = new Npc(options, yourSide, otherSide/*, this.tooltip*/);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 
@@ -234,7 +255,7 @@ var Battle = (function(){
 
             orderA += a._attackOrder || 0;
             orderB += b._attackOrder || 0;
-            return b.from.getAttr("agi")/ orderB - a.from.getAttr("agi")/ orderA;
+            return b.from.getAttr("agi") / orderB - a.from.getAttr("agi") / orderA;
         });
 
     }
@@ -274,9 +295,9 @@ var Battle = (function(){
 
     r.observe = function(){
         /*
-        var n = this.side1.length(true);
-        var m = this.side2.length(true);
-        */
+         var n = this.side1.length(true);
+         var m = this.side2.length(true);
+         */
         var k = 0, i = 0;
         var self = this;
 
@@ -337,7 +358,7 @@ var Battle = (function(){
 
     r.removeFromCollectList = function(id, list){
         var n = list.length;
-        for(var i=0; i<n; i++){
+        for(var i = 0; i < n; i++) {
             if(list[i].from.getId() === id){
                 list[i].from.removeFreshCooldown();
                 list.splice(i, 1);
@@ -381,7 +402,7 @@ var Battle = (function(){
             var member = list[i];
             if(member.hasMultipleAttacks()){
                 member.resetAttacksLeft();
-                for(var k=0; k<member.getMultipleAttacks(); k++){
+                for(var k = 0; k < member.getMultipleAttacks(); k++) {
                     res.push(member.getId());
                 }
                 continue;
@@ -563,7 +584,7 @@ var Battle = (function(){
 
         $.when(pubsub.publish("/bp/battle/onBeforeAttack/" + user.getId(), [opt]))
         .then((function(){
-            if(isTargetLocked) {
+            if(isTargetLocked){
                 opt.target = originalTarget;
             }
             if(move.onCast){
@@ -591,7 +612,7 @@ var Battle = (function(){
 
         }).bind(this))
         .then(function(){
-            if(isTargetLocked) {
+            if(isTargetLocked){
                 opt.target = originalTarget;
             }
 
@@ -652,9 +673,9 @@ var Battle = (function(){
         //    this.player.resetMenu();
         //}
         /*for(var i = 0; i < this.player.length; i++) {
-            this.player[i].resetMenu();
-        }
-        this.startNewTurn();*/
+         this.player[i].resetMenu();
+         }
+         this.startNewTurn();*/
 
     }
 

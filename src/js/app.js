@@ -12,10 +12,10 @@ var battle = new Battle();
 
 //battle.adjustAnimSpeed(5);
 
-battle.addNewPlayer("warrior", "side1", "side2");
-battle.addNewPlayer("rogue", "side1", "side2");
-battle.addNewPlayer("priest", "side1", "side2");
-battle.addNewNpc("serpant_boss", "side2", "side1");//
+battle.addNewPlayer("warrior", "down"); // (id, yourSide) id = charID | yourSide = "top" || "down"
+battle.addNewPlayer("rogue", "down");
+battle.addNewPlayer("priest", "down");
+battle.addNewNpc("serpant_boss", "top");//
 
 
 
