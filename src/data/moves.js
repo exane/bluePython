@@ -15,44 +15,6 @@ module.exports = self = {
         id: "default_attack",
         icon: "assets/ace.png"
     },
-    default_defense: {
-        name: "Default Defense",
-        priority: 1,
-        onTurnBegin: function(){
-            this.changeIncomingDmgMultiplierBy(-0.75);
-            logger.message(this.getFullName() + " defends himself!");
-        },
-        onTurnEnd: function(){
-            this.changeIncomingDmgMultiplierBy(0.75);
-        },
-        id: "default_defense",
-        icon: "assets/ace.png"
-    },
-    assassination: {
-        id: "assassination",
-        name: "Assassination (instant kill)",
-        basePower: 100,
-        priority: 1,
-        costs: function(){
-            return 1;//this.getMaxMana()*60/100 | 0;
-        },
-        onAttack: function(opt){
-            var enemy = opt.target;
-            enemy.changeHpBy(-enemy.getMaxHp());
-            logger.message(this.getFullName() + " cut " + enemy.getFullName() + "'s throat!")
-        },
-        icon: "assets/ace.png"
-    },
-    quick_attack: {
-        basePower: 80,
-        name: "Quick Attack (first hit guaranteed)",
-        accuracy: 90,
-        priority: 2,
-        isCrit: true,
-        costs: 25,
-        id: "quick_attack",
-        icon: "assets/ace.png"
-    },
     revive: {
         name: "Revive",
         id: "revive",
@@ -68,91 +30,6 @@ module.exports = self = {
         target: "friendly",
         icon: "assets/ace.png"
     },
-    sacrifice: {
-        basePower: 300,
-        name: "sacrifice",
-        accuracy: 100,
-        priority: -1,
-        id: "sacrifice",
-        onBeforeAttack: function(opt){
-            logger.message(this.getFullName() + " sacrifices himself and causes an explosion!");
-        },
-        onAfterAttack: function(opt){
-            this.changeHpBy(-this.maxHp);
-        },
-        icon: "assets/ace.png"
-    },
-    burnslash: {
-        basePower: 30,
-        name: "Burnslash (Aoe)",
-        accuracy: 100,
-        id: "burnslash",
-        isAoe: true,
-        priority: 0,
-        costs: 150,
-        icon: "assets/ace.png"
-    },
-    attackboost: {
-        name: "Attack Boost",
-        id: "attackboost",
-        costs: 100,
-        onCast: function(opt){
-            this.addBuff(buffData.load("attackboost"), this);
-
-            logger.message("str boosted by 2. total str boosts: " + this.getBoostLevel("str"));
-        },
-        noTarget: true
-    },
-    defboost: {
-        name: "Defense Boost",
-        id: "defboost",
-        costs: 100,
-        onCast: function(opt){
-            this.addBuff(buffData.load("defenseboost"), this);
-
-            logger.message("def boosted by 2. total def boosts: " + this.getBoostLevel("def"));
-        },
-        noTarget: true,
-        icon: "assets/ace.png"
-    },
-    fumeboost: {
-        name: "Fume Boost",
-        id: "fumeboost",
-        costs: 500,
-        onCast: function(opt){
-            opt.target.addBuff(buffData.load("fumeboost"), this);
-
-            logger.message("each stat increased by 300%! ");
-        },
-        target: "self",
-        icon: "assets/ace.png"
-    },
-    hot_test: {
-        name: "HoT",
-        id: "hot_test",
-        target: "friendly",
-        onCast: function(opt){
-
-            logger.message(this.getFullName() + " casts HoT!");
-            opt.target.addBuff(buffData.load("hot_test"), this);
-            opt.target.addBuff(buffData.load("onHit_test"), this);
-        },
-        icon: "assets/ace.png"
-    },
-    aimwater: {
-        name: "Aimwater(buff)",
-        id: "aimwater",
-        //noTarget: true,
-        target: "self",
-        desc: "Increases your crit chance by 50% and your crit damage by 200%. Costs 100 mana. Lasts 5 turns.",
-        costs: 100,
-        onCast: function(opt){
-            logger.message(this.getFullName() + " drinks aimwater! critical chance increased!");
-            opt.target.addBuff(buffData.load("aimwater_buff"), this);
-        },
-        icon: "assets/ace.png"
-    },
-
     mortal_strike: {
         name: "Mortal Strike",
         id: "mortal_strike",
