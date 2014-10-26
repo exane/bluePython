@@ -15,13 +15,7 @@ var Player = (function(){
         this.uiMenu = uiMenu;
 
         this._isOpen = false;
-        //this.events = events;
 
-
-        //this.otherSide = otherSide || null;
-
-        //this.listSkills();
-        //this.listTargets(otherSide, yourSide);
 
         this.initEvents();
     }
@@ -102,6 +96,14 @@ var Player = (function(){
 
         //logger.message("-> Choose a target to attack");
         this.uiMenu.children(".menu-main").hide();
+
+
+        if(this.isTargetSkippable()){
+            setTimeout(function(){
+                this.onTargetClick(this.getOtherside().getMemberByIndex(0));
+            }.bind(this), 1);
+            return 0;
+        }
         this.uiMenu.children(".menu-target-enemy").show();
 
         this.expandMenu();
@@ -157,7 +159,6 @@ var Player = (function(){
     }
 
     r.onSkillClick = function(skill){
-        //console.log(skill);
         if(this.hasChosen()) return 0;
         if(this.hasCooldown(skill.id)) return 0;
 
@@ -166,17 +167,20 @@ var Player = (function(){
         if(skill.cooldown){
             this.addCooldown(skill.id);
         }
-        //this.listTargets();
 
         this.turnAction.do = skill.id;
         this.turnAction.from = this;
         this.uiMenu.children(".menu-skills").hide();
 
         if(skill.isAoe || skill.target === "self"){
-            //this.onTargetClick(this.otherSide.member);
             if(this.hasChosen()) return 0;
             this.setChosen(true);
             this.ready(this.turnAction);
+            return 0;
+        }
+
+        if(this.isTargetSkippable(skill)){
+            this.onTargetClick(this.getOtherside().getMemberByIndex(0));
             return 0;
         }
 
@@ -187,6 +191,12 @@ var Player = (function(){
 
 
         this.uiMenu.children(".menu-target-enemy").show();
+    }
+
+    r.isTargetSkippable = function(skill){
+        var isSkill = !!skill;
+        if(!isSkill) skill = {}
+        return this.getOtherside().length() === 1 && (skill.target === "enemy" || !isSkill);
     }
 
     r.setChosen = function(value){
