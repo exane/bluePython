@@ -15,7 +15,7 @@ var battle = new Battle();
 battle.addNewPlayer("warrior", "down"); // (id, yourSide) id = charID | yourSide = "top" || "down"
 battle.addNewPlayer("rogue", "down");
 battle.addNewPlayer("priest", "down");
-battle.addNewNpc("serpant_boss", "top");//
+battle.addNewNpc("serpant_boss", "top");//yo
 
 
 
