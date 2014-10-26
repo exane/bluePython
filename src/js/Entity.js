@@ -1058,17 +1058,20 @@ var Entity = (function(){
          });
          */
     }
-    r._decreaseBuffTime = function(){
+    r._decreaseBuffTime = function(index){
         var n = this._buffs.length;
         var i;
 
-        for(i = 0; i < n; i++) {
+        index = index || 0;
+
+        for(i = index; i < n; i++) {
             var buff = this._buffs[i];
 
             //buff.duration = -1 => no duration
             if(buff.duration != -1 && buff.duration - 1 === 0){
                 this.removeBuff(buff, i);
-                return this.decreaseDurationTime();
+                //return this.decreaseDurationTime();
+                return this._decreaseBuffTime(index);
             }
         }
         for(i = 0; i < n; i++) {
@@ -1076,17 +1079,20 @@ var Entity = (function(){
             this._buffs[i].duration--;
         }
     }
-    r._decreaseDebuffTime = function(){
+    r._decreaseDebuffTime = function(index){
         var n = this._debuffs.length;
         var i;
 
-        for(i = 0; i < n; i++) {
+        index = index || 0;
+
+        for(i = index; i < n; i++) {
             var debuff = this._debuffs[i];
 
             //debuff.duration = -1 => no duration
             if(debuff.duration != -1 && debuff.duration - 1 === 0){
                 this.removeDebuff(debuff, i);
-                return this.decreaseDurationTime();
+                //return this.decreaseDurationTime();
+                return this._decreaseDebuffTime(index);
             }
         }
         for(i = 0; i < n; i++) {
