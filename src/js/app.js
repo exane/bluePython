@@ -12,6 +12,7 @@ var battle = new Battle();
 
 //battle.adjustAnimSpeed(5);
 
+battle.addNewPlayer("paladin", "down");
 battle.addNewPlayer("warrior", "down"); // (id, yourSide) id = charID | yourSide = "top" || "down"
 battle.addNewPlayer("rogue", "down");
 battle.addNewPlayer("priest", "down");
