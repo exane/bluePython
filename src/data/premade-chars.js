@@ -126,6 +126,23 @@ var data = {
         skills: ["backstab", "poison_weapon", "rupture", "kidney_shot"],
         abilities: ["calm_mind"]
     },
+    paladin: {
+      name: "Paladin",
+      id: "paladin",
+      defaultAttack: "genMan",
+      stats: {
+        str: 100,
+        def: 150,
+        agi: 100,
+        tec: 250,
+        int: 150,
+        vit: 90000,
+        lck: 150
+      },
+      img: "assets/paladin_10.png",
+      skills: ["righteous", "beacon_light", "purify"],
+      abilities: []
+    },
     serpant_boss: {
         name: "Serpant King",
         id: "serpant_boss",
