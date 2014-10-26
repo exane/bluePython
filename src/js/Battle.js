@@ -146,8 +146,7 @@ var Battle = (function(){
         }
     }
 
-    r.addNewPlayer = function(options, yourSide/*, otherSide*/){
-        var otherSide;
+    r.addNewPlayer = function(options, yourSide, otherSide){
         if(typeof options == "string"){
             options = data[options];
         }
@@ -164,9 +163,9 @@ var Battle = (function(){
             }
             //yourSide = this[yourSide];
         }
-        /*if(typeof otherSide == "string"){
+        if(typeof otherSide == "string"){
          otherSide = this[otherSide];
-         }*/
+         }
         //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
@@ -176,8 +175,7 @@ var Battle = (function(){
         return ally;
     }
 
-    r.addNewNpc = function(options, yourSide/*, otherSide*/){
-        var otherSide;
+    r.addNewNpc = function(options, yourSide, otherSide){
         if(typeof options == "string"){
             options = data[options];
         }
@@ -193,10 +191,10 @@ var Battle = (function(){
                     otherSide = this.side2;
                     break;
             }
-        }/*
+        }
         if(typeof otherSide == "string"){
-            //otherSide = this[otherSide];
-        }*/
+            otherSide = this[otherSide];
+        }
         var npc = new Npc(options, yourSide, otherSide/*, this.tooltip*/);
         this.checkIfEntityAlreadyExists(npc, yourSide, otherSide);
 

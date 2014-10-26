@@ -116,7 +116,10 @@ var Entity = (function(){
         this._tmp = bool;
     }
     r.delete = function(){
-        this.getYourside().remove(this);
+        setTimeout(function(){
+            this.getYourside().remove(this);
+        }.bind(this), 1200);
+        //this.getYourside().remove(this);
     }
     r.isPlayer = function(){
         return !!this._isPlayer;
