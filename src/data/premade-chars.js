@@ -98,7 +98,7 @@ var data = {
         id: "priest",
         stats: {
             str: 40,
-            def: 75,
+            def: 25,
             agi: 120,
             tec: 250,
             int: 300,
@@ -114,11 +114,11 @@ var data = {
         id: "rogue",
         stats: {
             str: 200,
-            def: 90,
+            def: 50,
             agi: 160,
             tec: 100,
             int: 12,
-            vit: 500000,//500
+            vit: 500,//500
             lck: 2500
         },
         img: "assets/rogue.png",
@@ -136,7 +136,7 @@ var data = {
         agi: 100,
         tec: 250,
         int: 150,
-        vit: 90000,
+        vit: 900,
         lck: 150
       },
       img: "assets/paladin_10.png",
@@ -147,7 +147,7 @@ var data = {
         name: "Serpant King",
         id: "serpant_boss",
         stats: {
-            str: 200,
+            str: 2,
             def: 100,
             agi: 200,
             tec: 200,
@@ -161,8 +161,7 @@ var data = {
         ai: function(){
             var moves = [
                 {chance: 20, id: "rend"},
-                {chance: 10, id: "spawn_mage"},
-                {chance: 70, id: "mortal_strike"}
+                {chance: 80, id: "mortal_strike"}
             ];
 
             this.turnAction.do = util.random(moves);

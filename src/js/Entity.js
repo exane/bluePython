@@ -1076,6 +1076,9 @@ var Entity = (function(){
                 //return this.decreaseDurationTime();
                 return this._decreaseBuffTime(index);
             }
+            if(buff.duration == -1){
+                //return this._decreaseBuffTime(index+1);
+            }
         }
         for(i = 0; i < n; i++) {
             if(buff.duration === -1) continue;

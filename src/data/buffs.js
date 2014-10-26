@@ -186,7 +186,6 @@ module.exports = self = {
 
                 if(!getPoison) return;
                 target.addDebuff(self.load("poison_weapon_dot_debuff"), this);
-
             }
         }
     },
