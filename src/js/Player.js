@@ -13,6 +13,7 @@ var Player = (function(){
         this.uiMenuSkill = $("#menu-skill");
         this.uiMenuBack = $("#menu-back");
         this.uiMenu = uiMenu;
+        this.uiAttacksLeft = $(".entity-attacks-left");
 
         this._isOpen = false;
 
@@ -27,6 +28,7 @@ var Player = (function(){
     r.uiMenuSkill = null;
     r.uiMenuBack = null;
     r.uiMenu = null;
+    r.uiAttacksLeft = null;
 
     r._isActive = false;
     r._isPlayer = true;
@@ -35,6 +37,7 @@ var Player = (function(){
 
     r.setActive = function(bool){
         if(bool){
+            this.updateAttacksLeftCounter();
             this.uiSetActive(true);
             this.addHighlightBuffs();
         }
@@ -142,7 +145,7 @@ var Player = (function(){
     r.onBack = function(){
         this.turnAction._back = true;
         this.turnAction.from = this;
-        this.ready(this.turnAction);
+        this.setReady();
     }
 
     r.resetMenu = function(){
@@ -175,7 +178,7 @@ var Player = (function(){
         if(skill.isAoe || skill.target === "self"){
             if(this.hasChosen()) return 0;
             this.setChosen(true);
-            this.ready(this.turnAction);
+            this.setReady();
             return 0;
         }
 
@@ -217,7 +220,15 @@ var Player = (function(){
         this.turnAction.from = this;
 
         this.setChosen(true);
+        this.setReady();
+    }
+
+    r.setReady = function(){
         this.ready(this.turnAction);
+    }
+
+    r.updateAttacksLeftCounter = function(){
+        this.uiAttacksLeft.text(this.getAttacksLeft() || null);
     }
 
     r.listTargets = function(otherSide, yourSide){

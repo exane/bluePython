@@ -86,7 +86,7 @@ var data = {
             lck: 1000
         },
         img: "assets/warrior_11.png",
-        skills: ["__SPAWN__", "__DELETE__", "shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
+        skills: ["shieldwall", "taunt", "mortal_strike", "rend", "bloodthirst", "bladestorm", "battle_shout"],
         abilities: ["endless_rage"],
         //multipleAttacks: 3,
         onBattleStart: function(){
