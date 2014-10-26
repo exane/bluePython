@@ -775,13 +775,23 @@ var Entity = (function(){
         this.setOutgoingDmgMultiplier(this.getOutgoingDmgMultiplier() + val);
     }
     r.eachBuff = function(cb){
-        for(var i = 0; i < this._buffs.length; i++) {
+        var n = this._buffs.length;
+        for(var i = 0; i < n; i++) {
             cb.call(this, this._buffs[i]);
+
+            if(n != this._buffs.length){ //if cb removes any buffs
+                return this.eachBuff(cb);
+            }
         }
     }
     r.eachDebuff = function(cb){
-        for(var i = 0; i < this._debuffs.length; i++) {
+        var n = this._debuffs.length;
+        for(var i = 0; i < n; i++) {
             cb.call(this, this._debuffs[i]);
+
+            if(n != this._debuffs.length){ //if cb removes any debuffs
+                return this.eachDebuff(cb);
+            }
         }
     }
     r.getRandomDebuff = function(){
