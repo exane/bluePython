@@ -10,7 +10,7 @@ module.exports = self = {
     },
     default_attack: {
         basePower: 40,
-        accuracy: 0,
+        accuracy: 95,
         name: "Default Attack",
         id: "default_attack",
         icon: "assets/ace.png"

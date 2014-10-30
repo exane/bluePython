@@ -50,6 +50,8 @@ var Entity = (function(){
         this.initEvadeChance();
         this.initHitChance();
 
+        this.initCritDamage();
+
         if(options.defaultAttack){
             this.setDefaultAttack(options.defaultAttack);
         }
@@ -93,7 +95,7 @@ var Entity = (function(){
     r._maxMana = 1;
     r._incomingDmgMultiplier = 1;
     r._outgoingDmgMultiplier = 1;
-    r._critDmgMultiplicator = 2;
+    r._critDmgMultiplicator = null; //percentage ie: 200
     r._additionalCritChances = 0;
     r._healMultiplier = 1;
     r._shieldAbsorb = 0;
@@ -109,10 +111,10 @@ var Entity = (function(){
     r._additionalHitChance = null; //percentage
 
     r.initEvadeChance = function(){
-        this._evade = this.getAttr("agi") / 100;
+        this._evade = ((this.getAttr("agi")*2 + this.getAttr("tec")/4) | 0) / 100;
     }
     r.initHitChance = function(){
-        this._additionalHitChance = this.getAttr("agi") / 100;
+        this._additionalHitChance = (this.getAttr("agi") | 0) / 100;
     }
     r.getEvadeChance = function(){
         return this._evade;
@@ -134,14 +136,14 @@ var Entity = (function(){
         accuracy -= this.getEvadeChance();
         accuracy += user.getHitChance();
 
-        if(rnd < accuracy) {
-            return true;
-        }
-
-        return false;
+        return rnd < accuracy;
     }
     r.evade = function(){
-        Display({target: this, miss: true})
+        Display({target: this, miss: true});
+    }
+
+    r.initCritDamage = function(){
+        this._critDmgMultiplicator = ((200 + (this.getAttr("tec")/12 | 0)) / 100 );
     }
 
 
@@ -358,7 +360,7 @@ var Entity = (function(){
         return this._outgoingDmgMultiplier;
     }
     r.getCritDmgMultiplicator = function(){
-        return this._critDmgMultiplicator;
+        return this._critDmgMultiplicator; //200
     }
     r.getHealMultiplier = function(){
         return this._healMultiplier;
@@ -462,8 +464,8 @@ var Entity = (function(){
     r.setOutgoingDmgMultiplier = function(val){
         this._outgoingDmgMultiplier = val;
     }
-    r.setCritDmgMultiplicator = function(number){
-        this._critDmgMultiplicator = number;
+    r.setCritDmgMultiplicator = function(percentage){
+        this._critDmgMultiplicator = percentage;
     }
     r.setHealMultiplier = function(number){
         this._healMultiplier = number;
@@ -859,7 +861,7 @@ var Entity = (function(){
     }
     r.increaseCritDmgBy = function(percentage){
         //50 = 50%, 20 = 20%
-        this._critDmgMultiplicator += percentage / 100;
+        this._critDmgMultiplicator += percentage;
     }
     r.decreaseCritDmgBy = function(percentage){
         this._critDmgMultiplicator -= percentage / 100;

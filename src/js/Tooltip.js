@@ -91,7 +91,9 @@ var Tooltip = (function(){
             }
 
             uiSelf.find(".tooltip-stats ul").append("<li>Crit chance: " + entity.getCritRate() + "%</li>");
-            uiSelf.find(".tooltip-stats ul").append("<li>Crit dmg: " + entity.getCritDmgMultiplicator() * 100 + "%</li>");
+            uiSelf.find(".tooltip-stats ul").append("<li>Crit dmg: " + ((entity.getCritDmgMultiplicator() * 100) | 0) + "%</li>");
+            uiSelf.find(".tooltip-stats ul").append("<li>Evadechance: +" + entity.getEvadeChance() + "%</li>");
+            uiSelf.find(".tooltip-stats ul").append("<li>Hitchance: +" + entity.getHitChance() + "%</li>");
 
             for(var i = 0; i < entity.getAbilities().length; i++) {
                 uiSelf.find(".tooltip-abilities").append(entity.getAbilities(i) + "; ");
