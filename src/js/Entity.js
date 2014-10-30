@@ -47,6 +47,9 @@ var Entity = (function(){
         this._abilityListener();
         this._buffListener();
 
+        this.initEvadeChance();
+        this.initHitChance();
+
         if(options.defaultAttack){
             this.setDefaultAttack(options.defaultAttack);
         }
@@ -101,6 +104,46 @@ var Entity = (function(){
     r._isPlayer = false;
     r._defaultAttack = "default_attack";
     r._frozen = false;
+
+    r._evade = null; //percentage
+    r._additionalHitChance = null; //percentage
+
+    r.initEvadeChance = function(){
+        this._evade = this.getAttr("agi") / 100;
+    }
+    r.initHitChance = function(){
+        this._additionalHitChance = this.getAttr("agi") / 100;
+    }
+    r.getEvadeChance = function(){
+        return this._evade;
+    }
+    r.getHitChance = function(){
+        return this._additionalHitChance;
+    }
+    r.changeHitChanceBy = function(percentage){
+        this._additionalHitChance += percentage;
+    }
+    r.changeEvadeChanceBy = function(percentage){
+        this._evade += percentage;
+    }
+
+    r.isHit = function(user, move){
+        var rnd = Math.random()*100 | 0;
+        var accuracy = typeof move.accuracy === "undefined" ? 100 : move.accuracy;
+
+        accuracy -= this.getEvadeChance();
+        accuracy += user.getHitChance();
+
+        if(rnd < accuracy) {
+            return true;
+        }
+
+        return false;
+    }
+    r.evade = function(){
+        Display({target: this, miss: true})
+    }
+
 
     r.isFrozen = function(){
         return this._frozen;
@@ -472,7 +515,7 @@ var Entity = (function(){
         buff.from = from;
 
         if(!this.hasBuff(name)){
-            new Display({buffName: name, buffDuration: duration, target: this});
+            Display({buffName: name, buffDuration: duration, target: this});
         }
 
         this._buffEvents(buff);
@@ -507,7 +550,7 @@ var Entity = (function(){
 
 
         if(!this.hasDebuff(name))
-            new Display({buffName: name, buffDuration: duration, target: this});
+            Display({buffName: name, buffDuration: duration, target: this});
 
         this._buffEvents(debuff);
         var t = this._debuffs.push(debuff);
@@ -694,7 +737,7 @@ var Entity = (function(){
             }
         }
 
-        new Display({target: this, amount: value, isCrit: crit});
+        Display({target: this, amount: value, isCrit: crit});
 
         this._currHp = this.getHp() + value;
         if(this.getHp() > this.getMaxHp()){
@@ -734,7 +777,7 @@ var Entity = (function(){
             this._mana = this.getMaxMana();
         }
 
-        new Display({target: this, amount: value, isMana: true});
+        Display({target: this, amount: value, isMana: true});
 /*
 
         this.uiMana.css({
@@ -807,26 +850,26 @@ var Entity = (function(){
 
         return this._buffs[i] || null;
     }
-    r.increaseCritChancesBy = function(prozent){
+    r.increaseCritChancesBy = function(percentage){
         //50 = 50%, 20 = 20%
-        this._additionalCritChances += prozent;
+        this._additionalCritChances += percentage;
     }
-    r.decreaseCritChancesBy = function(prozent){
-        this._additionalCritChances -= prozent;
+    r.decreaseCritChancesBy = function(percentage){
+        this._additionalCritChances -= percentage;
     }
-    r.increaseCritDmgBy = function(prozent){
+    r.increaseCritDmgBy = function(percentage){
         //50 = 50%, 20 = 20%
-        this._critDmgMultiplicator += prozent / 100;
+        this._critDmgMultiplicator += percentage / 100;
     }
-    r.decreaseCritDmgBy = function(prozent){
-        this._critDmgMultiplicator -= prozent / 100;
+    r.decreaseCritDmgBy = function(percentage){
+        this._critDmgMultiplicator -= percentage / 100;
     }
-    r.increaseHealMultiplierBy = function(prozent){
+    r.increaseHealMultiplierBy = function(percentage){
         //50 = 50%, 20 = 20%
-        this._healMultiplier += prozent / 100;
+        this._healMultiplier += percentage / 100;
     }
-    r.decreaseHealMultiplierBy = function(prozent){
-        this._healMultiplier -= prozent / 100;
+    r.decreaseHealMultiplierBy = function(percentage){
+        this._healMultiplier -= percentage / 100;
     }
     /**
      * stats as object.

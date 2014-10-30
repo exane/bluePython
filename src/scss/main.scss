@@ -405,6 +405,11 @@ $height: 600px;
   &.display-mana {
     color: #297eff;
   }
+  &.display-missed {
+    //font-style: italic;
+    color: #fbff28;
+
+  }
   &.display-crit {
     font-style: italic;
     color: #ff5f42;

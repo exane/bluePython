@@ -10,6 +10,7 @@ var abilityData = require("../data/abilities.js");
 var logger = require("./log.js");
 var Display = require("./Display.js");
 var Tooltip = require("./Tooltip.js");
+var Util = require("./Util.js");
 
 "use strict";
 
@@ -553,6 +554,20 @@ var Battle = (function(){
         //$.event.trigger("bp-ability-onTurnEnd");
         pubsub.publish("/bp/battle/onTurnEnd/");
     }
+/*
+    r.isHit = function(user, target, move){
+        var rnd = Math.random()*100 | 0;
+        var accuracy = typeof move.accuracy === "undefined" ? 100 : move.accuracy;
+
+        accuracy -= target.getEvadeChance();
+        accuracy += user.getHitChance();
+
+        if(rnd < accuracy) {
+            return true;
+        }
+
+        return false;
+    }*/
 
     r.calculateTurnOf = function(user, target, move){
         var critChance = user.calculateCritChance(target, move);
@@ -562,12 +577,14 @@ var Battle = (function(){
         : move.isCrit;
         var isTargetLocked = move.isAoe || false;
         var originalTarget = target;
+        var isHit = target.isHit(user, move);
 
         var opt = {
             target: target,
             yourSide: user.getYourside(),
             otherSide: user.getOtherside(),
-            isCrit: isCrit
+            isCrit: isCrit,
+            isHit: isHit
         }
         var dmg;
 
@@ -584,6 +601,10 @@ var Battle = (function(){
         .then((function(){
             if(isTargetLocked){
                 opt.target = originalTarget;
+            }
+            if(!isHit){ // attack missed
+                opt.target.evade();
+                return;
             }
             if(move.onCast){
                 move.onCast.call(user, opt);
@@ -610,6 +631,9 @@ var Battle = (function(){
 
         }).bind(this))
         .then(function(){
+            if(!isHit){
+                //attack missed
+            }
             if(isTargetLocked){
                 opt.target = originalTarget;
             }

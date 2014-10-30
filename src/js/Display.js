@@ -1,31 +1,40 @@
 var Display = (function(){
 
     var Display = function(options){
-        this.target = options.target || null;
-        this.amount = options.amount;
-        this.crit = options.isCrit || false;
-        this.isMana = options.isMana || false;
+        if(this instanceof Display){
+            this.target = options.target || null;
+            this.amount = options.amount;
+            this.crit = options.isCrit || false;
+            this.isMana = options.isMana || false;
 
-        this.buffName = options.buffName || null;
-        this.buffStats = options.buffStats || null;
-        this.buffDuration = options.buffDuration || null;
+            this.buffName = options.buffName || null;
+            this.buffStats = options.buffStats || null;
+            this.buffDuration = options.buffDuration || null;
 
-        this.id = (new Date()).getSeconds() * 1000 + (new Date()).getMilliseconds();
+            this.isMiss = options.miss || null;
 
-        if(!this.target){
-            throw new Error("target property must be defined!!!"); // !!! 
+            this.id = (new Date()).getSeconds() * 1000 + (new Date()).getMilliseconds();
+
+            if(!this.target){
+                throw new Error("target property must be defined!!!"); // !!!
+            }
+
+            if(typeof this.amount == "undefined"){
+                this.amount = null;
+            }
+
+            if(this.amount != null){
+                this.start("number");
+            }
+            if(this.buffName){
+                this.start("buff");
+            }
+            if(this.isMiss){
+                this.start("miss");
+            }
         }
-
-        if(typeof this.amount == "undefined"){
-            this.amount = null;
-        }
-
-        if(this.amount != null){
-            this.start("number");
-        }
-        if(this.buffName){
-            this.start("buff");
-        }
+        else
+            return new Display(options);
     }
     var r = Display.prototype;
 
@@ -35,6 +44,7 @@ var Display = (function(){
     r.id = null;
     r.uiData = null;
     r.displayDuration = 1000;
+    r.isMiss = null;
 
     r.getSpriteCenter = function(){
         var sprite = this.target.uiSprite;
@@ -71,6 +81,9 @@ var Display = (function(){
 
             styleClass += this.crit ? " display-crit" : "";
         }
+        else if(type === "missed"){
+            styleClass = "display-missed";
+        }
         else {
             styleClass = "";
         }
@@ -97,8 +110,8 @@ var Display = (function(){
 
 
         $(this.uiData).css({
-            "top": coords.y - this.uiData.height()/ 2 + randomY + "px",
-            "left": coords.x - this.uiData.width()/ 2 + randomX + "px"
+            "top": coords.y - this.uiData.height() / 2 + randomY + "px",
+            "left": coords.x - this.uiData.width() / 2 + randomX + "px"
         });
 
         if(type === "buff"){
@@ -111,7 +124,11 @@ var Display = (function(){
             this.uiData.text(this.getAmount());
             this.popOut(this.flyAbove);
         }
-
+        if(type === "miss"){
+            this.uiData.addClass(this.getStyleClass("missed"));
+            this.uiData.text("missed!");
+            this.popOut(this.flyAbove);
+        }
 
 
         setTimeout(function(){
@@ -123,7 +140,8 @@ var Display = (function(){
         var randomFactor = (Math.random() * 10 | 0) - 20;
         var size = 50 + randomFactor;
         var self = this;
-        next = next || function(){};
+        next = next || function(){
+        };
 
         size = this.crit ? size + 20 : size;
 
