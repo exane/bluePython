@@ -1081,7 +1081,7 @@ var Entity = (function(){
             }
         }
         for(i = 0; i < n; i++) {
-            if(buff.duration === -1) continue;
+            if(this._buffs[i].duration === -1) continue;
             this._buffs[i].duration--;
         }
     }
@@ -1102,7 +1102,7 @@ var Entity = (function(){
             }
         }
         for(i = 0; i < n; i++) {
-            if(debuff.duration === -1) continue;
+            if(this._debuffs[i].duration === -1) continue;
             this._debuffs[i].duration--;
         }
     }
