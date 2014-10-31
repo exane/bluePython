@@ -161,6 +161,7 @@ var data = {
         ai: function(){
             var moves = [
                 {chance: 20, id: "rend"},
+                //{chance: 90, id: "spawn_mage"},
                 {chance: 80, id: "mortal_strike"}
             ];
 

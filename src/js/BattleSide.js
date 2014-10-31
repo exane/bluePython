@@ -63,15 +63,20 @@ var BattleSide = (function(){
         var uiSprite = $(this.uiSide).find(".sprite");
         var sprite = $("<img>");
         var spriteContainer = $("<div></div>");
+        var imgContainer = $("<div></div>");
 
         $(sprite).attr("id", this.sideId + "-battle-sprite-" + entity.getId());
         $(sprite).attr("src", entity.getImg());
 
         $(spriteContainer).attr("id", this.sideId + "-battle-sprite-" + entity.getId() + "-container");
-        $(spriteContainer).addClass("sprite-img-container");
+        $(spriteContainer).addClass("sprite-container");
+
+        $(imgContainer).attr("id", this.sideId + "-battle-sprite-img-" + entity.getId() + "-container");
+        $(imgContainer).addClass("img-container");
 
         $(spriteContainer).appendTo(uiSprite);
-        $(sprite).appendTo(spriteContainer);
+        $(imgContainer).appendTo(spriteContainer);
+        $(sprite).appendTo(imgContainer);
 
         entity.uiSprite = $(sprite);
         entity.uiSprite.attr("data-id", entity.getId());
@@ -92,7 +97,7 @@ var BattleSide = (function(){
     r._createUiBuffs = function(entity, uiInfo){
         var uiBuffs = $("<div></div>").attr("id", this.sideId + "-battle-buffs-" + entity.getId());
         //$(uiBuffs).appendTo(uiInfo);
-        $(uiBuffs).appendTo(entity.uiSprite.parent());
+        $(uiBuffs).appendTo(entity.uiSprite.parent().parent());
         $(uiBuffs).addClass("battle-buffs");
         //entity.uiBuffs = $(uiBuffs);
         entity.uiBuffs = $(uiBuffs);
@@ -101,7 +106,7 @@ var BattleSide = (function(){
     r._createUiDebuffs = function(entity, uiInfo){
         var uiDebuffs = $("<div></div>").attr("id", this.sideId + "-battle-debuffs-" + entity.getId());
         //$(uiBuffs).appendTo(uiInfo);
-        $(uiDebuffs).appendTo(entity.uiSprite.parent());
+        $(uiDebuffs).appendTo(entity.uiSprite.parent().parent());
         $(uiDebuffs).addClass("battle-debuffs");
         //entity.uiBuffs = $(uiBuffs);
         entity.uiDebuffs = $(uiDebuffs);
@@ -120,7 +125,7 @@ var BattleSide = (function(){
         $(uiHpText).text(entity.getHp() + " / " + entity.getMaxHp());
 
 
-        $(uiHpContainer).appendTo(entity.uiSprite.parent());
+        $(uiHpContainer).appendTo(entity.uiSprite.parent().parent());
 
         $(uiHp).appendTo(uiHpContainer);
         $(uiHpText).appendTo(uiHpContainer);
@@ -141,7 +146,7 @@ var BattleSide = (function(){
 
 
         //$(uiMana).appendTo(uiInfo);
-        $(uiManaContainer).appendTo(entity.uiSprite.parent());
+        $(uiManaContainer).appendTo(entity.uiSprite.parent().parent());
 
         $(uiManaBackground).appendTo(uiManaContainer);
         $(uiMana).appendTo(uiManaContainer);
@@ -173,6 +178,7 @@ var BattleSide = (function(){
         }
         return null;
     }
+
     r.getMemberIndexById = function(id){
         var n = this.member.length;
         for(var i=0; i<n; i++){

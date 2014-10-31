@@ -19,6 +19,7 @@ var Npc = (function(){
         if(this.isFainted()) return 0;
 
         this.turnAction.from = this;
+        this.turnAction.target = null;
 
 
         if(typeof this.ai == "function"){
