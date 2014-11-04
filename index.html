@@ -8,7 +8,6 @@
 <div class="wrapper">
     <div class="view unselectable">
         <div class="tooltip">
-
             <!--
             <div class="tooltip-icon">
                 <img src="assets/ragged-wound.png">
@@ -75,15 +74,47 @@
         <div class="gameover">
         </div>
     </div>
+    <div class="controller controller-small unselectable">
+        <div class="controller-arrow-container">
+            <div class="controller-arrow-img arrow-left"></div>
+        </div>
+        <div class="controller-small-view hidden">
+            Hint: Click on battlefield to reset menu <span class="entity-attacks-left"></span>
+
+            <div class="menu menu-main">
+                <ul>
+                    <li class="menu-attack">Attack</li>
+                    <li class="menu-skill">Skill</li>
+                    <li class="menu-back">Back</li>
+                </ul>
+            </div>
+            <div class="menu menu-target-enemy">
+                <ul>
+                    <!--<li>Boss</li>-->
+                </ul>
+            </div>
+            <div class="menu menu-target-ally">
+                <ul>
+                    <!--<li>Boss</li>-->
+                </ul>
+            </div>
+            <div class="menu menu-skills">
+                <ul>
+                    <!--<li>Skills..</li>-->
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="log-console">
     </div>
-    <div class="controller show unselectable">
+    <div class="controller controller-large show unselectable">
         Hint: Click on battlefield to reset menu <span class="entity-attacks-left"></span>
+
         <div class="menu menu-main">
             <ul>
-                <li id="menu-attack">Attack</li>
-                <li id="menu-skill">Skill</li>
-                <li id="menu-back">Back</li>
+                <li class="menu-attack">Attack</li>
+                <li class="menu-skill">Skill</li>
+                <li class="menu-back">Back</li>
             </ul>
         </div>
         <div class="menu menu-target-enemy">
@@ -102,6 +133,7 @@
             </ul>
         </div>
     </div>
+
 </div>
 <script src="build/bundle.js"></script>
 </body>

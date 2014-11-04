@@ -5,6 +5,8 @@
 
 $width: 1200px;
 $height: 600px;
+$height-large: 850px;
+$height-small: 500px;
 
 * {
   padding: 0;
@@ -253,15 +255,6 @@ $height: 600px;
 }
 
 .controller {
-  height: 250px;
-  width: $width /4;
-
-  background-color: rgba(0, 220, 2, 0.61);
-  border: 1px solid black;
-  float: right;
-
-  position: relative;
-
   overflow-y: auto;
 
   ul {
@@ -290,6 +283,77 @@ $height: 600px;
     }
 
   }
+}
+
+.controller-large {
+  height: 250px;
+  width: $width /4;
+
+  @media only screen and (max-height: $height-large) {
+    display: none !important;
+  }
+
+  background-color: rgba(0, 220, 2, 0.61);
+  border: 1px solid black;
+  float: right;
+
+  position: relative;
+
+
+}
+
+.controller-small {
+  width: 20px;
+  height: $height;
+  background-color: rgba(0, 220, 2, 0.61);
+  position: relative;
+  margin-top: -$height - 2px;
+  left: $width - 22px;
+  border: 1px solid black;
+  float: left;
+
+  .menu {
+    display: block;
+  }
+
+  @media only screen and (max-height: $height-large) {
+    display: block !important;
+  }
+  @media only screen and (min-height: $height-large) {
+    display: none !important;
+  }
+
+  .controller-small-view {
+    width: calc(100% - 22px);
+    float: left;
+    overflow-x: hidden;
+  }
+
+  .controller-arrow-container {
+    width: 20px;
+    height: 100%;
+    float: left;
+    &:hover {
+      background: rgba(0, 178, 0, 0.91);
+    }
+  }
+
+  .controller-arrow-img {
+    height: 16px;
+    width: 16px;
+    background: url("../assets/iconmonstr-arrow-29-icon-16.png") no-repeat;
+    margin: 0 auto;
+    position: absolute;
+    top: 48%;
+
+    &.arrow-left {
+      transform:scale(-1,1);
+    }
+    &.arrow-right {
+      transform:scale(1,1);
+    }
+  }
+
 
 }
 
@@ -301,6 +365,11 @@ $height: 600px;
   padding: 10px;
   width: $width - $width/4 - 50px;
   float: left;
+
+
+  @media only screen and (max-height: $height-large) {
+    display: none !important;
+  }
 
   p {
     margin: 5px 0;
@@ -456,6 +525,10 @@ $height: 600px;
   margin-right: 5px;
 }
 
+
+.hidden {
+  display: none;
+}
 
 
 

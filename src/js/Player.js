@@ -8,14 +8,22 @@ var Player = (function(){
     var Player = function(options, yourSide, otherSide, uiMenu){
         Entity.call(this, options, yourSide, otherSide);
 
-        this.uiMenuAttack = $("#menu-attack");
-        //this.uiMenuDefense = $("#menu-defense");
-        this.uiMenuSkill = $("#menu-skill");
-        this.uiMenuBack = $("#menu-back");
+        this.uiMenuAttack = $(".menu-attack");
+        this.uiMenuSkill = $(".menu-skill");
+        this.uiMenuBack = $(".menu-back");
         this.uiMenu = uiMenu;
         this.uiAttacksLeft = $(".entity-attacks-left");
+        this.uiView = $(".view");
+        this.uiWrapper = $(".wrapper");
+
+        this.uiOpenControllerSmall = $(".controller-small .controller-arrow-container");
 
         this._isOpen = false;
+        this._isSmallView = false;
+
+        this.onResize();
+
+        //this.setMenuOpen(false);
 
 
         this.initEvents();
@@ -29,11 +37,26 @@ var Player = (function(){
     r.uiMenuBack = null;
     r.uiMenu = null;
     r.uiAttacksLeft = null;
+    r.uiOpenControllerSmall = null;
+    r.uiView = null;
+    r.uiWrapper = null;
 
     r._isActive = false;
     r._isPlayer = true;
 
+    r._isSmallView = null;
+
     r._isOpen = null;
+    Player._menuOpen = false;
+
+    r.isMenuOpen = function(){
+        return Player._menuOpen;
+    }
+
+    r.setMenuOpen = function(bool){
+        Player._menuOpen = bool;
+    }
+
 
     r.setActive = function(bool){
         if(bool){
@@ -60,9 +83,22 @@ var Player = (function(){
         return this._isOpen;
     }
 
+    r.isSmallView = function(){
+        return this._isSmallView;
+    }
+
+    r.onResize = function(){
+        if($(window).height() < 850){
+            this._isSmallView = true;
+        }
+        else {
+            this._isSmallView = false;
+        }
+    }
+
     r.initEvents = function(){
         var self = this;
-        //debugger;
+
         this.uiMenuAttack.click(function(){
             if(self.isActive())
                 self.clickAttack.call(self);
@@ -79,26 +115,42 @@ var Player = (function(){
             }
         });
 
-        $(".view").on("click", this.onReset.bind(this));
+        this.uiOpenControllerSmall.click(function(){
+            if(self.isActive())
+                self.clickOpenControllerSmall.call(self);
+        });
+
+        $(window).resize(this.onResize.bind(this));
+
+        this.uiView.on("click", this.onReset.bind(this));
         //this.resetMenu();
 
     }
 
     r.clickSkills = function(){
         this.listSkills();
-        this.uiMenu.children(".menu-main").hide();
-        this.uiMenu.children(".menu-skills").show();
+        //this.uiMenu.children(".menu-main").hide();
+        //this.uiMenu.children(".menu-skills").show();
+
+
+        this.uiWrapper.find(".menu-main").hide();
+        this.uiWrapper.find(".menu-skills").show();
+
         this.expandMenu();
     }
 
     r.clickAttack = function(){
 
         this.turnAction.do = this.getDefaultAttack();
+        this.uiWrapper.find(".menu-main").hide();
+        this.uiWrapper.find(".menu-target-enemy").show();
+
         this.listTargets(this.getOtherside(), this.getYourside());
 
 
         //logger.message("-> Choose a target to attack");
-        this.uiMenu.children(".menu-main").hide();
+        //this.uiMenu.children(".menu-main").hide();
+        this.uiWrapper.find(".menu-main").hide();
 
 
         if(this.isTargetSkippable()){
@@ -107,15 +159,57 @@ var Player = (function(){
             }.bind(this), 1);
             return 0;
         }
-        this.uiMenu.children(".menu-target-enemy").show();
+        //this.uiMenu.children(".menu-target-enemy").show();
+        this.uiWrapper.find(".menu-target-enemy").show();
 
         this.expandMenu();
 
     }
 
+    r.clickOpenControllerSmall = function(){
+        if(this.isMenuOpen()){
+            this.reduceSmallMenu();
+        }
+        else {
+            this.expandSmallMenu();
+        }
+        this.uiOpenControllerSmall.parent().find(".controller-small-view").removeClass("hidden");
+    }
+
+    r.expandSmallMenu = function(){
+
+        this.setMenuOpen(true);
+
+        this.uiOpenControllerSmall.find(".controller-arrow-img").removeClass("arrow-left");
+        this.uiOpenControllerSmall.find(".controller-arrow-img").addClass("arrow-right");
+
+        this.uiOpenControllerSmall.parent().animate({
+            "width": "+=250",
+            "left": "-=250"
+        }, {
+            duration: 300
+        });
+    }
+
+    r.reduceSmallMenu = function(){
+        this.setMenuOpen(false);
+
+        this.uiOpenControllerSmall.find(".controller-arrow-img").addClass("arrow-left");
+        this.uiOpenControllerSmall.find(".controller-arrow-img").removeClass("arrow-right");
+
+        this.uiOpenControllerSmall.parent().animate({
+            "width": "-=250",
+            "left": "+=250"
+        }, {
+            duration: 300
+        });
+    }
+
     r.expandMenu = function(){
-        var maxHeight = $(".view").css("height");
         this.setOpen(true);
+        if(this.isSmallView()) return false;
+
+        var maxHeight = $(".view").css("height");
         //return;
         this.uiMenu.animate({
             "margin-top": "-=" + maxHeight,
@@ -126,6 +220,7 @@ var Player = (function(){
     }
 
     r.reduceMenu = function(){
+        if(this.isSmallView()) return 0;
 
         var maxHeight = $(".view").css("height");
         if(!this.isOpen()) return;
@@ -155,10 +250,15 @@ var Player = (function(){
         this.turnAction = {};
         this.reduceMenu();
         this.setOpen(false);
-        this.uiMenu.children(".menu-main").show();
-        this.uiMenu.children(".menu-target-enemy").hide();
-        this.uiMenu.children(".menu-target-ally").hide();
-        this.uiMenu.children(".menu-skills").hide();
+        /*
+         this.uiMenu.children(".menu-main").show();
+         this.uiMenu.children(".menu-target-enemy").hide();
+         this.uiMenu.children(".menu-target-ally").hide();
+         this.uiMenu.children(".menu-skills").hide();*/
+        this.uiWrapper.find(".menu-main").show();
+        this.uiWrapper.find(".menu-target-enemy").hide();
+        this.uiWrapper.find(".menu-target-ally").hide();
+        this.uiWrapper.find(".menu-skills").hide();
 
     }
 
@@ -174,7 +274,8 @@ var Player = (function(){
 
         this.turnAction.do = skill.id;
         this.turnAction.from = this;
-        this.uiMenu.children(".menu-skills").hide();
+        //this.uiMenu.children(".menu-skills").hide();
+        this.uiWrapper.find(".menu-skills").hide();
 
         if(skill.isAoe || skill.target === "self"){
             if(this.hasChosen()) return 0;
@@ -189,12 +290,14 @@ var Player = (function(){
         }
 
         if(skill.target && skill.target === "friendly"){
-            this.uiMenu.children(".menu-target-ally").show();
+            //this.uiMenu.children(".menu-target-ally").show();
+            this.uiWrapper.find(".menu-target-ally").show();
             return 0;
         }
 
 
-        this.uiMenu.children(".menu-target-enemy").show();
+        //this.uiMenu.children(".menu-target-enemy").show();
+        this.uiWrapper.find(".menu-target-enemy").show();
     }
 
     r.isTargetSkippable = function(skill){
@@ -234,12 +337,15 @@ var Player = (function(){
 
     r.listTargets = function(otherSide, yourSide){
         //if(!this.player) return 0;
-        var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
+        //var ulEnemy = this.uiMenu.children(".menu-target-enemy").find("ul");
+        var ulEnemy = this.uiWrapper.find(".menu-target-enemy ul");
         //console.log(ulEnemy, otherSide);
-        var ulAlly = this.uiMenu.children(".menu-target-ally").find("ul");
+        //var ulAlly = this.uiMenu.children(".menu-target-ally").find("ul");
+        var ulAlly = this.uiWrapper.find(".menu-target-ally ul");
         var npc, pointer, i;
         var n = otherSide.length();
         var m = yourSide.length();
+        var self = this;
 
         ulEnemy.text("");
         ulAlly.text("");
@@ -247,31 +353,26 @@ var Player = (function(){
             npc = otherSide.getMemberByIndex(i);
             pointer = $("<li>" + npc.getName() + "</li>");
 
-
             otherSide.addDomPointerReferenceTo(npc.getId(), pointer);
 
-            $(pointer).appendTo(ulEnemy);
 
-            $(pointer).on("click", this.onTargetClick.bind(this, npc));
+            pointer.on("click", this.onTargetClick.bind(this, npc));
             pointer.on("mouseover", npc.uiSetTarget.bind(npc, true));
             pointer.on("mouseout", npc.uiSetTarget.bind(npc, false));
-            //console.log(pointer, npc);
+            pointer.appendTo(ulEnemy);
+
         }
         for(i = 0; i < m; i++) {
-
             npc = yourSide.getMemberByIndex(i);
             pointer = $("<li>" + npc.getName() + "</li>");
 
-            //console.log("npc", npc);
-
-            //this.side2.addDomPointerReferenceTo(npc.id, pointer);
             yourSide.addDomPointerReferenceTo(npc.getId(), pointer);
 
-            $(pointer).appendTo(ulAlly);
 
-            $(pointer).on("click", this.onTargetClick.bind(this, npc));
+            pointer.on("click", this.onTargetClick.bind(this, npc));
             pointer.on("mouseover", npc.uiSetTarget.bind(npc, true));
             pointer.on("mouseout", npc.uiSetTarget.bind(npc, false));
+            pointer.appendTo(ulAlly);
         }
     }
 
