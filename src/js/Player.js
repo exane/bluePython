@@ -49,12 +49,58 @@ var Player = (function(){
     r._isOpen = null;
     Player._menuOpen = false;
 
-    r.isMenuOpen = function(){
+    r.isMenuOpen = Player.isMenuOpen = function(){
         return Player._menuOpen;
     }
 
-    r.setMenuOpen = function(bool){
+    r.setMenuOpen = Player.setMenuOpen = function(bool){
         Player._menuOpen = bool;
+    }
+
+    Player.reduceMenuGlobal = function(){
+        if(!Player.isMenuOpen()) return;
+        Player.setMenuOpen(false);
+
+        var el = $(".controller-small .controller-arrow-container");
+        el.find(".controller-arrow-img").addClass("arrow-left");
+        el.find(".controller-arrow-img").removeClass("arrow-right");
+
+        el.parent().find(".controller-small-view").stop().fadeOut("fast");
+
+        el.parent().animate({
+            //"width": "-=250",
+            "left": "+=250"
+        }, {
+            duration: 300
+        });
+    }
+    Player.extendMenuGlobal = function(){
+
+        if(Player.isMenuOpen()) return;
+
+        Player.setMenuOpen(true);
+        var el = $(".controller-small .controller-arrow-container");
+        el.find(".controller-arrow-img").removeClass("arrow-left");
+        el.find(".controller-arrow-img").addClass("arrow-right");
+
+        el.parent().find(".controller-small-view").stop().fadeIn("slow");
+
+        el.parent().animate({
+            //"width": "+=250",
+            "left": "-=250"
+        }, {
+            duration: 300
+        });
+    }
+
+    Player.openControllerSmall = function(){
+        if(Player.isMenuOpen()){
+            Player.reduceMenuGlobal();
+        }
+        else {
+            Player.extendMenuGlobal();
+        }
+        $(".controller-small .controller-arrow-container").parent().find(".controller-small-view").removeClass("hidden");
     }
 
 
@@ -177,14 +223,17 @@ var Player = (function(){
     }
 
     r.expandSmallMenu = function(){
+        if(this.isMenuOpen()) return;
 
         this.setMenuOpen(true);
 
         this.uiOpenControllerSmall.find(".controller-arrow-img").removeClass("arrow-left");
         this.uiOpenControllerSmall.find(".controller-arrow-img").addClass("arrow-right");
 
+        this.uiOpenControllerSmall.parent().find(".controller-small-view").stop().fadeIn("slow");
+
         this.uiOpenControllerSmall.parent().animate({
-            "width": "+=250",
+            //"width": "+=250",
             "left": "-=250"
         }, {
             duration: 300
@@ -192,13 +241,17 @@ var Player = (function(){
     }
 
     r.reduceSmallMenu = function(){
+        if(!this.isMenuOpen()) return;
         this.setMenuOpen(false);
 
-        this.uiOpenControllerSmall.find(".controller-arrow-img").addClass("arrow-left");
-        this.uiOpenControllerSmall.find(".controller-arrow-img").removeClass("arrow-right");
+        this.uiOpenControllerSmall.find(".controller-arrow-img")
+        .addClass("arrow-left")
+        .removeClass("arrow-right");
+
+        this.uiOpenControllerSmall.parent().find(".controller-small-view").stop().fadeOut("fast");
 
         this.uiOpenControllerSmall.parent().animate({
-            "width": "-=250",
+            //"width": "-=250",
             "left": "+=250"
         }, {
             duration: 300

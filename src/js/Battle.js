@@ -107,6 +107,7 @@ var Battle = (function(){
 
     r.startNewTurn = function(){
         $(".controller").show();
+        Player.openControllerSmall();
 
         this.decrementDurationTimer(this.side1);
         this.decrementDurationTimer(this.side2);
@@ -350,6 +351,7 @@ var Battle = (function(){
 
             if(!observeList.length){
                 pubsub.unsubscribe(handle);
+                Player.reduceMenuGlobal();
                 self.runStartEvent(collectData);
             }
         })
@@ -554,20 +556,6 @@ var Battle = (function(){
         //$.event.trigger("bp-ability-onTurnEnd");
         pubsub.publish("/bp/battle/onTurnEnd/");
     }
-/*
-    r.isHit = function(user, target, move){
-        var rnd = Math.random()*100 | 0;
-        var accuracy = typeof move.accuracy === "undefined" ? 100 : move.accuracy;
-
-        accuracy -= target.getEvadeChance();
-        accuracy += user.getHitChance();
-
-        if(rnd < accuracy) {
-            return true;
-        }
-
-        return false;
-    }*/
 
     r.calculateTurnOf = function(user, target, move){
         var critChance = user.calculateCritChance(target, move);

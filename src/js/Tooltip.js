@@ -23,10 +23,8 @@ var Tooltip = (function(){
 
     r.listener = function(){
         var self = this;
-        //$(".view .sprite .sprite-img-container").hover(this.onMouseover.bind(this), this.onMouseout.bind(this));
-        $(".view .sprite").on("mouseover", " .img-container", self.onMouseover.bind(self));
+        $(".view .sprite").on("mouseover", " .img-container, .battle-buffs, .battle-debuffs", self.onMouseover.bind(self));
         $(".menu-skills").on("mouseover", "li", self.onMouseoverSkills.bind(self));
-        //$(document).on("bp-tooltip-update", this.render.bind(this));
         pubsub.subscribe("/bp/tooltip/update/", this.render.bind(this));
     }
 

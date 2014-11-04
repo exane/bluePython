@@ -18,6 +18,8 @@ $height-small: 500px;
   height: 100%;
   margin: 0 auto;
 
+  overflow: hidden;
+
   font-family: "Source Sans Pro";
 }
 
@@ -303,7 +305,7 @@ $height-small: 500px;
 }
 
 .controller-small {
-  width: 20px;
+  width: 270px;
   height: $height;
   background-color: rgba(0, 220, 2, 0.61);
   position: relative;
