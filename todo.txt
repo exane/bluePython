@@ -6,7 +6,6 @@
 - heals sollen critten können
 - stun möglichkeiten erweitern(mit historie wer wann gestunt hat, um festzustellen bis wann das ziel mindest noch gestunt sein müsste)
 - ui weiter ausbessern (responsive)
-- bug: back button funktioniert nicht wenn der vordermann tot ist
 
 
 

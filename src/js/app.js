@@ -12,7 +12,7 @@ battle.addNewPlayer("warrior", "down"); // (id, yourSide) id = charID | yourSide
 battle.addNewPlayer("rogue", "down");
 battle.addNewPlayer("priest", "down");
 battle.addNewNpc("serpant_boss", "top");
-battle.addNewNpc("serpant_boss", "top");
+//battle.addNewNpc("serpant_boss", "top");
 //battle.addNewNpc("serpant_boss", "top");
 
 /* //hit / miss test case

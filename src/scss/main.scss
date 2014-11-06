@@ -290,6 +290,7 @@ $height-small: 500px;
 .controller-large {
   height: 250px;
   width: $width /4;
+  display: none !important;
 
   @media only screen and (max-height: $height-large) {
     display: none !important;
@@ -300,7 +301,6 @@ $height-small: 500px;
   float: right;
 
   position: relative;
-
 
 }
 
@@ -319,10 +319,10 @@ $height-small: 500px;
   }
 
   @media only screen and (max-height: $height-large) {
-    display: block !important;
+  //display: block !important;
   }
   @media only screen and (min-height: $height-large) {
-    display: none !important;
+  //display: none !important;
   }
 
   .controller-small-view {
@@ -349,13 +349,12 @@ $height-small: 500px;
     top: 48%;
 
     &.arrow-left {
-      transform:scale(-1,1);
+      transform: scale(-1, 1);
     }
     &.arrow-right {
-      transform:scale(1,1);
+      transform: scale(1, 1);
     }
   }
-
 
 }
 
@@ -367,7 +366,6 @@ $height-small: 500px;
   padding: 10px;
   width: $width - $width/4 - 50px;
   float: left;
-
 
   @media only screen and (max-height: $height-large) {
     display: none !important;
@@ -402,14 +400,16 @@ $height-small: 500px;
 }
 
 .menu-skills {
+  .skill-img-container {
+    height: inherit;
+    width: 50px;
+    float: left;
+  }
   p {
     display: block;
   }
   img {
     max-width: 32px;
-    display: block;
-    float: left;
-    margin: 5px;
   }
 }
 
@@ -526,7 +526,6 @@ $height-small: 500px;
   float: right;
   margin-right: 5px;
 }
-
 
 .hidden {
   display: none;

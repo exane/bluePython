@@ -166,8 +166,8 @@ var Battle = (function(){
             //yourSide = this[yourSide];
         }
         if(typeof otherSide == "string"){
-         otherSide = this[otherSide];
-         }
+            otherSide = this[otherSide];
+        }
         //var ally = this.player = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip);
         var ally = new Player(options, yourSide, otherSide, this.uiMenu, this.tooltip, this.playerOrder++);
         this.checkIfEntityAlreadyExists(ally, yourSide);
@@ -321,6 +321,9 @@ var Battle = (function(){
                 data.from.resetAttacksLeft();
 
                 if(i > 0) i--;
+                while(i > 0 && self.player[i].isFainted()) {
+                    i--;
+                }
                 self.removeFromCollectList(self.player[i].getId(), collectData);
                 self.player[i].resetAttacksLeft();
                 self.handlePlayerEvents(i);

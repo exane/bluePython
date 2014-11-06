@@ -261,6 +261,7 @@ var Player = (function(){
     r.expandMenu = function(){
         this.setOpen(true);
         if(this.isSmallView()) return false;
+        return false;
 
         var maxHeight = $(".view").css("height");
         //return;
@@ -274,6 +275,7 @@ var Player = (function(){
 
     r.reduceMenu = function(){
         if(this.isSmallView()) return 0;
+        return false;
 
         var maxHeight = $(".view").css("height");
         if(!this.isOpen()) return;
@@ -440,17 +442,17 @@ var Player = (function(){
             //moves.push(moveData[this.player.skillList[i]].name);
             var data = moveData[this.getSkillList(i)];
             var li = $("<li data-type='skill' value='" + data.id + "'></li>");
-            $(li).append("<img src='" + data.icon + "'>");
-            $(li).append("<p>" + data.name + "</p>");
+            li.append("<div class='skill-img-container'><img src='" + data.icon + "'></div>");
+            li.append("<p>" + data.name + "</p>");
 
-            $(li).removeClass("onCooldown");
+            li.removeClass("onCooldown");
             if(this.hasCooldown(data.id)){
-                $(li).addClass("onCooldown");
+                li.addClass("onCooldown");
             }
 
-            $(li).removeClass("noResource");
+            li.removeClass("noResource");
             if(!this.hasEnoughResources(data.costs || 0)){
-                $(li).addClass("noResource");
+                li.addClass("noResource");
             }
 
             ul.append(li);
