@@ -117,6 +117,8 @@ var Tooltip = (function(){
             var self = $(this);
             self.find(".tooltip-icon img").attr("src", move.icon);
             self.find(".tooltip-name").text(move.name);
+            self.find(".tooltip-costs").text("Costs: " + (move.costs || "0") + " Mana");
+            self.find(".tooltip-cooldown").text((move.cooldown || 0) > 0 ? "Cooldown: " + move.cooldown + " turns" : null);
             self.find(".tooltip-desc").text(move.desc);
         });
     }

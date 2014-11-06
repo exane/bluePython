@@ -498,9 +498,11 @@ $height-small: 500px;
 .tooltip {
   //position: absolute;
   //border: 1px solid red;
-  height: $height;
-  width: $height/2 - 2;
+  height: $height - 10px;
+  width: $height/2 - 2 - 10px;
   float: left;
+  background: rgba(30, 30, 30, 0.4);
+  margin: 5px;
   //top: 0;
 
   .tooltip-icon {
@@ -530,6 +532,7 @@ $height-small: 500px;
 .hidden {
   display: none;
 }
+
 
 
 
