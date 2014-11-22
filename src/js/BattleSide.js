@@ -68,6 +68,7 @@ var BattleSide = (function(){
         $(sprite).attr("id", this.sideId + "-battle-sprite-" + entity.getId());
         $(sprite).attr("src", entity.getImg());
 
+
         $(spriteContainer).attr("id", this.sideId + "-battle-sprite-" + entity.getId() + "-container");
         $(spriteContainer).addClass("sprite-container");
 

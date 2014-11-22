@@ -69,6 +69,7 @@ var Entity = (function(){
             pubsub.subscribe("/bp/battle/onBattleStart/", options.onBattleStart.bind(this));
         }
 
+
         //console.log(this);
     }
     var r = Entity.prototype;
@@ -110,8 +111,10 @@ var Entity = (function(){
     r._evade = null; //percentage
     r._additionalHitChance = null; //percentage
 
+    r._hitIndicatorFlag = 0;
+
     r.initEvadeChance = function(){
-        this._evade = ((this.getAttr("agi")*2 + this.getAttr("tec")/4) | 0) / 100;
+        this._evade = ((this.getAttr("agi") * 2 + this.getAttr("tec") / 4) | 0) / 100;
     }
     r.initHitChance = function(){
         this._additionalHitChance = (this.getAttr("agi") | 0) / 100;
@@ -130,7 +133,7 @@ var Entity = (function(){
     }
 
     r.isHit = function(user, move){
-        var rnd = Math.random()*100 | 0;
+        var rnd = Math.random() * 100 | 0;
         var accuracy = typeof move.accuracy === "undefined" ? 100 : move.accuracy;
 
         accuracy -= this.getEvadeChance();
@@ -143,7 +146,7 @@ var Entity = (function(){
     }
 
     r.initCritDamage = function(){
-        this._critDmgMultiplicator = ((200 + (this.getAttr("tec")/12 | 0)) / 100 );
+        this._critDmgMultiplicator = ((200 + (this.getAttr("tec") / 12 | 0)) / 100 );
     }
 
 
@@ -618,19 +621,21 @@ var Entity = (function(){
 
         if(this.getHp() > this.getMaxHp()){
             this._currHp = this.getMaxHp();
-        }/*
-        this.uiHp.text(this.getHp(false, true) + " / " + this.getMaxHp(true));*/
-        this.setHpText(this.getHp(false, true) + " / " + this.getMaxHp(true));/*
-        this.uiMana.text(this.getMana(false, true) + " / " + this.getMaxMana(true));*/
+        }
+        /*
+                this.uiHp.text(this.getHp(false, true) + " / " + this.getMaxHp(true));*/
+        this.setHpText(this.getHp(false, true) + " / " + this.getMaxHp(true));
+        /*
+                this.uiMana.text(this.getMana(false, true) + " / " + this.getMaxMana(true));*/
         this.setManaText(this.getMana(false, true) + " / " + this.getMaxMana(true));
         /*this.uiHp.css({
             "background": "linear-gradient(to right, #0cff00 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
         });*/
         this.uiHp.css("width", this.getHp(true, false) + "%");
         this.uiMana.css("width", this.getMana(true, false) + "%");
-       /* this.uiMana.css({
-            "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
-        });*/
+        /* this.uiMana.css({
+             "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
+         });*/
         this._renderBuffs();
         //$.event.trigger("bp-tooltip-update");
         pubsub.publish("/bp/tooltip/update");
@@ -721,6 +726,7 @@ var Entity = (function(){
         value = value | 0;
         crit = crit || false;
 
+
         if(value > 0){
             value *= this.getHealMultiplier();
             value = value | 0;
@@ -739,7 +745,6 @@ var Entity = (function(){
             }
         }
 
-        Display({target: this, amount: value, isCrit: crit});
 
         this._currHp = this.getHp() + value;
         if(this.getHp() > this.getMaxHp()){
@@ -752,13 +757,13 @@ var Entity = (function(){
 
             this.uiSprite.addClass("fainted");
         }
-/*
-         this.uiHp.css({
-         "background": "linear-gradient(to right, #00b900 " + this.getHp(true) + "%, rgba(0,0,0,0) 0%)"
-         });*/
         this.uiHp.css("width", this.getHp(true, false) + "%");
 
         this.setHpText(this.getHp(false, true) + " / " + this.getMaxHp(true));
+
+        Display({target: this, amount: value, isCrit: crit});
+        this.displayHitIndicator(crit); //needs to be below Display! (bug)
+
     }
     r.setHpText = function(text){
         this.uiHpText.text(text);
@@ -780,12 +785,12 @@ var Entity = (function(){
         }
 
         Display({target: this, amount: value, isMana: true});
-/*
+        /*
 
-        this.uiMana.css({
-            "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
-        });
-*/
+                this.uiMana.css({
+                    "background": "linear-gradient(to right, #297eff " + this.getMana(true) + "%, rgba(0,0,0,0) 0%)"
+                });
+        */
         this.uiMana.css("width", this.getMana(true, false) + "%");
 
         this.setManaText(this.getMana(false, true) + " / " + this.getMaxMana(true));
@@ -843,12 +848,12 @@ var Entity = (function(){
         }
     }
     r.getRandomDebuff = function(){
-        var i = Math.random()*this._debuffs.length | 0;
+        var i = Math.random() * this._debuffs.length | 0;
 
         return this._debuffs[i] || null;
     }
     r.getRandomBuff = function(){
-        var i = Math.random()*this._buffs.length | 0;
+        var i = Math.random() * this._buffs.length | 0;
 
         return this._buffs[i] || null;
     }
@@ -964,10 +969,23 @@ var Entity = (function(){
             cdDur = this._cooldowns[i].duration;
             origDur = moveData.load(this._cooldowns[i].id).cooldown;
 
-            if(cdDur === origDur && (cd.attackNr === this.getAttacksLeft() || removeAll)) {
+            if(cdDur === origDur && (cd.attackNr === this.getAttacksLeft() || removeAll)){
                 this.removeCooldown(this._cooldowns[i].id);
             }
         }
+    }
+    r.displayHitIndicator = function(isCrit){
+        if(this._hitIndicatorFlag) return;
+        this._hitIndicatorFlag = 1;
+        this.uiSprite.effect({
+            effect: "shake",
+            duration: isCrit ? 400 : 500,
+            distance: isCrit ? 15 : 8,
+            times: isCrit ? 3 : 2,
+            complete: function(){
+                this._hitIndicatorFlag = 0;
+            }.bind(this)
+        });
     }
 
     /**

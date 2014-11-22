@@ -6,6 +6,8 @@
 - heals sollen critten können
 - stun möglichkeiten erweitern(mit historie wer wann gestunt hat, um festzustellen bis wann das ziel mindest noch gestunt sein müsste)
 - ui weiter ausbessern (responsive)
+- attack animation
+- BUG: jquery animation stoppt wenn jquery ui shake-effect ausgelöst wird und gleichzeitig mana abgezogen wird
 
 
 

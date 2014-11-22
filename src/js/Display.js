@@ -1,11 +1,25 @@
 var Display = (function(){
 
+    var type = {
+        MANA_GAIN: 0x1,
+        MANA_DRAIN: 0x2,
+        DAMAGE: 0x4,
+        HEAL: 0x8,
+        BUFF: 0x10,
+        DEBUFF: 0x20,
+        CRIT: 0x40,
+        MISS: 0x80
+    }
+
     var Display = function(options){
         if(this instanceof Display){
             this.target = options.target || null;
             this.amount = options.amount;
             this.crit = options.isCrit || false;
             this.isMana = options.isMana || false;
+            this.isDmg = options.amount < 0;
+
+            this.setTypeFlag(options);
 
             this.buffName = options.buffName || null;
             this.buffStats = options.buffStats || null;
@@ -45,6 +59,9 @@ var Display = (function(){
     r.uiData = null;
     r.displayDuration = 1000;
     r.isMiss = null;
+    r.isMana = null;
+    r.isDmg = null;
+    r.typeFlag = 0x0;
 
     r.getSpriteCenter = function(){
         var sprite = this.target.uiSprite;
@@ -57,9 +74,42 @@ var Display = (function(){
         }
     }
 
+    r.setTypeFlag = function(opt){
+        /*
+        DEBUFF: 0x20,
+        */
+        if(opt.buffName){
+            this.typeFlag |= type.BUFF;
+        }
+
+        if(opt.isCrit){
+            this.typeFlag |= type.CRIT;
+        }
+
+        if(opt.miss){
+            this.typeFlag |= type.MISS;
+        }
+
+        if(opt.amount > 0) {
+            if(opt.isMana){
+                this.typeFlag |= type.MANA_GAIN;
+            }
+            else {
+                this.typeFlag |= type.HEAL;
+            }
+        }
+        else {
+            if(opt.isMana){
+                this.typeFlag |= type.MANA_DRAIN;
+            }
+            else {
+                this.typeFlag |= type.DAMAGE;
+            }
+        }
+    }
+
     r.getAmount = function(){
-        if(this.isMana) return this.amount;
-        if(this.amount > 0) return this.amount;
+        if(this.typeFlag & (type.MANA_DRAIN | type.MANA_GAIN | type.HEAL)) return this.amount;
         return this.amount * -1;
     }
 
@@ -114,7 +164,7 @@ var Display = (function(){
             "left": coords.x - this.uiData.width() / 2 + randomX + "px"
         });
 
-        if(type === "buff"){
+        if(this.typeFlag & type.BUFF){
             this.uiData.addClass(this.getStyleClass("buff"));
             this.uiData.text(this.buffName);
             this.popOut();
@@ -122,9 +172,14 @@ var Display = (function(){
         if(type === "number"){
             this.uiData.addClass(this.getStyleClass(this.amount));
             this.uiData.text(this.getAmount());
-            this.popOut(this.flyAbove);
+            if(this.typeFlag & type.DAMAGE){
+                this.popOut(this.flyDown);
+            }
+            else {
+                this.popOut(this.flyAbove);
+            }
         }
-        if(type === "miss"){
+        if(this.typeFlag & type.MISS){
             this.uiData.addClass(this.getStyleClass("missed"));
             this.uiData.text("missed!");
             this.popOut(this.flyAbove);
@@ -139,9 +194,7 @@ var Display = (function(){
     r.popOut = function(next){
         var randomFactor = (Math.random() * 10 | 0) - 20;
         var size = 50 + randomFactor;
-        var self = this;
-        next = next || function(){
-        };
+        next = next || function(){};
 
         size = this.crit ? size + 20 : size;
 
@@ -154,13 +207,23 @@ var Display = (function(){
         }, {
             duration: 200,
             easing: "linear",
-            complete: next.bind(self)
+            complete: next.bind(this)
         });
     }
 
     r.flyAbove = function(){
         $(this.uiData).animate({
             "top": "-=20",
+            "opacity": "0.75"
+        }, {
+            duration: this.displayDuration,
+            easing: "easeOutCirc"
+        })
+    }
+
+    r.flyDown = function(){
+        $(this.uiData).animate({
+            "top": "+=20",
             "opacity": "0.75"
         }, {
             duration: this.displayDuration,
